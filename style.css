@@ -1083,3 +1083,11 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .brand{font-size:15px;letter-spacing:-.06em}
   .market-ticker{max-width:178px}
 }
+
+
+/* --- MOBILE TOPBAR / WALLET FINAL TUNE --- */
+@media(max-width:520px){
+  .brand{font-size:17px;letter-spacing:-.07em}
+  .market-ticker{max-width:190px;padding-left:8px;padding-right:8px;gap:6px}
+  .hero-wallet{min-height:46px;padding-top:9px;padding-bottom:9px}
+}
