@@ -1076,3 +1076,10 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .top-wallet{display:inline-flex}
   .hero-wallet{display:none}
 }
+
+
+/* --- MOBILE TOPBAR BALANCE --- */
+@media(max-width:520px){
+  .brand{font-size:15px;letter-spacing:-.06em}
+  .market-ticker{max-width:178px}
+}
