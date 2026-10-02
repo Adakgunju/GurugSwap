@@ -585,3 +585,62 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .swap-input,.token-box strong{font-size:27px}
   .swap-status{background:#0d0e0b}
 }
+
+/* --- GURUG UNIVERSE: CLEAR CARD SYSTEM --- */
+.link-grid{
+  gap:12px;
+}
+.link-card{
+  min-height:175px;
+  background:#11120d;
+  border:1px solid rgba(255,229,0,.34);
+  border-radius:16px;
+  padding:23px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.018),0 10px 28px rgba(0,0,0,.18);
+}
+.link-card:hover{
+  transform:translateY(-4px);
+  background:#15160f;
+  border-color:rgba(255,229,0,.72);
+  box-shadow:0 16px 38px rgba(0,0,0,.3),0 0 24px rgba(255,229,0,.035);
+}
+.link-card.featured{
+  background:var(--yellow);
+  border-color:var(--yellow);
+  box-shadow:0 14px 35px rgba(255,229,0,.08);
+}
+.link-card span{
+  color:#b9b7a5;
+}
+.link-card.featured span{
+  color:#16160e;
+}
+.link-card strong{
+  color:#f4f2df;
+}
+.link-card.featured strong{
+  color:#080808;
+}
+.link-card em{
+  color:#bdbba8;
+}
+.link-card.featured em{
+  color:#080808;
+}
+.universe-feature{
+  border:1px solid rgba(255,229,0,.7);
+  box-shadow:0 14px 35px rgba(0,0,0,.2);
+}
+.universe-feature:hover{
+  border-color:var(--yellow);
+  box-shadow:0 18px 42px rgba(255,229,0,.11);
+}
+@media(max-width:520px){
+  .link-grid{gap:10px}
+  .link-card{
+    min-height:142px;
+    padding:19px;
+    border-radius:14px;
+    border-color:rgba(255,229,0,.34);
+  }
+}
