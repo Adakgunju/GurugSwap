@@ -1097,3 +1097,23 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
 @media(max-width:520px){
   .market-ticker{flex:0 0 175px;max-width:175px}
 }
+
+
+/* --- MOBILE HERO: RESTORE PRESENCE --- */
+@media(max-width:520px){
+  .hero{
+    padding-top:16px;
+    padding-bottom:28px;
+  }
+  .hero-art{
+    height:300px;
+    margin-bottom:6px;
+  }
+  .logo-backdrop{
+    width:290px;
+    height:290px;
+  }
+  .gurug-frame{
+    width:274px;
+  }
+}
