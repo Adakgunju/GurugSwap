@@ -1053,3 +1053,26 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .swap-card{width:100%}
   .links-heading h2{font-size:52px}
 }
+
+
+/* --- MOBILE WALLET: MINING STYLE HERO CTA --- */
+.hero-wallet{display:none}
+@media(max-width:520px){
+  .top-wallet{display:none}
+  .hero-wallet{
+    display:flex;
+    width:min(100%,290px);
+    min-height:52px;
+    margin:24px auto 0;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    font-size:12px;
+    letter-spacing:.09em;
+    box-shadow:0 10px 26px rgba(255,229,0,.10);
+  }
+}
+@media(min-width:521px){
+  .top-wallet{display:inline-flex}
+  .hero-wallet{display:none}
+}
