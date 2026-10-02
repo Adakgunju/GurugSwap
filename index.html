@@ -44,7 +44,12 @@
           </div>
           <div class="swap-meta"><span>SLIPPAGE</span><select id="slippage"><option value="0.5">0.5%</option><option value="1">1%</option><option value="2">2%</option></select></div>
           <button class="connect" id="swapButton" type="button">SWAP GURUG</button>
-          <div id="swapStatus" class="swap-status">Enter SOL to get a live GURUG quote.</div>
+          <div id="swapStatus" class="swap-status">
+            <div class="swap-status-top"><span class="swap-status-dot"></span><span id="swapStatusLabel">READY TO SWAP</span></div>
+            <div class="swap-progress"><span id="swapProgressFill"></span></div>
+            <div id="swapStatusMessage" class="swap-status-message">Enter SOL to get a live GURUG quote.</div>
+            <a id="swapTxLink" class="swap-tx-link" href="#" target="_blank" rel="noopener noreferrer" hidden>VIEW TRANSACTION ↗</a>
+          </div>
           <div class="card-foot"><span>NON-CUSTODIAL</span><span>SOLANA MAINNET</span><span>RAYDIUM</span></div>
         </div>
       </div>
