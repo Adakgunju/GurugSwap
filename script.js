@@ -55,7 +55,11 @@ async function connectPhantom() {
 
   try {
     const response = await provider.connect();
-    updateWalletButton(response.publicKey);
+    const connectedKey = response?.publicKey || provider.publicKey;
+    updateWalletButton(connectedKey);
+    if (connectedKey) {
+      setTimeout(() => updateWalletButton(provider.publicKey || connectedKey), 250);
+    }
   } catch (err) {
     console.log("Wallet connection cancelled or failed.", err);
   }
@@ -83,6 +87,10 @@ if (provider) {
   provider.on("disconnect", () => updateWalletButton(null));
   provider.on("accountChanged", (publicKey) => updateWalletButton(publicKey));
   if (provider.publicKey) updateWalletButton(provider.publicKey);
+  // Phantom may finish restoring the session shortly after the page loads.
+  setTimeout(() => {
+    if (provider.publicKey) updateWalletButton(provider.publicKey);
+  }, 500);
 }
 
 
