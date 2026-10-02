@@ -1474,3 +1474,20 @@ body:before{opacity:.028!important}
       0 18px 45px rgba(0,0,0,.55)!important;
   }
 }
+
+
+/* --- CLEAN HERO BACKDROP / FIT ABOUT BACKGROUND LOGO --- */
+.hero{
+  background:linear-gradient(180deg,rgba(10,11,9,.72),rgba(5,6,5,.78))!important;
+}
+.about{
+  background:
+    linear-gradient(180deg,rgba(10,11,9,.70),rgba(5,6,5,.80)),
+    url("https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png") center/300px no-repeat!important;
+}
+@media(max-width:520px){
+  .about{
+    background-size:cover,260px!important;
+    background-position:center,center!important;
+  }
+}
