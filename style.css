@@ -1358,3 +1358,18 @@ footer{border-top:0}
 .gurug-rain i:nth-child(16){--s:39px;--o:.22}
 .gurug-rain i:nth-child(17){--s:26px;--o:.30}
 .gurug-rain i:nth-child(18){--s:43px;--o:.18}
+
+
+/* --- ABOUT CARD TOP EDGE: MAKE THE UPPER LINE CLEAR --- */
+.about{
+  border-top:1px solid rgba(255,229,0,.52)!important;
+  box-shadow:
+    0 -1px 0 rgba(255,229,0,.14),
+    0 18px 55px rgba(0,0,0,.34),
+    inset 0 0 0 1px rgba(255,255,255,.018)!important;
+}
+@media(max-width:520px){
+  .about{
+    border-top:1px solid rgba(255,229,0,.55)!important;
+  }
+}
