@@ -656,3 +656,10 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
 /* --- GURUG UNIVERSE: WIDER GAPS --- */
 .universe-feature-grid{margin-top:36px;gap:22px}
 @media(max-width:520px){.universe-feature-grid{margin-top:32px;gap:20px}}
+
+
+/* --- SECTION SPACING: COMPACT 01 / 02 / 03 --- */
+.swap-section,.links-section,.about{padding-top:42px;padding-bottom:42px}
+@media(max-width:520px){
+  .swap-section,.links-section,.about{padding-top:27px;padding-bottom:27px}
+}
