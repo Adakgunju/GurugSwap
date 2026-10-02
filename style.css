@@ -1332,3 +1332,29 @@ footer{border-top:0}
     background-size:cover,340px!important;
   }
 }
+
+
+/* --- BRIGHTER GURUG SNOW / COIN-SIZED FLOATERS --- */
+.gurug-rain i{
+  opacity:var(--o)!important;
+  box-shadow:0 0 22px rgba(255,229,0,.14);
+  filter:saturate(.9) brightness(1.08);
+}
+.gurug-rain i:nth-child(1){--s:34px;--o:.24}
+.gurug-rain i:nth-child(2){--s:25px;--o:.30}
+.gurug-rain i:nth-child(3){--s:42px;--o:.18}
+.gurug-rain i:nth-child(4){--s:29px;--o:.27}
+.gurug-rain i:nth-child(5){--s:22px;--o:.32}
+.gurug-rain i:nth-child(6){--s:38px;--o:.21}
+.gurug-rain i:nth-child(7){--s:27px;--o:.29}
+.gurug-rain i:nth-child(8){--s:46px;--o:.17}
+.gurug-rain i:nth-child(9){--s:31px;--o:.25}
+.gurug-rain i:nth-child(10){--s:23px;--o:.31}
+.gurug-rain i:nth-child(11){--s:41px;--o:.19}
+.gurug-rain i:nth-child(12){--s:28px;--o:.28}
+.gurug-rain i:nth-child(13){--s:24px;--o:.26}
+.gurug-rain i:nth-child(14){--s:36px;--o:.20}
+.gurug-rain i:nth-child(15){--s:21px;--o:.33}
+.gurug-rain i:nth-child(16){--s:39px;--o:.22}
+.gurug-rain i:nth-child(17){--s:26px;--o:.30}
+.gurug-rain i:nth-child(18){--s:43px;--o:.18}
