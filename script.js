@@ -27,11 +27,29 @@ function updateWalletButton(publicKey) {
   connectWalletBtn.textContent = publicKey ? shortAddress(publicKey.toString()) : "CONNECT WALLET";
 }
 
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function openInPhantom() {
+  const pageUrl = encodeURIComponent(window.location.href);
+  const ref = encodeURIComponent(window.location.origin);
+  window.location.href = `https://phantom.app/ul/browse/${pageUrl}?ref=${ref}`;
+}
+
 async function connectPhantom() {
   const provider = getPhantomProvider();
 
   if (!provider) {
-    alert("Phantom wallet was not detected. Please open this site with the Phantom wallet extension or Phantom's in-app browser.");
+    if (isMobileDevice()) {
+      // Regular mobile browsers do not inject Phantom's provider.
+      // Open this exact page inside Phantom's in-app browser so the
+      // normal provider connection path becomes available.
+      openInPhantom();
+      return;
+    }
+
+    alert("Phantom wallet was not detected. Please install Phantom or open this site with the Phantom extension.");
     return;
   }
 
