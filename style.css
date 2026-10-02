@@ -694,3 +694,17 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
     background-attachment:scroll,scroll;
   }
 }
+
+
+/* --- MOBILE: TIGHTER CONTENT MARGINS --- */
+@media(max-width:520px){
+  .swap-section,.links-section,.about{
+    margin:8px 6px;
+    padding:28px 13px;
+    border-radius:20px;
+  }
+  .swap-layout{margin-top:22px}
+  .links-heading{margin-top:12px}
+  .link-grid{margin-top:20px}
+  .about-inner{margin-top:20px}
+}
