@@ -644,3 +644,5 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
     border-color:rgba(255,229,0,.34);
   }
 }
+
+.link-card strong{font-size:22px;line-height:1.02;overflow-wrap:anywhere;word-break:normal}.universe-logo{width:54px;height:54px;object-fit:cover;border-radius:50%;box-shadow:0 5px 18px rgba(0,0,0,.14);align-self:flex-start;margin-top:2px}.link-card.featured strong{font-size:25px;letter-spacing:-.035em}@media(max-width:520px){.link-card strong{font-size:18px;line-height:1.08;letter-spacing:-.025em}.link-card.featured strong{font-size:20px}.universe-logo{width:43px;height:43px;margin-top:1px}}
