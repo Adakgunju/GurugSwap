@@ -836,3 +836,220 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
     letter-spacing:-.055em;
   }
 }
+
+/* --- GURUG SWAP / MINING VISUAL SYSTEM --- */
+.topbar{
+  height:78px;
+  padding:0 5vw;
+  border-bottom:1px solid rgba(255,229,0,.24);
+  background:rgba(10,11,8,.94);
+}
+.brand{
+  font-family:'Syne',sans-serif;
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-.07em;
+  white-space:nowrap;
+}
+.market-ticker{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-width:245px;
+  padding:9px 18px;
+  border:1px solid rgba(255,229,0,.24);
+  border-radius:999px;
+  background:#11120d;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.018);
+}
+.ticker-label{
+  color:#9c9b8c;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.18em;
+}
+.market-ticker strong{
+  color:#f7f4df;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:-.02em;
+}
+.ticker-change{
+  color:#ffe500;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.06em;
+}
+.ticker-change.down{color:#c9c9bd}
+.wallet-btn{
+  min-width:132px;
+  border-radius:10px;
+  padding:13px 18px;
+}
+
+.hero{
+  min-height:calc(100vh - 78px);
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  padding:5vh 8vw 7vh;
+  gap:5vw;
+}
+.hero-art{height:560px;order:0}
+.hero-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  order:1;
+}
+.hero-identity{max-width:470px}
+.hero-tagline{
+  margin:0 0 22px;
+  color:#a9a795;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.22em;
+  line-height:1.7;
+  max-width:390px;
+}
+.hero-identity h1{
+  margin:0;
+  color:#f7f4df;
+  font-size:clamp(72px,9vw,132px);
+  line-height:.78;
+  letter-spacing:-.09em;
+}
+.hero-network{
+  margin:20px 0 0;
+  color:#ffe500;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.28em;
+}
+.hero-copy .contract{margin-top:34px}
+
+.swap-section,.links-section,.about{
+  border-top-color:rgba(255,229,0,.15);
+}
+.swap-section{padding-top:52px;padding-bottom:52px}
+.swap-layout{padding:0;margin:0}
+.swap-card{
+  border-color:rgba(255,229,0,.42);
+  background:#17180f;
+}
+.card-head{
+  font-size:10px;
+  letter-spacing:.2em;
+}
+.token-box small{
+  color:#a9a795;
+}
+.token-box strong,.swap-input{
+  font-weight:700;
+}
+.swap-meta{font-size:9px}
+.card-foot{font-size:8px}
+
+.links-section{padding-top:56px;padding-bottom:56px}
+.links-heading{margin-top:0}
+.links-heading h2{
+  font-size:clamp(54px,6.7vw,96px);
+  margin:0;
+}
+.links-heading p{
+  color:#8f8e80;
+  font-size:12px;
+  line-height:1.7;
+}
+.link-card,.universe-feature{
+  border-color:rgba(255,229,0,.34);
+}
+.link-card strong,.universe-feature strong{
+  font-family:'Syne',sans-serif;
+  line-height:1;
+}
+.about{padding-top:58px;padding-bottom:58px}
+
+@media(max-width:850px){
+  .topbar{padding:0 22px}
+  .market-ticker{min-width:220px}
+  .hero{
+    display:flex;
+    flex-direction:column;
+    min-height:auto;
+    padding:42px 7vw 58px;
+    text-align:center;
+  }
+  .hero-art{
+    order:0;
+    width:100%;
+    height:300px;
+    margin:0 auto 18px;
+  }
+  .hero-copy{
+    order:1;
+    align-items:center;
+    width:100%;
+  }
+  .hero-identity{max-width:430px}
+  .hero-tagline{margin:0 auto 18px;max-width:330px;font-size:9px;line-height:1.7}
+  .hero-identity h1{font-size:70px}
+  .hero-network{font-size:9px;letter-spacing:.25em;margin-top:15px}
+  .hero-copy .contract{display:none}
+}
+
+@media(max-width:520px){
+  .topbar{
+    height:72px;
+    padding:0 14px;
+    gap:8px;
+  }
+  .brand{font-size:17px}
+  .market-ticker{
+    min-width:0;
+    flex:1;
+    max-width:170px;
+    padding:7px 9px;
+    gap:7px;
+  }
+  .ticker-label{font-size:7px;letter-spacing:.12em}
+  .market-ticker strong{font-size:10px}
+  .ticker-change{font-size:7px}
+  .wallet-btn{
+    min-width:0;
+    padding:10px 11px;
+    min-height:42px;
+    font-size:8px;
+    letter-spacing:.06em;
+  }
+  .hero{
+    padding:24px 18px 40px;
+  }
+  .hero-art{
+    height:235px;
+    margin-bottom:14px;
+  }
+  .gurug-frame{width:224px}
+  .hero-tagline{
+    max-width:285px;
+    margin-bottom:17px;
+    font-size:8px;
+    letter-spacing:.18em;
+    line-height:1.8;
+  }
+  .hero-identity h1{
+    font-size:58px;
+    line-height:.82;
+  }
+  .hero-network{
+    margin-top:14px;
+    font-size:8px;
+    letter-spacing:.22em;
+  }
+  .swap-section,.links-section,.about{
+    padding-top:34px;
+    padding-bottom:34px;
+  }
+  .swap-card{width:100%}
+  .links-heading h2{font-size:52px}
+}
