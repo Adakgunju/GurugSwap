@@ -72,7 +72,32 @@ h1 span,h2 span,.big-type span{color:var(--yellow)}
 .halo{position:absolute;width:430px;height:430px;border-radius:50%;background:var(--yellow);filter:blur(85px);opacity:.12}
 .orbit{position:absolute;border:1px solid rgba(255,229,0,.14);border-radius:50%;transform:rotate(-18deg)}
 .orbit-one{width:500px;height:210px}.orbit-two{width:580px;height:280px;transform:rotate(24deg);border-color:rgba(255,255,255,.06)}
-.gurug{position:relative;width:min(500px,82%);z-index:2;border-radius:50%;box-shadow:0 0 90px rgba(255,229,0,.15)}
+.gurug-frame{
+  position:relative;width:min(540px,88%);aspect-ratio:1;display:grid;place-items:center;
+  border:1px solid rgba(255,229,0,.42);border-radius:50%;padding:11px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.035),0 0 55px rgba(255,229,0,.09);
+  background:radial-gradient(circle,rgba(255,229,0,.06),transparent 68%);
+  z-index:2;
+}
+.gurug-frame:before{
+  content:"";position:absolute;inset:7px;border:1px solid rgba(255,255,255,.12);
+  border-radius:50%;pointer-events:none;
+}
+.gurug-frame:after{
+  content:"GURUG • SOLANA • GURUG • SOLANA •";position:absolute;inset:-18px;
+  border:1px solid rgba(255,229,0,.11);border-radius:50%;display:grid;place-items:start center;
+  padding-top:4px;color:rgba(255,229,0,.52);font-size:7px;letter-spacing:.2em;
+  pointer-events:none;
+}
+.gurug{position:relative;width:100%;z-index:2;border-radius:50%;box-shadow:0 0 90px rgba(255,229,0,.15)}
+.frame-mark{
+  position:absolute;width:30px;height:30px;z-index:4;pointer-events:none;
+}
+.frame-mark:before,.frame-mark:after{content:"";position:absolute;background:var(--yellow);opacity:.8}
+.frame-mark:before{width:30px;height:1px;top:0;left:0}
+.frame-mark:after{width:1px;height:30px;top:0;left:0}
+.frame-mark-tl{top:22px;left:22px}
+.frame-mark-br{right:22px;bottom:22px;transform:rotate(180deg)}
 .coin-ring{
   position:absolute;z-index:3;top:8%;right:0;border:1px solid #555;border-radius:50%;
   width:170px;height:170px;display:grid;place-items:center;color:var(--yellow);
@@ -134,50 +159,21 @@ footer{border-top:1px solid var(--line);padding:28px 8vw;display:flex;justify-co
 
 @media(max-width:850px){
   nav{display:none}.wallet-btn{padding:10px}.hero{grid-template-columns:1fr;padding-top:70px}.hero-art{height:470px;order:-1}
-  .gurug{width:min(390px,78vw)}.coin-ring{right:4%;top:4%;width:120px;height:120px}.orbit-one{width:400px}.orbit-two{width:460px}
+  .gurug-frame{width:min(390px,78vw)}.coin-ring{right:4%;top:4%;width:120px;height:120px}.orbit-one{width:400px}.orbit-two{width:460px}
   .swap-layout,.about-inner{grid-template-columns:1fr}.link-grid{grid-template-columns:1fr 1fr}.links-heading{display:block}.links-heading p{margin-top:20px}
 }
 @media(max-width:520px){
   .topbar{padding:0 18px}.brand{font-size:16px}.brand img{width:34px;height:34px}
   .hero,.swap-section,.links-section,.about{padding-left:20px;padding-right:20px}
-  h1{font-size:64px}.lead{font-size:15px}.hero-actions{flex-wrap:wrap}.contract{align-items:flex-start;flex-direction:column}
+  h1{font-size:64px}.lead{font-size:15px}.hero-actions{flex-wrap:wrap}
+  .primary-btn,.ghost-btn,.connect,.wallet-btn{font-size:13px;padding:15px 18px;min-height:48px}
+  .primary-btn,.ghost-btn{letter-spacing:.07em}
+  .connect{font-size:13px}
+  .wallet-btn{font-size:12px;min-width:126px;padding:14px 16px}
+  .contract{align-items:flex-start;flex-direction:column}
   .contract button{width:100%}.hero-art{height:390px}.floating-tag,.hero-stamp{display:none}
   .swap-card{padding:14px}.swap-points{grid-template-columns:1fr}.swap-points div,.swap-points div:not(:first-child){padding:12px 0;border-right:0;border-bottom:1px solid #252525}.swap-points div:last-child{border-bottom:0}
   .link-grid{grid-template-columns:1fr}.links-section,.swap-section,.about{padding-top:90px;padding-bottom:90px}
   footer{padding:22px 20px;gap:10px;flex-direction:column}.about-meta{flex-wrap:wrap}
 }
 
-/* GURUG motion accents — subtle, decorative and never interactive */
-.orbit-one{animation:gurugOrbitOne 22s linear infinite}
-.orbit-two{animation:gurugOrbitTwo 30s linear infinite}
-.coin-ring{animation:gurugSpin 26s linear infinite}
-.tag-one{animation:gurugFloatOne 5.5s ease-in-out infinite}
-.tag-two{animation:gurugFloatTwo 6.5s ease-in-out infinite}
-.hero-stamp{animation:gurugStamp 18s linear infinite}
-@keyframes gurugOrbitOne{
-  from{transform:rotate(-18deg)}
-  to{transform:rotate(342deg)}
-}
-@keyframes gurugOrbitTwo{
-  from{transform:rotate(24deg)}
-  to{transform:rotate(-336deg)}
-}
-@keyframes gurugSpin{
-  from{transform:rotate(14deg)}
-  to{transform:rotate(374deg)}
-}
-@keyframes gurugFloatOne{
-  0%,100%{transform:translate3d(0,0,0)}
-  50%{transform:translate3d(0,-8px,0)}
-}
-@keyframes gurugFloatTwo{
-  0%,100%{transform:translate3d(0,0,0)}
-  50%{transform:translate3d(0,7px,0)}
-}
-@keyframes gurugStamp{
-  from{transform:rotate(-12deg)}
-  to{transform:rotate(348deg)}
-}
-@media (prefers-reduced-motion:reduce){
-  .orbit-one,.orbit-two,.coin-ring,.tag-one,.tag-two,.hero-stamp{animation:none}
-}
