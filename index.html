@@ -7,6 +7,7 @@
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
   <div class="noise"></div>
@@ -66,9 +67,18 @@
         <div class="swap-card">
           <div class="card-head"><span>GURUG SWAP</span><span class="live-dot">● LIVE ROUTE</span></div>
           <div class="token-box">
-            <div><small>YOU PAY</small><strong>0.00</strong></div>
+            <div><small>YOU PAY</small><input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00"></div>
             <div class="token">SOL <span>◎</span></div>
           </div>
+          <button class="arrow" type="button" aria-label="Swap direction">↓</button>
+          <div class="token-box">
+            <div><small>YOU RECEIVE</small><strong id="gurugAmount">0.00</strong></div>
+            <div class="token gurug-token"><img src="./assets/gurug-logo.png?v=2" alt=""> GURUG</div>
+          </div>
+          <div class="swap-meta"><span>Slippage</span><select id="slippage"><option value="0.5">0.5%</option><option value="1">1%</option><option value="2">2%</option></select></div>
+          <button class="connect" id="swapButton" type="button">SWAP GURUG</button>
+          <div id="swapStatus" class="swap-status">Connect your wallet to swap.</div>
+        </div>
           <button class="arrow">↓</button>
           <div class="token-box">
             <div><small>YOU RECEIVE</small><strong>0.00</strong></div>
