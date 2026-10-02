@@ -353,3 +353,97 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .sol-token,.gurug-token{padding:6px 8px}
   .connect{min-height:53px}
 }
+
+/* --- SWAP CARD: HIGH CONTRAST / CLEAR HIERARCHY --- */
+.swap-section{background:linear-gradient(180deg,#090908 0%,#080807 100%)}
+.swap-layout{margin-top:40px}
+.swap-card{
+  width:500px;
+  padding:25px;
+  background:#252521;
+  border:2px solid #5c5c54;
+  border-radius:24px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 24px 70px rgba(0,0,0,.55);
+}
+.swap-card:before{display:none}
+.card-head{
+  color:#ffffff;
+  margin-bottom:18px;
+  font-size:10px;
+}
+.live-dot{color:#d8d8d0}
+.token-box{
+  background:#393934;
+  border:1px solid #77776d;
+  padding:21px 20px;
+  border-radius:16px;
+  box-shadow:0 3px 12px rgba(0,0,0,.18);
+}
+.token-box:focus-within{
+  background:#41413b;
+  border-color:#b1b1a5;
+  box-shadow:0 0 0 2px rgba(255,229,0,.10);
+}
+.token-box small{
+  color:#d5d5cd;
+  font-size:10px;
+  font-weight:800;
+}
+.token-box strong,.swap-input{color:#ffffff}
+.token-box strong{font-size:32px}
+.swap-input{font-size:32px}
+.swap-input::placeholder{color:#bdbdb5}
+.sol-token,.gurug-token{
+  background:#242420;
+  border:1px solid #68685f;
+  color:#fff;
+  padding:7px 11px;
+}
+.arrow{
+  background:#252521;
+  border:3px solid #090908;
+  color:#ffe500;
+  box-shadow:0 4px 16px rgba(0,0,0,.45);
+}
+.swap-meta{color:#d0d0c8}
+.swap-meta select{
+  background:#393934;
+  border-color:#77776d;
+  color:#fff;
+}
+.connect{
+  min-height:57px;
+  border-radius:13px;
+  box-shadow:0 8px 22px rgba(255,229,0,.12);
+}
+.swap-status{
+  background:#30302b;
+  border:1px solid #64645b;
+  border-radius:14px;
+  padding:14px;
+}
+.swap-status-message{color:#d1d1c9}
+.swap-tx-link[hidden]{display:none!important}
+.card-foot{
+  border-top-color:#55554d;
+  color:#aaa9a0;
+}
+@media(max-width:520px){
+  .swap-card{
+    width:100%;
+    padding:18px;
+    background:#252521;
+    border:2px solid #5c5c54;
+    border-radius:20px;
+  }
+  .token-box{
+    background:#393934;
+    border-color:#77776d;
+    padding:18px 15px;
+  }
+  .token-box:focus-within{background:#41413b}
+  .swap-input,.token-box strong{font-size:27px}
+  .swap-status{background:#30302b}
+}
