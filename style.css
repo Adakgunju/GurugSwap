@@ -663,3 +663,34 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
 @media(max-width:520px){
   .swap-section,.links-section,.about{padding-top:27px;padding-bottom:27px}
 }
+
+
+/* --- INDEPENDENT GURUG SECTIONS --- */
+.swap-section,.links-section,.about{
+  margin:18px 4vw;
+  padding:58px 5vw;
+  border:1px solid rgba(255,229,0,.38);
+  border-radius:28px;
+  overflow:hidden;
+  background-color:#0d0e0b;
+  background-image:
+    linear-gradient(rgba(8,9,6,.88),rgba(8,9,6,.92)),
+    url("https://raw.githubusercontent.com/Adakgunju/GurugSwap/main/assets/gurug-logo.png");
+  background-size:cover,520px;
+  background-position:center,center;
+  background-repeat:no-repeat;
+  background-attachment:fixed,fixed;
+  box-shadow:0 18px 55px rgba(0,0,0,.38),inset 0 0 0 1px rgba(255,255,255,.025);
+}
+.swap-section{background-color:#0d0e0b}
+.links-section{background-position:center,72% center}
+.about{background-position:center,28% center}
+@media(max-width:520px){
+  .swap-section,.links-section,.about{
+    margin:12px 12px;
+    padding:34px 18px;
+    border-radius:22px;
+    background-size:cover,330px;
+    background-attachment:scroll,scroll;
+  }
+}
