@@ -263,9 +263,10 @@ async function executeGurugSwap() {
       }
     }
 
-    setSwapStatus("Swap confirmed! GURUG should arrive shortly.");
+    setSwapStatus("Swap confirmed! Enter an amount for your next swap.");
     lastSwapResponse = null;
-    setTimeout(getQuote, 500);
+    if (solAmountInput) solAmountInput.value = "";
+    if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
   } catch (err) {
     console.error("GURUG swap failed:", err);
     const message = err?.message || "Swap cancelled or failed.";
