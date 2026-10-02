@@ -218,8 +218,32 @@ async function executeGurugSwap() {
 
     setSwapStatus("Transaction sent. Waiting for confirmation...");
     const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+
+    // Poll the signature instead of using the legacy 30-second confirmTransaction timeout.
+    // A transaction can already be on-chain even when a single confirmation request times out.
     for (const signature of signatures) {
-      await connection.confirmTransaction(signature, "confirmed");
+      let confirmed = false;
+      for (let attempt = 0; attempt < 60; attempt++) {
+        const statusResult = await connection.getSignatureStatuses([signature], {
+          searchTransactionHistory: true
+        });
+        const status = statusResult?.value?.[0];
+
+        if (status?.err) {
+          throw new Error("Transaction failed on-chain. Check the transaction details.");
+        }
+
+        if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
+          confirmed = true;
+          break;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      if (!confirmed) {
+        throw new Error("Transaction was sent, but confirmation is taking longer than expected. Check the transaction signature.");
+      }
     }
 
     setSwapStatus("Swap confirmed! GURUG should arrive shortly.");
