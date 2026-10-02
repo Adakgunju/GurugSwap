@@ -708,3 +708,28 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .link-grid{margin-top:20px}
   .about-inner{margin-top:20px}
 }
+
+
+/* --- REMOVE SECTION OUTER BOXES --- */
+.swap-section,.links-section,.about{
+  margin:0;
+  padding-left:7vw;
+  padding-right:7vw;
+  border-left:0;
+  border-right:0;
+  border-radius:0;
+  background-image:none;
+  background-color:transparent;
+  background-attachment:scroll;
+  box-shadow:none;
+}
+@media(max-width:520px){
+  .swap-section,.links-section,.about{
+    margin:0;
+    padding-left:18px;
+    padding-right:18px;
+    border-radius:0;
+    background-image:none;
+    box-shadow:none;
+  }
+}
