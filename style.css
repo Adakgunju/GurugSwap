@@ -486,3 +486,102 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .token-box:focus-within{background:#1b1b18}
   .swap-status{background:#11110f}
 }
+
+/* --- GURUG MINING INSPIRED SWAP --- */
+.swap-section{
+  background:linear-gradient(180deg,rgba(255,229,0,.018),transparent 65%);
+}
+.swap-card{
+  width:500px;
+  padding:25px;
+  background:#17180f;
+  border:1px solid rgba(255,229,0,.42);
+  border-radius:18px;
+  box-shadow:0 18px 55px rgba(0,0,0,.42);
+}
+.swap-card:before{display:none}
+.card-head{
+  color:#f4f0d8;
+  margin-bottom:17px;
+}
+.live-dot{color:#c8c4aa}
+.token-box{
+  background:#0d0e0b;
+  border:1px solid rgba(255,229,0,.30);
+  padding:21px 20px;
+  border-radius:14px;
+  box-shadow:none;
+}
+.token-box:focus-within{
+  background:#11120d;
+  border-color:rgba(255,229,0,.68);
+  box-shadow:0 0 0 1px rgba(255,229,0,.08);
+}
+.token-box small{
+  color:#aaa995;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.18em;
+}
+.token-box strong{
+  color:#f8f8ef;
+  font-size:32px;
+}
+.swap-input{
+  color:#f8f8ef;
+  font-size:32px;
+}
+.swap-input::placeholder{color:#77776e}
+.sol-token,.gurug-token{
+  background:#11120d;
+  border:1px solid rgba(255,229,0,.28);
+  color:#f3f1dc;
+  padding:7px 10px;
+  border-radius:999px;
+}
+.arrow{
+  background:#10110d;
+  border:3px solid #070806;
+  color:#ffe500;
+  box-shadow:0 4px 14px rgba(0,0,0,.45);
+}
+.swap-meta{
+  color:#b9b6a2;
+}
+.swap-meta select{
+  background:#0d0e0b;
+  border:1px solid rgba(255,229,0,.30);
+  color:#f3f1dc;
+}
+.connect{
+  min-height:56px;
+  border-radius:10px;
+  box-shadow:0 7px 22px rgba(255,229,0,.09);
+}
+.swap-status{
+  background:#0d0e0b;
+  border:1px solid rgba(255,229,0,.25);
+  border-radius:12px;
+}
+.swap-status-message{color:#bbb9aa}
+.card-foot{
+  border-top-color:rgba(255,229,0,.20);
+  color:#77766b;
+}
+@media(max-width:520px){
+  .swap-card{
+    width:100%;
+    padding:18px;
+    background:#17180f;
+    border:1px solid rgba(255,229,0,.42);
+    border-radius:17px;
+  }
+  .token-box{
+    background:#0d0e0b;
+    border-color:rgba(255,229,0,.30);
+    padding:18px 15px;
+  }
+  .token-box:focus-within{background:#11120d}
+  .swap-input,.token-box strong{font-size:27px}
+  .swap-status{background:#0d0e0b}
+}
