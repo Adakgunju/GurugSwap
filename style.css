@@ -231,3 +231,125 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .token-box strong,.swap-input{font-size:27px}
   .sol-token,.gurug-token{padding:7px 9px}
 }
+
+/* --- CLEAN PREMIUM SWAP CARD --- */
+.swap-layout{margin-top:38px}
+.swap-card{
+  width:500px;
+  padding:24px;
+  background:#171714;
+  border:1px solid #4a4a42;
+  border-radius:22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.42);
+}
+.swap-card:before{display:none}
+.card-head{
+  margin-bottom:16px;
+  color:#f8f8f2;
+  font-size:9px;
+  letter-spacing:.18em;
+}
+.live-dot{color:#a9a9a1}
+.token-box{
+  background:#292925;
+  border:1px solid #55554d;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:none;
+}
+.token-box:focus-within{
+  background:#2e2e29;
+  border-color:#85857b;
+  box-shadow:0 0 0 2px rgba(255,229,0,.06);
+}
+.token-box small{
+  color:#aaa9a0;
+  font-size:9px;
+  letter-spacing:.16em;
+  margin-bottom:8px;
+}
+.token-box strong{
+  color:#fafaf5;
+  font-size:31px;
+  font-weight:700;
+}
+.swap-input{
+  width:185px;
+  color:#fafaf5;
+  font-size:31px;
+  font-weight:700;
+}
+.swap-input::placeholder{color:#8f8f88}
+.token{
+  color:#f5f5ef;
+  font-size:11px;
+  gap:7px;
+}
+.sol-token,.gurug-token{
+  background:#171714;
+  border:1px solid #4b4b43;
+  padding:7px 10px;
+  border-radius:999px;
+}
+.sol-logo{width:22px;height:22px}
+.sol-logo i{width:18px;height:3px}
+.gurug-token img{width:27px;height:27px}
+.arrow{
+  width:36px;
+  height:36px;
+  margin:-2px auto;
+  background:#171714;
+  border:3px solid #080808;
+  box-shadow:0 5px 16px rgba(0,0,0,.35);
+}
+.swap-meta{
+  color:#9d9d95;
+  font-size:9px;
+  margin-top:15px;
+}
+.swap-meta select{
+  background:#292925;
+  color:#f5f5ef;
+  border:1px solid #55554d;
+  border-radius:8px;
+}
+.connect{
+  margin-top:16px;
+  min-height:55px;
+  border-radius:12px;
+  font-size:15px;
+  box-shadow:none;
+}
+.connect:hover{
+  box-shadow:0 10px 26px rgba(255,229,0,.12);
+}
+.swap-status{
+  background:#11110f;
+  border-color:#383832;
+  border-radius:12px;
+  padding:12px 13px;
+}
+.card-foot{
+  margin-top:17px;
+  padding-top:11px;
+  border-top-color:#383832;
+  color:#77776f;
+}
+@media(max-width:520px){
+  .swap-card{
+    width:100%;
+    padding:17px;
+    border-radius:18px;
+    background:#171714;
+    border-color:#46463f;
+  }
+  .token-box{
+    padding:17px 14px;
+    border-radius:13px;
+    background:#292925;
+  }
+  .swap-input{width:145px;font-size:27px}
+  .token-box strong{font-size:27px}
+  .sol-token,.gurug-token{padding:6px 8px}
+  .connect{min-height:53px}
+}
