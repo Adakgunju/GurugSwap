@@ -109,10 +109,49 @@ const swapStatus = document.getElementById("swapStatus");
 let lastSwapResponse = null;
 let gurugDecimals = null;
 
-function setSwapStatus(message, error = false) {
+function setSwapStatus(message, error = false, state = "") {
   if (!swapStatus) return;
-  swapStatus.textContent = message;
-  swapStatus.classList.toggle("error", error);
+  const label = document.getElementById("swapStatusLabel");
+  const messageEl = document.getElementById("swapStatusMessage");
+  const progress = document.getElementById("swapProgressFill");
+  const txLink = document.getElementById("swapTxLink");
+
+  swapStatus.classList.remove("error", "success", "active");
+  if (state === "active") swapStatus.classList.add("active");
+  if (state === "success") swapStatus.classList.add("success");
+  if (error) swapStatus.classList.add("error");
+
+  if (label) {
+    label.textContent = error ? "SWAP FAILED"
+      : state === "success" ? "SWAP SUCCESSFUL"
+      : state === "active" ? "PROCESSING"
+      : "READY TO SWAP";
+  }
+  if (messageEl) messageEl.textContent = message;
+  if (progress) progress.style.width = error ? "100%" : state === "success" ? "100%" : state === "active" ? "72%" : "0%";
+  if (txLink && state !== "success") {
+    txLink.hidden = true;
+    txLink.removeAttribute("href");
+  }
+}
+
+function showSwapSuccess(solAmount, gurugAmount, signature) {
+  if (!swapStatus) return;
+  const label = document.getElementById("swapStatusLabel");
+  const messageEl = document.getElementById("swapStatusMessage");
+  const progress = document.getElementById("swapProgressFill");
+  const txLink = document.getElementById("swapTxLink");
+
+  swapStatus.classList.remove("error", "active");
+  swapStatus.classList.add("success");
+
+  if (label) label.textContent = "SWAP SUCCESSFUL";
+  if (messageEl) messageEl.textContent = solAmount + " SOL → " + gurugAmount + " GURUG";
+  if (progress) progress.style.width = "100%";
+  if (txLink && signature) {
+    txLink.href = "https://solscan.io/tx/" + signature;
+    txLink.hidden = false;
+  }
 }
 
 async function getGurugDecimals() {
@@ -244,7 +283,7 @@ async function executeGurugSwap() {
       signatures.push(signed.signature);
     }
 
-    setSwapStatus("Transaction sent. Waiting for confirmation...");
+    setSwapStatus("Transaction sent. Waiting for on-chain confirmation...", false, "active");
     // Use a fallback RPC list for confirmation. The public Solana RPC can rate-limit
     // browser traffic with HTTP 403 even when the swap itself has already landed.
     const confirmationRpcs = [
@@ -253,6 +292,7 @@ async function executeGurugSwap() {
     ];
 
     for (const signature of signatures) {
+      setSwapStatus("Confirming your swap on Solana...", false, "active");
       let confirmed = false;
       let lastRpcError = null;
 
@@ -291,7 +331,14 @@ async function executeGurugSwap() {
       }
     }
 
-    setSwapStatus("Swap confirmed! Enter an amount for your next swap.");
+    const confirmedSolAmount = Number(solAmountInput?.value || 0).toLocaleString("en-US", {
+      maximumFractionDigits: 6
+    });
+    const confirmedGurugAmount = gurugAmountEl?.textContent || "0.00";
+    const finalSignature = signatures[signatures.length - 1];
+
+    showSwapSuccess(confirmedSolAmount, confirmedGurugAmount, finalSignature);
+
     lastSwapResponse = null;
     if (solAmountInput) solAmountInput.value = "";
     if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
