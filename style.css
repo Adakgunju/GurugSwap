@@ -146,3 +146,38 @@ footer{border-top:1px solid var(--line);padding:28px 8vw;display:flex;justify-co
   .link-grid{grid-template-columns:1fr}.links-section,.swap-section,.about{padding-top:90px;padding-bottom:90px}
   footer{padding:22px 20px;gap:10px;flex-direction:column}.about-meta{flex-wrap:wrap}
 }
+
+/* GURUG motion accents — subtle, decorative and never interactive */
+.orbit-one{animation:gurugOrbitOne 22s linear infinite}
+.orbit-two{animation:gurugOrbitTwo 30s linear infinite}
+.coin-ring{animation:gurugSpin 26s linear infinite}
+.tag-one{animation:gurugFloatOne 5.5s ease-in-out infinite}
+.tag-two{animation:gurugFloatTwo 6.5s ease-in-out infinite}
+.hero-stamp{animation:gurugStamp 18s linear infinite}
+@keyframes gurugOrbitOne{
+  from{transform:rotate(-18deg)}
+  to{transform:rotate(342deg)}
+}
+@keyframes gurugOrbitTwo{
+  from{transform:rotate(24deg)}
+  to{transform:rotate(-336deg)}
+}
+@keyframes gurugSpin{
+  from{transform:rotate(14deg)}
+  to{transform:rotate(374deg)}
+}
+@keyframes gurugFloatOne{
+  0%,100%{transform:translate3d(0,0,0)}
+  50%{transform:translate3d(0,-8px,0)}
+}
+@keyframes gurugFloatTwo{
+  0%,100%{transform:translate3d(0,0,0)}
+  50%{transform:translate3d(0,7px,0)}
+}
+@keyframes gurugStamp{
+  from{transform:rotate(-12deg)}
+  to{transform:rotate(348deg)}
+}
+@media (prefers-reduced-motion:reduce){
+  .orbit-one,.orbit-two,.coin-ring,.tag-one,.tag-two,.hero-stamp{animation:none}
+}
