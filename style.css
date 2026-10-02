@@ -64,7 +64,7 @@ h1 span,h2 span,.big-type span{color:var(--yellow)}
 .swap-meta select{background:#292929;color:#fff;border:1px solid #555;padding:7px 10px;outline:0;border-radius:8px}
 .connect{width:100%;text-align:center;margin-top:16px;font-size:16px;font-weight:800;letter-spacing:.1em;min-height:54px}
 .connect:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.swap-status{min-height:20px;margin-top:12px;color:#ddd; font-size:11px;line-height:1.4;text-align:center}.swap-status.error{color:#ff8b8b}
+.swap-status{min-height:20px;margin-top:12px;color:#ddd;font-size:11px;line-height:1.4;text-align:center}.swap-status.error{color:#ff8b8b}
 .card-foot{display:flex;justify-content:space-between;margin-top:18px;padding-top:12px;border-top:1px solid #444;color:#c9c9c4;font-size:8px;letter-spacing:.14em}
 
 .links-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-top:28px}
@@ -83,8 +83,14 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(55px,7vw,105px);line-height:.82
 footer{border-top:1px solid #333;padding:28px 8vw;display:flex;justify-content:space-between;color:#999;font-size:8px;letter-spacing:.16em}
 
 @media(max-width:850px){
-  nav{display:none}.hero{grid-template-columns:1fr;padding-top:70px}.hero-art{height:470px;order:-1}.gurug-frame{width:min(390px,78vw)}
-  .link-grid{grid-template-columns:1fr 1fr}.links-heading{display:block}.links-heading p{margin-top:20px}
+  nav{display:none}
+  .hero{grid-template-columns:1fr;padding-top:70px}
+  .hero-art{height:470px;order:-1}
+  .gurug-frame{width:min(390px,78vw)}
+  .about-inner{grid-template-columns:1fr;gap:55px}
+  .about-copy{max-width:100%}
+  .link-grid{grid-template-columns:1fr 1fr}
+  .links-heading{display:block}.links-heading p{margin-top:20px}
 }
 @media(max-width:520px){
   .topbar{padding:0 18px}.brand{font-size:16px}.brand img{width:34px;height:34px}
@@ -95,5 +101,7 @@ footer{border-top:1px solid #333;padding:28px 8vw;display:flex;justify-content:s
   .contract{align-items:flex-start;flex-direction:column}.contract button{width:100%}.hero-art{height:390px}
   .swap-card{padding:14px}.link-grid{grid-template-columns:1fr}
   .links-section,.swap-section,.about{padding-top:90px;padding-bottom:90px}
+  .big-type{font-size:clamp(48px,16vw,72px)}
+  .about-copy{font-size:17px;line-height:1.7}
   footer{padding:22px 20px;gap:10px;flex-direction:column}.about-meta{flex-wrap:wrap}
 }
