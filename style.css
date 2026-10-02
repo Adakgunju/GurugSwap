@@ -154,3 +154,13 @@ footer{border-top:1px solid #333;padding:28px 8vw;display:flex;justify-content:s
   footer{padding:22px 20px;gap:10px;flex-direction:column}.about-meta{flex-wrap:wrap}
 }
 
+
+/* Premium rounded UI */
+.wallet-btn,.primary-btn,.ghost-btn,.connect{border-radius:10px}
+.contract button{border-radius:9px}
+.gurug-frame{overflow:visible}
+.swap-card{border-radius:18px}
+.token-box{border-radius:12px}
+.swap-meta select{border-radius:8px}
+.arrow{border-radius:50%}
+.link-card{border-radius:14px}
