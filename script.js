@@ -182,6 +182,7 @@ function formatToken(raw, decimals) {
 }
 
 async function getQuote() {
+  if (isSwapping) return;
   const amount = parseSolToLamports(solAmountInput?.value);
   if (!amount) {
     if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
@@ -217,6 +218,7 @@ async function getQuote() {
 }
 
 let quoteTimer;
+let isSwapping = false;
 if (solAmountInput) {
   solAmountInput.addEventListener("input", () => {
     clearTimeout(quoteTimer);
@@ -239,8 +241,10 @@ async function executeGurugSwap() {
     return;
   }
 
+  clearTimeout(quoteTimer);
+  isSwapping = true;
   swapButton.disabled = true;
-  setSwapStatus("Preparing transaction...");
+  setSwapStatus("Preparing transaction...", false, "active");
 
   try {
     if (!lastSwapResponse) {
@@ -347,6 +351,7 @@ async function executeGurugSwap() {
     const message = err?.message || "Swap cancelled or failed.";
     setSwapStatus(message, true);
   } finally {
+    isSwapping = false;
     swapButton.disabled = false;
   }
 }
