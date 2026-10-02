@@ -49,7 +49,9 @@ async function connectPhantom() {
       return;
     }
 
-    alert("Phantom wallet was not detected. Please install Phantom or open this site with the Phantom extension.");
+    if (swapStatus) {
+      setSwapStatus("Opening Phantom wallet...");
+    }
     return;
   }
 
