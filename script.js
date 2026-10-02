@@ -222,6 +222,20 @@ let isSwapping = false;
 if (solAmountInput) {
   solAmountInput.addEventListener("input", () => {
     clearTimeout(quoteTimer);
+    if (swapStatus?.classList.contains("success")) {
+      swapStatus.classList.remove("success");
+      const label = document.getElementById("swapStatusLabel");
+      const messageEl = document.getElementById("swapStatusMessage");
+      const progress = document.getElementById("swapProgressFill");
+      const txLink = document.getElementById("swapTxLink");
+      if (label) label.textContent = "PROCESSING";
+      if (messageEl) messageEl.textContent = "Getting a new live Raydium quote...";
+      if (progress) progress.style.width = "35%";
+      if (txLink) {
+        txLink.hidden = true;
+        txLink.removeAttribute("href");
+      }
+    }
     quoteTimer = setTimeout(getQuote, 350);
   });
 }
