@@ -113,7 +113,7 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(55px,7vw,105px);line-height:.82
 .swap-input::placeholder{color:#4d4d4d}.swap-input::-webkit-outer-spin-button,.swap-input::-webkit-inner-spin-button{margin:0}
 .swap-meta{display:flex;justify-content:space-between;align-items:center;color:#666;font-size:9px;letter-spacing:.12em;margin-top:14px}
 .swap-meta select{background:#171717;color:#ddd;border:1px solid #333;padding:7px 10px;outline:0}
-.connect{width:100%;text-align:center;margin-top:16px;font-size:10px}
+.connect{width:100%;text-align:center;margin-top:16px;font-size:14px;font-weight:800;letter-spacing:.1em;min-height:52px}
 .connect:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .swap-status{min-height:18px;margin-top:12px;color:#777;font-size:9px;line-height:1.4;text-align:center}.swap-status.error{color:#ff8b8b}
 .card-foot{display:flex;justify-content:space-between;margin-top:18px;padding-top:12px;border-top:1px solid #222;color:#505050;font-size:7px;letter-spacing:.14em}
