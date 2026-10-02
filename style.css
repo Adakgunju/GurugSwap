@@ -1248,3 +1248,87 @@ footer{border-top:0}
     border-top:1px solid rgba(255,229,0,.46)!important;
   }
 }
+
+
+/* --- MINING-STYLE FALLING GURUG CIRCLES + TRANSLUCENT CARDS --- */
+.gurug-rain{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.gurug-rain i{
+  position:absolute;
+  top:-70px;
+  left:var(--x);
+  width:var(--s);
+  height:var(--s);
+  border-radius:50%;
+  background:url("https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png") center/cover no-repeat;
+  opacity:var(--o);
+  filter:saturate(.8);
+  box-shadow:0 0 18px rgba(255,229,0,.10);
+  animation:gurugSnow var(--d) linear var(--delay) infinite;
+}
+.gurug-rain i:nth-child(1){--x:4%;--s:20px;--o:.10;--d:18s;--delay:-3s}
+.gurug-rain i:nth-child(2){--x:11%;--s:13px;--o:.16;--d:15s;--delay:-10s}
+.gurug-rain i:nth-child(3){--x:18%;--s:28px;--o:.08;--d:23s;--delay:-5s}
+.gurug-rain i:nth-child(4){--x:27%;--s:16px;--o:.13;--d:17s;--delay:-13s}
+.gurug-rain i:nth-child(5){--x:36%;--s:11px;--o:.18;--d:14s;--delay:-7s}
+.gurug-rain i:nth-child(6){--x:44%;--s:24px;--o:.09;--d:21s;--delay:-16s}
+.gurug-rain i:nth-child(7){--x:53%;--s:15px;--o:.14;--d:16s;--delay:-2s}
+.gurug-rain i:nth-child(8){--x:61%;--s:30px;--o:.07;--d:24s;--delay:-11s}
+.gurug-rain i:nth-child(9){--x:69%;--s:18px;--o:.12;--d:19s;--delay:-6s}
+.gurug-rain i:nth-child(10){--x:77%;--s:12px;--o:.17;--d:14s;--delay:-9s}
+.gurug-rain i:nth-child(11){--x:84%;--s:26px;--o:.08;--d:22s;--delay:-18s}
+.gurug-rain i:nth-child(12){--x:92%;--s:15px;--o:.14;--d:17s;--delay:-4s}
+.gurug-rain i:nth-child(13){--x:7%;--s:12px;--o:.12;--d:20s;--delay:-15s}
+.gurug-rain i:nth-child(14){--x:31%;--s:22px;--o:.08;--d:25s;--delay:-20s}
+.gurug-rain i:nth-child(15){--x:58%;--s:10px;--o:.18;--d:13s;--delay:-8s}
+.gurug-rain i:nth-child(16){--x:73%;--s:21px;--o:.09;--d:18s;--delay:-14s}
+.gurug-rain i:nth-child(17){--x:87%;--s:13px;--o:.15;--d:16s;--delay:-12s}
+.gurug-rain i:nth-child(18){--x:97%;--s:23px;--o:.07;--d:23s;--delay:-17s}
+@keyframes gurugSnow{
+  0%{transform:translate3d(0,-80px,0) rotate(0deg)}
+  50%{transform:translate3d(18px,55vh,0) rotate(160deg)}
+  100%{transform:translate3d(-14px,115vh,0) rotate(320deg)}
+}
+.topbar,main,footer{position:relative;z-index:1}
+
+/* translucent black card language */
+.hero{
+  background:
+    linear-gradient(180deg,rgba(10,11,9,.72),rgba(5,6,5,.78)),
+    url("https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png") center/520px no-repeat!important;
+  backdrop-filter:blur(2px);
+}
+.swap-card{
+  background:rgba(12,13,10,.78)!important;
+  backdrop-filter:blur(7px);
+}
+.link-card{
+  background:rgba(12,13,10,.70)!important;
+  border-color:rgba(255,229,0,.25)!important;
+  backdrop-filter:blur(6px);
+}
+.universe-feature{
+  background:rgba(10,11,9,.72)!important;
+  color:var(--white)!important;
+  border-color:rgba(255,229,0,.36)!important;
+  backdrop-filter:blur(7px);
+  box-shadow:inset 0 0 35px rgba(255,229,0,.018);
+}
+.universe-feature strong{color:var(--white)!important}
+.universe-feature p{color:var(--muted)!important}
+.about{
+  background:
+    linear-gradient(180deg,rgba(10,11,9,.70),rgba(5,6,5,.80)),
+    url("https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png") center/520px no-repeat!important;
+  backdrop-filter:blur(3px);
+}
+@media(max-width:520px){
+  .hero,.about{
+    background-size:cover,340px!important;
+  }
+}
