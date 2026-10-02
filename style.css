@@ -98,13 +98,13 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(55px,7vw,105px);line-height:.82
 
 .swap-card{width:450px;max-width:100%;
   position:relative;background:linear-gradient(145deg,#121212,#0d0d0d);border:1px solid #303030;padding:22px;
-  box-shadow:20px 20px 0 #141414,0 0 60px rgba(255,229,0,.035)
+  box-shadow:20px 20px 0 #1b1b1b,0 0 60px rgba(255,229,0,.055)
 }
 .swap-card:before{content:"";position:absolute;inset:8px;border:1px solid rgba(255,255,255,.025);pointer-events:none}
 .card-head{display:flex;justify-content:space-between;color:#999;font-size:9px;letter-spacing:.15em;margin-bottom:16px}
 .live-dot{color:#8d8d8d}.live-dot:first-letter{color:#77c56b}
-.token-box{background:#151515;border:1px solid #292929;padding:18px;display:flex;justify-content:space-between;align-items:center;transition:.2s}
-.token-box:focus-within{border-color:#4a4a4a;background:#171717}
+.token-box{background:#1d1d1d;border:1px solid #3a3a3a;padding:18px;display:flex;justify-content:space-between;align-items:center;transition:.2s}
+.token-box:focus-within{border-color:#666;background:#202020}
 .token-box small{display:block;color:#666;font-size:8px;letter-spacing:.17em;margin-bottom:6px}
 .token-box strong{font-size:28px;letter-spacing:-.04em}
 .token{font-weight:800;font-size:12px;display:flex;align-items:center;gap:7px}.token span{font-size:21px;color:#aaa}.gurug-token img{width:28px;height:28px;border-radius:50%;box-shadow:0 0 15px rgba(255,229,0,.15)}
@@ -112,7 +112,7 @@ h2{font-family:'Syne',sans-serif;font-size:clamp(55px,7vw,105px);line-height:.82
 .swap-input{width:170px;background:transparent;border:0;outline:0;color:var(--white);font:700 28px 'Space Grotesk',system-ui,sans-serif;padding:0}
 .swap-input::placeholder{color:#4d4d4d}.swap-input::-webkit-outer-spin-button,.swap-input::-webkit-inner-spin-button{margin:0}
 .swap-meta{display:flex;justify-content:space-between;align-items:center;color:#666;font-size:9px;letter-spacing:.12em;margin-top:14px}
-.swap-meta select{background:#171717;color:#ddd;border:1px solid #333;padding:7px 10px;outline:0}
+.swap-meta select{background:#1c1c1c;color:#eee;border:1px solid #444;padding:7px 10px;outline:0}
 .connect{width:100%;text-align:center;margin-top:16px;font-size:16px;font-weight:800;letter-spacing:.1em;min-height:54px}
 .connect:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .swap-status{min-height:18px;margin-top:12px;color:#777;font-size:9px;line-height:1.4;text-align:center}.swap-status.error{color:#ff8b8b}
