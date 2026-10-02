@@ -1183,3 +1183,28 @@ footer{border-top:0}
     background-attachment:scroll,scroll;
   }
 }
+
+
+/* --- REMOVE DOUBLE BOXING: KEEP INNER SWAP / SNS CARDS ONLY --- */
+.swap-section,
+.links-section{
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+.swap-section{padding-top:42px;padding-bottom:42px}
+.links-section{padding-top:42px;padding-bottom:42px}
+@media(max-width:520px){
+  .swap-section,
+  .links-section{
+    margin:0!important;
+    padding:30px 18px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+}
