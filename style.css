@@ -1373,3 +1373,48 @@ footer{border-top:0}
     border-top:1px solid rgba(255,229,0,.55)!important;
   }
 }
+
+
+/* --- GURUG LOGO FRAME: MATCH MINING COIN RING --- */
+.gurug-frame{
+  border:5px solid #ffe500!important;
+  padding:12px!important;
+  background:linear-gradient(135deg,#ffea38 0%,#ffb900 48%,#ffe500 100%)!important;
+  box-shadow:
+    0 0 0 2px rgba(255,229,0,.95),
+    0 0 0 9px #15150d,
+    0 0 0 12px #ffe500,
+    0 0 0 15px rgba(255,229,0,.35),
+    0 22px 55px rgba(0,0,0,.55),
+    0 0 55px rgba(255,229,0,.18)!important;
+}
+.gurug-frame:before{
+  inset:7px!important;
+  border:2px solid rgba(255,247,150,.95)!important;
+  box-shadow:inset 0 0 0 2px rgba(255,183,0,.75);
+}
+.frame-line{
+  inset:-18px!important;
+  border:2px solid rgba(255,229,0,.85)!important;
+  box-shadow:
+    0 0 0 4px rgba(255,229,0,.16),
+    0 0 0 8px rgba(255,229,0,.07)!important;
+}
+.gurug{
+  box-shadow:0 0 35px rgba(255,229,0,.22)!important;
+}
+@media(max-width:520px){
+  .gurug-frame{
+    border-width:4px!important;
+    padding:10px!important;
+    box-shadow:
+      0 0 0 2px rgba(255,229,0,.95),
+      0 0 0 7px #15150d,
+      0 0 0 10px #ffe500,
+      0 0 0 13px rgba(255,229,0,.35),
+      0 18px 45px rgba(0,0,0,.55),
+      0 0 42px rgba(255,229,0,.18)!important;
+  }
+  .gurug-frame:before{inset:6px!important}
+  .frame-line{inset:-15px!important}
+}
