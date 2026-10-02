@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b0b0b">
+  <meta name="theme-color" content="#080808">
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
   <link rel="stylesheet" href="style.css">
@@ -11,6 +11,8 @@
 </head>
 <body>
   <div class="noise"></div>
+  <div class="grid-glow"></div>
+
   <header class="topbar">
     <a class="brand" href="#">
       <img src="./assets/gurug-logo.png?v=2" alt="GURUG">
@@ -27,11 +29,11 @@
   <main>
     <section class="hero">
       <div class="hero-copy">
-        <div class="eyebrow">SOLANA • GURUG • MEME POWER</div>
+        <div class="eyebrow"><i></i> SOLANA • GURUG • MEME POWER</div>
         <h1>SWAP<br><span>LIKE A GURUG.</span></h1>
-        <p class="lead">A home for GURUG on Solana. Swap SOL for GURUG, explore the community, and enter the GURUG universe.</p>
+        <p class="lead">The native home of GURUG on Solana. Fast, simple and built around one thing: getting your GURUG.</p>
         <div class="hero-actions">
-          <a class="primary-btn" href="#swap">BUY GURUG ↗</a>
+          <a class="primary-btn" href="#swap">BUY GURUG <span>↗</span></a>
           <a class="ghost-btn" href="#links">EXPLORE GURUG</a>
         </div>
         <div class="contract">
@@ -45,63 +47,89 @@
 
       <div class="hero-art">
         <div class="halo"></div>
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
         <div class="coin-ring">GURUG • SOL • GURUG • SOL • </div>
         <img src="./assets/gurug-logo.png?v=2" alt="GURUG thinking" class="gurug">
         <div class="floating-tag tag-one">$GURUG</div>
         <div class="floating-tag tag-two">ON SOLANA</div>
+        <div class="hero-stamp">G<br><small>GURUG<br>SWAP</small></div>
       </div>
     </section>
 
     <section id="swap" class="swap-section">
       <div class="section-label">01 / SWAP</div>
       <div class="swap-layout">
-        <div>
+        <div class="swap-intro">
+          <div class="mini-kicker">THE GURUG TERMINAL</div>
           <h2>GET YOUR<br><span>GURUG.</span></h2>
-          <p>Start with the official Raydium swap route. The pair will be preselected for SOL → GURUG.</p>
-          <a class="raydium-btn" href="https://raydium.io/swap/?inputMint=sol&outputMint=G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5" target="_blank" rel="noopener noreferrer">
-            OPEN RAYDIUM SWAP <span>↗</span>
-          </a>
-          <p class="small-note">This first version uses Raydium's web interface. A custom in-page swap UI can be added in the next build.</p>
+          <p>Swap SOL directly for GURUG through live Raydium liquidity. Connect Phantom, enter an amount, and approve the transaction.</p>
+          <div class="swap-points">
+            <div><b>01</b><span>CONNECT</span><small>Phantom wallet</small></div>
+            <div><b>02</b><span>QUOTE</span><small>Live Raydium route</small></div>
+            <div><b>03</b><span>SWAP</span><small>Settle on Solana</small></div>
+          </div>
+          <div class="route-note"><span class="route-dot"></span> ROUTED BY RAYDIUM <em>•</em> SETTLED ON SOLANA</div>
         </div>
 
         <div class="swap-card">
           <div class="card-head"><span>GURUG SWAP</span><span class="live-dot">● LIVE ROUTE</span></div>
+
           <div class="token-box">
-            <div><small>YOU PAY</small><input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00"></div>
+            <div>
+              <small>YOU PAY</small>
+              <input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.001" placeholder="0.00">
+            </div>
             <div class="token">SOL <span>◎</span></div>
           </div>
+
           <button class="arrow" type="button" aria-label="Swap direction">↓</button>
+
           <div class="token-box">
             <div><small>YOU RECEIVE</small><strong id="gurugAmount">0.00</strong></div>
             <div class="token gurug-token"><img src="./assets/gurug-logo.png?v=2" alt=""> GURUG</div>
           </div>
-          <div class="swap-meta"><span>Slippage</span><select id="slippage"><option value="0.5">0.5%</option><option value="1">1%</option><option value="2">2%</option></select></div>
+
+          <div class="swap-meta">
+            <span>SLIPPAGE</span>
+            <select id="slippage">
+              <option value="0.5">0.5%</option>
+              <option value="1">1%</option>
+              <option value="2">2%</option>
+            </select>
+          </div>
+
           <button class="connect" id="swapButton" type="button">SWAP GURUG</button>
-          <div id="swapStatus" class="swap-status">Connect your wallet to swap.</div>
+          <div id="swapStatus" class="swap-status">Enter SOL to get a live GURUG quote.</div>
+          <div class="card-foot"><span>NON-CUSTODIAL</span><span>SOLANA MAINNET</span><span>RAYDIUM</span></div>
         </div>
       </div>
     </section>
 
     <section id="links" class="links-section">
       <div class="section-label">02 / THE GURUG UNIVERSE</div>
+      <div class="links-heading">
+        <h2>ONE GURUG.<br><span>MANY WORLDS.</span></h2>
+        <p>Trade it. Track it. Play it. Follow the chaos.</p>
+      </div>
       <div class="link-grid">
-        <a class="link-card featured" href="https://raydium.io/swap/?inputMint=sol&outputMint=G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5" target="_blank" rel="noopener noreferrer">
-          <span>BUY</span><strong>GURUG</strong><em>↗</em>
+        <a class="link-card featured" href="#swap">
+          <span>01 / TRADE</span><strong>GURUG SWAP</strong><em>↗</em>
         </a>
         <a class="link-card" href="https://dexscreener.com/solana/G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5" target="_blank" rel="noopener noreferrer">
-          <span>MARKET</span><strong>CHART</strong><em>↗</em>
+          <span>02 / MARKET</span><strong>CHART</strong><em>↗</em>
         </a>
         <a class="link-card" href="https://adakgunju.github.io/Gurug/gellog/" target="_blank" rel="noopener noreferrer">
-          <span>PLAY</span><strong>GURUG ARCADE</strong><em>↗</em>
+          <span>03 / PLAY</span><strong>GURUG ARCADE</strong><em>↗</em>
         </a>
         <a class="link-card" href="https://x.com/gurugsol" target="_blank" rel="noopener noreferrer">
-          <span>FOLLOW</span><strong>𝕏 / X</strong><em>↗</em>
+          <span>04 / FOLLOW</span><strong>𝕏 / X</strong><em>↗</em>
         </a>
         <a class="link-card" href="https://t.me/gurugsol" target="_blank" rel="noopener noreferrer">
-          <span>JOIN</span><strong>TELEGRAM</strong><em>↗</em>
+          <span>05 / COMMUNITY</span><strong>TELEGRAM</strong><em>↗</em>
         </a>
         <a class="link-card" href="https://www.dextools.io/app/en/solana/pair-explorer/" target="_blank" rel="noopener noreferrer">
-          <span>TRACK</span><strong>DEX TOOLS</strong><em>↗</em>
+          <span>06 / TRACK</span><strong>DEX TOOLS</strong><em>↗</em>
         </a>
       </div>
     </section>
@@ -111,8 +139,10 @@
       <div class="about-inner">
         <div class="big-type">THINK.<br>SWAP.<br><span>GURUG.</span></div>
         <div class="about-copy">
+          <div class="about-line"></div>
           <p>GURUG is a meme character with a questionable plan and a very confident face.</p>
-          <p>Built on Solana. Built for fun. This page is the first brick of the GURUG web universe.</p>
+          <p>Built on Solana. Built for fun. GURUG SWAP is the first brick of the GURUG web universe.</p>
+          <div class="about-meta"><span>CHAIN <b>SOLANA</b></span><span>ASSET <b>$GURUG</b></span><span>MOOD <b>UNSERIOUS</b></span></div>
         </div>
       </div>
     </section>
@@ -121,7 +151,7 @@
   <footer>
     <span>© GURUG</span>
     <span>BUILT ON SOLANA</span>
-    <span>GURUGSWAP — V0.1</span>
+    <span>GURUGSWAP — V1.0</span>
   </footer>
 
   <script src="script.js"></script>
