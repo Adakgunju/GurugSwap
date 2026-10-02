@@ -371,3 +371,39 @@ async function executeGurugSwap() {
 }
 
 if (swapButton) swapButton.addEventListener("click", executeGurugSwap);
+
+
+/* --- LIVE GURUG MARKET TICKER --- */
+async function updateGurugMarketTicker() {
+  const priceEl = document.getElementById("gurugPrice");
+  const changeEl = document.getElementById("gurugChange");
+  if (!priceEl || !changeEl) return;
+
+  try {
+    const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/88a3L9i5KHddtUEPJ1crt8yp8RJNoWrgb7sSGGoU1qqe", {
+      cache: "no-store"
+    });
+    const json = await res.json();
+    const pair = json?.pair;
+    const price = Number(pair?.priceUsd);
+    const change = Number(pair?.priceChange?.h24);
+
+    if (Number.isFinite(price)) {
+      priceEl.textContent = price < 0.000001
+        ? "$" + price.toFixed(10)
+        : price < 0.001
+          ? "$" + price.toFixed(7)
+          : "$" + price.toFixed(6);
+    }
+
+    if (Number.isFinite(change)) {
+      changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
+      changeEl.classList.toggle("down", change < 0);
+    }
+  } catch (err) {
+    console.log("GURUG ticker update failed.", err);
+  }
+}
+
+updateGurugMarketTicker();
+setInterval(updateGurugMarketTicker, 30000);
