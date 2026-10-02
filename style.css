@@ -1231,3 +1231,20 @@ footer{border-top:0}
     background-attachment:scroll,scroll!important;
   }
 }
+
+
+/* --- HERO CARD TOP EDGE: KEEP THE TOP LINE CLEAR --- */
+.hero{
+  margin-top:22px!important;
+  border-top:1px solid rgba(255,229,0,.42)!important;
+  box-shadow:
+    0 -1px 0 rgba(255,229,0,.10),
+    0 18px 55px rgba(0,0,0,.34),
+    inset 0 0 0 1px rgba(255,255,255,.018)!important;
+}
+@media(max-width:520px){
+  .hero{
+    margin-top:16px!important;
+    border-top:1px solid rgba(255,229,0,.46)!important;
+  }
+}
