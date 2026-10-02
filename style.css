@@ -145,7 +145,7 @@ footer{border-top:1px solid var(--line);padding:28px 8vw;display:flex;justify-co
   h1{font-size:64px}.lead{font-size:15px}.hero-actions{flex-wrap:wrap}
   .primary-btn,.ghost-btn,.connect,.wallet-btn{font-size:13px;padding:15px 18px;min-height:48px}
   .primary-btn,.ghost-btn{letter-spacing:.07em}
-  .connect{font-size:13px}
+  .connect{font-size:16px}
   .wallet-btn{font-size:12px;min-width:126px;padding:14px 16px}
   .contract{align-items:flex-start;flex-direction:column}
   .contract button{width:100%}.hero-art{height:390px}
