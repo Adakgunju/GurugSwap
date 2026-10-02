@@ -723,6 +723,9 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   background-attachment:scroll;
   box-shadow:none;
 }
+
+/* --- SWAP SECTION: BALANCED TOP / BOTTOM SPACE --- */
+.swap-layout{margin-top:0}
 @media(max-width:520px){
   .swap-section,.links-section,.about{
     margin:0;
