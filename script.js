@@ -23,8 +23,10 @@ function shortAddress(address) {
 }
 
 function updateWalletButton(publicKey) {
-  if (!connectWalletBtn) return;
-  connectWalletBtn.textContent = publicKey ? shortAddress(publicKey.toString()) : "CONNECT WALLET";
+  const label = publicKey ? shortAddress(publicKey.toString()) : "CONNECT WALLET";
+  if (connectWalletBtn) connectWalletBtn.textContent = label;
+  const heroBtn = document.getElementById("heroConnectWallet");
+  if (heroBtn) heroBtn.textContent = label;
 }
 
 function isMobileDevice() {
@@ -407,3 +409,21 @@ async function updateGurugMarketTicker() {
 
 updateGurugMarketTicker();
 setInterval(updateGurugMarketTicker, 30000);
+
+
+const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
+if (heroConnectWalletBtn) {
+  heroConnectWalletBtn.addEventListener("click", async () => {
+    const provider = getPhantomProvider();
+    if (provider?.publicKey) {
+      try {
+        await provider.disconnect();
+        updateWalletButton(null);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      await connectPhantom();
+    }
+  });
+}
