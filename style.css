@@ -1446,3 +1446,31 @@ body:before{opacity:.028!important}
 .link-card,.universe-feature{
   background:rgba(10,12,8,.76)!important;
 }
+
+
+/* --- MINING-EXACT 3-BAND LOGO RING --- */
+.gurug-frame{
+  border:0!important;
+  padding:12px!important;
+  background:#ffb800!important;
+  box-shadow:
+    0 0 0 6px #17160d,
+    0 0 0 11px #ffe500,
+    0 20px 55px rgba(0,0,0,.55)!important;
+}
+.gurug-frame:before{
+  display:none!important;
+}
+.frame-line{
+  display:none!important;
+}
+@media(max-width:520px){
+  .gurug-frame{
+    border:0!important;
+    padding:10px!important;
+    box-shadow:
+      0 0 0 5px #17160d,
+      0 0 0 10px #ffe500,
+      0 18px 45px rgba(0,0,0,.55)!important;
+  }
+}
