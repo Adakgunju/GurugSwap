@@ -1091,3 +1091,9 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .market-ticker{max-width:190px;padding-left:8px;padding-right:8px;gap:6px}
   .hero-wallet{min-height:46px;padding-top:9px;padding-bottom:9px}
 }
+
+
+/* --- MOBILE TICKER WIDTH --- */
+@media(max-width:520px){
+  .market-ticker{flex:0 0 175px;max-width:175px}
+}
