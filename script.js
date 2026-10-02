@@ -217,32 +217,49 @@ async function executeGurugSwap() {
     }
 
     setSwapStatus("Transaction sent. Waiting for confirmation...");
-    const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+    // Use a fallback RPC list for confirmation. The public Solana RPC can rate-limit
+    // browser traffic with HTTP 403 even when the swap itself has already landed.
+    const confirmationRpcs = [
+      "https://solana-rpc.publicnode.com",
+      "https://api.mainnet-beta.solana.com"
+    ];
 
-    // Poll the signature instead of using the legacy 30-second confirmTransaction timeout.
-    // A transaction can already be on-chain even when a single confirmation request times out.
     for (const signature of signatures) {
       let confirmed = false;
-      for (let attempt = 0; attempt < 60; attempt++) {
-        const statusResult = await connection.getSignatureStatuses([signature], {
-          searchTransactionHistory: true
-        });
-        const status = statusResult?.value?.[0];
+      let lastRpcError = null;
 
-        if (status?.err) {
-          throw new Error("Transaction failed on-chain. Check the transaction details.");
+      for (const rpcUrl of confirmationRpcs) {
+        try {
+          const connection = new solanaWeb3.Connection(rpcUrl, "confirmed");
+
+          for (let attempt = 0; attempt < 45; attempt++) {
+            const statusResult = await connection.getSignatureStatuses([signature], {
+              searchTransactionHistory: true
+            });
+            const status = statusResult?.value?.[0];
+
+            if (status?.err) {
+              throw new Error("Transaction failed on-chain. Check the transaction details.");
+            }
+
+            if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
+              confirmed = true;
+              break;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+          if (confirmed) break;
+        } catch (rpcError) {
+          lastRpcError = rpcError;
+          console.warn("Confirmation RPC failed:", rpcUrl, rpcError);
         }
-
-        if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
-          confirmed = true;
-          break;
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       if (!confirmed) {
-        throw new Error("Transaction was sent, but confirmation is taking longer than expected. Check the transaction signature.");
+        const explorerUrl = "https://solscan.io/tx/" + signature;
+        throw new Error("Swap was sent, but confirmation could not be checked automatically. Check the transaction: " + explorerUrl);
       }
     }
 
@@ -251,7 +268,8 @@ async function executeGurugSwap() {
     setTimeout(getQuote, 500);
   } catch (err) {
     console.error("GURUG swap failed:", err);
-    setSwapStatus(err?.message || "Swap cancelled or failed.", true);
+    const message = err?.message || "Swap cancelled or failed.";
+    setSwapStatus(message, true);
   } finally {
     swapButton.disabled = false;
   }
