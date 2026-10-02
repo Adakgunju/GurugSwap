@@ -1117,3 +1117,11 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
     width:274px;
   }
 }
+
+
+/* --- MOBILE TOPBAR: PREVENT HORIZONTAL OVERFLOW --- */
+@media(max-width:520px){
+  .topbar{width:100%;box-sizing:border-box;overflow:hidden}
+  .brand{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap}
+  .market-ticker{flex:0 0 165px;max-width:165px;min-width:0;box-sizing:border-box}
+}
