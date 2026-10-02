@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0b">
+  <title>GURUG SWAP — SOL ↔ GURUG</title>
+  <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#">
+      <img src="assets/gurug-logo.png" alt="GURUG">
+      <span>GURUG<span class="accent">SWAP</span></span>
+    </a>
+    <nav>
+      <a href="#swap">SWAP</a>
+      <a href="#links">LINKS</a>
+      <a href="#about">ABOUT</a>
+    </nav>
+    <a class="wallet-btn" href="#swap">CONNECT WALLET</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">SOLANA • GURUG • MEME POWER</div>
+        <h1>SWAP<br><span>LIKE A GURUG.</span></h1>
+        <p class="lead">A home for GURUG on Solana. Swap SOL for GURUG, explore the community, and enter the GURUG universe.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#swap">BUY GURUG ↗</a>
+          <a class="ghost-btn" href="#links">EXPLORE GURUG</a>
+        </div>
+        <div class="contract">
+          <span>GURUG CONTRACT</span>
+          <button id="copyMint" title="Copy contract address">
+            <code id="mintText">G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5</code>
+            <b id="copyText">COPY</b>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-art">
+        <div class="halo"></div>
+        <div class="coin-ring">GURUG • SOL • GURUG • SOL • </div>
+        <img src="assets/gurug-logo.png" alt="GURUG thinking" class="gurug">
+        <div class="floating-tag tag-one">$GURUG</div>
+        <div class="floating-tag tag-two">ON SOLANA</div>
+      </div>
+    </section>
+
+    <section id="swap" class="swap-section">
+      <div class="section-label">01 / SWAP</div>
+      <div class="swap-layout">
+        <div>
+          <h2>GET YOUR<br><span>GURUG.</span></h2>
+          <p>Start with the official Raydium swap route. The pair will be preselected for SOL → GURUG.</p>
+          <a class="raydium-btn" href="https://raydium.io/swap/?inputMint=sol&outputMint=G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5" target="_blank" rel="noopener noreferrer">
+            OPEN RAYDIUM SWAP <span>↗</span>
+          </a>
+          <p class="small-note">This first version uses Raydium's web interface. A custom in-page swap UI can be added in the next build.</p>
+        </div>
+
+        <div class="swap-card">
+          <div class="card-head"><span>GURUG SWAP</span><span class="live-dot">● LIVE ROUTE</span></div>
+          <div class="token-box">
+            <div><small>YOU PAY</small><strong>0.00</strong></div>
+            <div class="token">SOL <span>◎</span></div>
+          </div>
+          <button class="arrow">↓</button>
+          <div class="token-box">
+            <div><small>YOU RECEIVE</small><strong>0.00</strong></div>
+            <div class="token gurug-token"><img src="assets/gurug-logo.png" alt=""> GURUG</div>
+          </div>
+          <a class="connect" href="https://raydium.io/swap/?inputMint=sol&outputMint=G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5" target="_blank" rel="noopener noreferrer">CONNECT & SWAP</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="links" class="links-section">
+      <div class="section-label">02 / THE GURUG UNIVERSE</div>
+      <div class="link-grid">
+        <a class="link-card featured" href="https://raydium.io/swap/?inputMint=sol&outputMint=G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5" target="_blank" rel="noopener noreferrer">
+          <span>BUY</span><strong>GURUG</strong><em>↗</em>
+        </a>
+        <a class="link-card" href="#" onclick="alert('Chart link — add your preferred chart URL here.'); return false;">
+          <span>MARKET</span><strong>CHART</strong><em>↗</em>
+        </a>
+        <a class="link-card" href="https://adakgunju.github.io/Gurug/gellog/" target="_blank" rel="noopener noreferrer">
+          <span>PLAY</span><strong>GURUG ARCADE</strong><em>↗</em>
+        </a>
+        <a class="link-card" href="#" onclick="alert('Add the official GURUG X URL here.'); return false;">
+          <span>FOLLOW</span><strong>𝕏 / X</strong><em>↗</em>
+        </a>
+        <a class="link-card" href="#" onclick="alert('Add the official GURUG Telegram URL here.'); return false;">
+          <span>JOIN</span><strong>TELEGRAM</strong><em>↗</em>
+        </a>
+        <a class="link-card" href="#" onclick="alert('Add your preferred DEX analytics URL here.'); return false;">
+          <span>TRACK</span><strong>DEX TOOLS</strong><em>↗</em>
+        </a>
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="section-label">03 / GURUG</div>
+      <div class="about-inner">
+        <div class="big-type">THINK.<br>SWAP.<br><span>GURUG.</span></div>
+        <div class="about-copy">
+          <p>GURUG is a meme character with a questionable plan and a very confident face.</p>
+          <p>Built on Solana. Built for fun. This page is the first brick of the GURUG web universe.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© GURUG</span>
+    <span>BUILT ON SOLANA</span>
+    <span>GURUGSWAP — V0.1</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
