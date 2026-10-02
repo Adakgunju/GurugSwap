@@ -1125,3 +1125,32 @@ footer{padding:30px 7vw;border-top-color:#292925;color:#696962}
   .brand{font-size:15px;flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap}
   .market-ticker{flex:0 0 165px;max-width:165px;min-width:0;box-sizing:border-box}
 }
+
+
+/* --- CLEAN SECTION FLOW + MINING-STYLE SWAP CARD --- */
+.swap-section,.links-section,.about{border-top:0!important}
+.swap-section{background:radial-gradient(circle at 50% 35%,rgba(255,229,0,.055),transparent 42%),#090a08!important}
+.swap-card{
+  background:linear-gradient(145deg,#1b1d11,#11130d)!important;
+  border:1px solid rgba(255,229,0,.42)!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.38),inset 0 0 35px rgba(255,229,0,.025)!important;
+  border-radius:22px!important;
+}
+.swap-card:before{
+  inset:8px;
+  border:1px solid rgba(255,229,0,.12)!important;
+  border-radius:15px;
+}
+.token-box{
+  background:#11120d!important;
+  border-color:rgba(255,229,0,.30)!important;
+}
+.token-box:focus-within{background:#15170f!important;border-color:rgba(255,229,0,.55)!important}
+.arrow{background:#10110c;border-color:#090a08}
+.swap-meta select{background:#11120d;border-color:rgba(255,229,0,.28)}
+.swap-status{background:#10110d;border-color:rgba(255,229,0,.20)}
+.card-foot{border-top-color:rgba(255,229,0,.16)}
+@media(max-width:520px){
+  .swap-section{padding-top:30px!important;padding-bottom:30px!important}
+  .swap-card{border-radius:18px!important}
+}
