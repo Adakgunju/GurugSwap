@@ -138,7 +138,12 @@ const CANONICAL_TOKEN_ICONS = new Map([
 function applyCanonicalTokenIcon(token) {
   if (!token) return token;
   const canonicalIcon = CANONICAL_TOKEN_ICONS.get(token.mint);
-  if (canonicalIcon) token.icon = canonicalIcon;
+  if (canonicalIcon) {
+    token.icon = canonicalIcon;
+    // GURUG SWAP's own token gets a local verified badge in this UI.
+    // This is a site-level display badge, not a Jupiter verification claim.
+    if (token.mint === mint) token.verified = true;
+  }
   return token;
 }
 
