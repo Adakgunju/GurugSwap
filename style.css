@@ -1627,11 +1627,13 @@ body:before{opacity:.028!important}
 /* --- WALLET BALANCES / MAX-READY UI --- */
 .token-balance{
   margin-top:5px;
-  color:#77786b;
+  color:#c9c9bc;
   font-size:8px;
+  font-weight:600;
   letter-spacing:.08em;
   line-height:1.2;
   min-height:10px;
+  text-shadow:0 1px 8px rgba(0,0,0,.35);
 }
 .swap-input + .token-balance{
   text-align:left;
