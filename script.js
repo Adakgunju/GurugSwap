@@ -1315,7 +1315,10 @@ function tokenInfoIconMarkup(token) {
   return '<span class="token-info-icon token-info-placeholder">' + String(token?.symbol || "?").slice(0,1).toUpperCase() + '</span>';
 }
 
+let tokenInfoRequestId = 0;
+
 async function updateTokenInfo(token = toToken) {
+  const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
   const symbolEl = document.getElementById("tokenInfoSymbol");
   const identityEl = document.getElementById("tokenInfoIdentity");
@@ -1351,6 +1354,7 @@ async function updateTokenInfo(token = toToken) {
   try {
     const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
     const json = await res.json();
+    if (requestId !== tokenInfoRequestId) return;
     const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
     const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
     const pair = solanaPairs.sort((a,b) =>
