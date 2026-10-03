@@ -917,7 +917,14 @@ async function renderTokenList(query = "") {
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
+
+      // Update the token UI immediately after selection. TOKEN INFO is
+      // explicitly driven by the selected TO token, not by a delayed refresh.
       updateTokenButtons();
+      if (tokenPicker.dataset.target === "to") {
+        updateTokenInfo(toToken);
+      }
+
       resetQuoteForTokenChange();
     });
 
