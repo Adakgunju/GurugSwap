@@ -273,12 +273,76 @@ async function rpcRequest(rpcUrl, method, params) {
   }
 }
 
+async function getJupiterHoldingBalance(owner, token) {
+  const url = "https://api.jup.ag/ultra/v1/holdings/" + encodeURIComponent(owner);
+  const res = await fetch(url, {
+    cache: "no-store"
+  });
+
+  if (!res.ok) throw new Error("Jupiter holdings HTTP " + res.status);
+
+  const data = await res.json();
+
+  // Jupiter's holdings response can evolve, so locate the holding by mint
+  // while accepting the common amount field shapes.
+  const candidates = [];
+
+  function collect(value) {
+    if (!value) return;
+    if (Array.isArray(value)) {
+      value.forEach(collect);
+      return;
+    }
+    if (typeof value !== "object") return;
+
+    if (value.mint === token.mint || value.address === token.mint || value.id === token.mint) {
+      candidates.push(value);
+    }
+
+    Object.values(value).forEach(collect);
+  }
+
+  collect(data);
+
+  for (const item of candidates) {
+    const raw =
+      item.uiAmountString ??
+      item.uiAmount ??
+      item.balance ??
+      item.amount;
+
+    const amount = Number(raw);
+    if (Number.isFinite(amount)) return amount;
+
+    const rawAmount = Number(item.rawAmount ?? item.raw_amount);
+    const decimals = Number(item.decimals);
+    if (Number.isFinite(rawAmount) && Number.isInteger(decimals)) {
+      return rawAmount / Math.pow(10, decimals);
+    }
+  }
+
+  return null;
+}
+
 async function getWalletTokenBalance(token) {
   const provider = getPhantomProvider();
   if (!provider?.publicKey) throw new Error("Wallet not connected");
 
   const owner = provider.publicKey.toString();
   let lastError = null;
+
+  // Prefer Jupiter's wallet-holdings service for SPL tokens. It is designed
+  // specifically for wallet holdings and avoids browser RPC token-account
+  // edge cases. Fall back to direct Solana RPC below.
+  if (token.symbol !== "SOL") {
+    try {
+      const jupiterBalance = await getJupiterHoldingBalance(owner, token);
+      if (jupiterBalance !== null) return jupiterBalance;
+    } catch (jupiterError) {
+      lastError = jupiterError;
+      console.warn("Jupiter holdings balance failed:", jupiterError);
+    }
+  }
 
   for (const rpcUrl of BALANCE_RPCS) {
     try {
