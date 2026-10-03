@@ -153,29 +153,63 @@ function setBalanceMessage(el, token, amount) {
   el.textContent = "BALANCE " + formatBalance(amount, token.decimals ?? 6);
 }
 
+const BALANCE_RPCS = [
+  "https://api.mainnet-beta.solana.com",
+  "https://solana-rpc.publicnode.com"
+];
+
+async function rpcRequest(rpcUrl, method, params) {
+  const res = await fetch(rpcUrl, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({jsonrpc:"2.0", id:1, method, params})
+  });
+  if (!res.ok) throw new Error("RPC HTTP " + res.status);
+  const json = await res.json();
+  if (json?.error) throw new Error(json.error.message || "RPC error");
+  return json.result;
+}
+
 async function getWalletTokenBalance(token) {
   const provider = getPhantomProvider();
   if (!provider?.publicKey) return 0;
 
-  if (token.symbol === "SOL") {
-    const connection = new solanaWeb3.Connection("https://solana-rpc.publicnode.com", "confirmed");
-    const lamports = await connection.getBalance(provider.publicKey);
-    walletSolBalance = lamports / 1e9;
-    return walletSolBalance;
+  const owner = provider.publicKey.toString();
+
+  for (const rpcUrl of BALANCE_RPCS) {
+    try {
+      if (token.symbol === "SOL") {
+        const result = await rpcRequest(rpcUrl, "getBalance", [owner, {commitment:"confirmed"}]);
+        const lamports = Number(result?.value);
+        if (Number.isFinite(lamports)) {
+          walletSolBalance = lamports / 1e9;
+          return walletSolBalance;
+        }
+      } else {
+        const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
+          owner,
+          {mint: token.mint},
+          {encoding:"jsonParsed", commitment:"confirmed"}
+        ]);
+
+        let total = 0;
+        for (const account of result?.value || []) {
+          const amount = Number(
+            account?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString ??
+            account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ??
+            0
+          );
+          if (Number.isFinite(amount)) total += amount;
+        }
+        return total;
+      }
+    } catch (err) {
+      console.warn("Balance RPC failed:", rpcUrl, token.symbol, err);
+    }
   }
 
-  const connection = new solanaWeb3.Connection("https://solana-rpc.publicnode.com", "confirmed");
-  const accounts = await connection.getParsedTokenAccountsByOwner(provider.publicKey, {
-    mint: new solanaWeb3.PublicKey(token.mint)
-  });
-  let total = 0;
-  for (const account of accounts.value || []) {
-    const amount = Number(account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0);
-    if (Number.isFinite(amount)) total += amount;
-  }
-  return total;
+  throw new Error("Could not read " + token.symbol + " balance");
 }
-
 async function refreshWalletBalances(fromSnapshot = fromToken, toSnapshot = toToken) {
   const provider = getPhantomProvider();
   const requestId = ++balanceRequestId;
