@@ -176,7 +176,7 @@ async function getWalletTokenBalance(token) {
   return total;
 }
 
-async function refreshWalletBalances() {
+async function refreshWalletBalances(fromSnapshot = fromToken, toSnapshot = toToken) {
   const provider = getPhantomProvider();
   const requestId = ++balanceRequestId;
 
@@ -188,31 +188,37 @@ async function refreshWalletBalances() {
     return;
   }
 
-  // Capture the selected tokens at the start of this request. Without this,
-  // a slower previous request can write the old SOL balance into a newly
-  // selected token row after the user changes FROM/TO.
-  const currentFromToken = fromToken;
-  const currentToToken = toToken;
-
   try {
-    const fromBalance = await getWalletTokenBalance(currentFromToken);
+    // Keep the exact token pair that was selected when this request began.
+    // A later token change invalidates this request immediately.
+    const [fromBalance, toBalance] = await Promise.all([
+      getWalletTokenBalance(fromSnapshot),
+      getWalletTokenBalance(toSnapshot)
+    ]);
+
     if (requestId !== balanceRequestId) return;
 
     walletTokenBalance = fromBalance;
-    if (fromBalanceEl) setBalanceMessage(fromBalanceEl, currentFromToken, fromBalance);
+    if (fromBalanceEl) setBalanceMessage(fromBalanceEl, fromSnapshot, fromBalance);
+    if (toBalanceEl) setBalanceMessage(toBalanceEl, toSnapshot, toBalance);
 
-    const toBalance = await getWalletTokenBalance(currentToToken);
-    if (requestId !== balanceRequestId) return;
-
-    if (toBalanceEl) setBalanceMessage(toBalanceEl, currentToToken, toBalance);
     updateSwapButtonState();
   } catch (err) {
     if (requestId !== balanceRequestId) return;
     console.warn("Wallet balance refresh failed:", err);
+
+    // Keep the UI explicit even if one RPC request fails.
+    if (fromBalanceEl) {
+      fromBalanceEl.hidden = false;
+      fromBalanceEl.textContent = "BALANCE —";
+    }
+    if (toBalanceEl) {
+      toBalanceEl.hidden = false;
+      toBalanceEl.textContent = "BALANCE —";
+    }
     updateSwapButtonState();
   }
 }
-
 function updateSwapButtonState() {
   if (!swapButton) return;
   const provider = getPhantomProvider();
@@ -234,9 +240,18 @@ function updateSwapButtonState() {
   swapButton.disabled = false;
 }
 
-async function refreshBalancesSoon() {
+function refreshBalancesSoon() {
   clearTimeout(balanceRefreshTimer);
-  balanceRefreshTimer = setTimeout(refreshWalletBalances, 120);
+
+  // Invalidate any in-flight request immediately when the selected token changes.
+  balanceRequestId++;
+
+  const fromSnapshot = fromToken;
+  const toSnapshot = toToken;
+
+  balanceRefreshTimer = setTimeout(() => {
+    refreshWalletBalances(fromSnapshot, toSnapshot);
+  }, 120);
 }
 
 let lastSwapResponse = null;
@@ -338,11 +353,9 @@ function updateTokenButtons() {
   if (fromSymbol) fromSymbol.textContent = fromToken.symbol;
   if (toSymbol) toSymbol.textContent = toToken.symbol;
 
-  // FROM button: remove the original SOL icon before inserting the
-  // currently selected token icon. This prevents two icons from stacking.
+  // FROM: remove every old icon, including the original HTML SOL icon.
   if (fromButton) {
-    fromButton.classList.toggle("is-sol", fromToken.symbol === "SOL");
-    fromButton.querySelectorAll(".sol-logo, .token-dynamic-icon").forEach(el => el.remove());
+    fromButton.querySelectorAll("img, .sol-logo, .token-dynamic-icon, .token-fallback").forEach(el => el.remove());
 
     if (fromToken.symbol === "SOL") {
       const solLogo = document.createElement("span");
@@ -350,7 +363,7 @@ function updateTokenButtons() {
       solLogo.setAttribute("aria-hidden", "true");
       solLogo.innerHTML = "<i></i><i></i><i></i>";
       fromButton.insertBefore(solLogo, fromButton.firstChild);
-    } else if (fromToken.icon) {
+    } else if (fromToken.icon && fromToken.icon !== "sol") {
       const img = document.createElement("img");
       img.className = "token-dynamic-icon";
       img.src = fromToken.icon;
@@ -364,24 +377,21 @@ function updateTokenButtons() {
     }
   }
 
-  // TO button uses its existing image element for normal token icons.
-  // SOL has no token image here, so hide it cleanly.
+  // TO: the existing image is only used for non-SOL tokens.
   if (toIcon) {
-    if (toToken.symbol === "SOL") {
+    if (toToken.symbol === "SOL" || !toToken.icon || toToken.icon === "sol") {
       toIcon.style.display = "none";
-    } else if (toToken.icon) {
+    } else {
       toIcon.src = toToken.icon;
       toIcon.style.display = "block";
-    } else {
-      toIcon.style.display = "none";
     }
   }
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
+
   refreshBalancesSoon();
   updateSwapButtonState();
 }
-
 async function renderTokenList(query = "") {
   if (!tokenList) return;
   const q = query.trim().toLowerCase();
