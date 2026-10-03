@@ -1418,6 +1418,10 @@ if (tokenInfoSwapButton) {
   });
 }
 
+// Initial TOKEN INFO follows the default TO token (GURUG).
+// Later TO selections call updateTokenInfo() directly with the selected token.
+updateTokenInfo(toToken);
+
 /* --- LIVE GURUG MARKET TICKER --- */
 async function updateGurugMarketTicker() {
   const priceEl = document.getElementById("gurugPrice");
