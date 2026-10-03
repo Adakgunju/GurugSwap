@@ -87,9 +87,18 @@ if (connectWalletBtn) {
 
 const provider = getPhantomProvider();
 if (provider) {
-  provider.on("connect", (publicKey) => updateWalletButton(publicKey));
-  provider.on("disconnect", () => updateWalletButton(null));
-  provider.on("accountChanged", (publicKey) => updateWalletButton(publicKey));
+  provider.on("connect", (publicKey) => {
+    updateWalletButton(publicKey);
+    refreshBalancesSoon();
+  });
+  provider.on("disconnect", () => {
+    updateWalletButton(null);
+    refreshBalancesSoon();
+  });
+  provider.on("accountChanged", (publicKey) => {
+    updateWalletButton(publicKey);
+    refreshBalancesSoon();
+  });
   if (provider.publicKey) updateWalletButton(provider.publicKey);
   // Phantom may finish restoring the session shortly after the page loads.
   setTimeout(() => {
@@ -125,6 +134,96 @@ let fromToken = TOKEN_CATALOG[0];
 let toToken = TOKEN_CATALOG[1];
 const swapButton = document.getElementById("swapButton");
 const swapStatus = document.getElementById("swapStatus");
+const fromBalanceEl = document.getElementById("fromBalance");
+const toBalanceEl = document.getElementById("toBalance");
+
+let walletTokenBalance = null;
+let walletSolBalance = null;
+let balanceRefreshTimer = null;
+
+function formatBalance(value, decimals = 6) {
+  if (!Number.isFinite(value)) return "0";
+  return value.toLocaleString("en-US", {maximumFractionDigits: Math.min(decimals, 6)});
+}
+
+function setBalanceMessage(el, token, amount) {
+  if (!el) return;
+  el.hidden = false;
+  el.textContent = "BALANCE " + formatBalance(amount, token.decimals ?? 6);
+}
+
+async function getWalletTokenBalance(token) {
+  const provider = getPhantomProvider();
+  if (!provider?.publicKey) return 0;
+
+  if (token.symbol === "SOL") {
+    const connection = new solanaWeb3.Connection("https://solana-rpc.publicnode.com", "confirmed");
+    const lamports = await connection.getBalance(provider.publicKey);
+    walletSolBalance = lamports / 1e9;
+    return walletSolBalance;
+  }
+
+  const connection = new solanaWeb3.Connection("https://solana-rpc.publicnode.com", "confirmed");
+  const accounts = await connection.getParsedTokenAccountsByOwner(provider.publicKey, {
+    mint: new solanaWeb3.PublicKey(token.mint)
+  });
+  let total = 0;
+  for (const account of accounts.value || []) {
+    const amount = Number(account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount || 0);
+    if (Number.isFinite(amount)) total += amount;
+  }
+  return total;
+}
+
+async function refreshWalletBalances() {
+  const provider = getPhantomProvider();
+  if (!provider?.publicKey) {
+    walletTokenBalance = null;
+    walletSolBalance = null;
+    if (fromBalanceEl) fromBalanceEl.hidden = true;
+    if (toBalanceEl) toBalanceEl.hidden = true;
+    return;
+  }
+
+  try {
+    const [fromBalance, toBalance] = await Promise.all([
+      getWalletTokenBalance(fromToken),
+      getWalletTokenBalance(toToken)
+    ]);
+    walletTokenBalance = fromBalance;
+    if (fromBalanceEl) setBalanceMessage(fromBalanceEl, fromToken, fromBalance);
+    if (toBalanceEl) setBalanceMessage(toBalanceEl, toToken, toBalance);
+    updateSwapButtonState();
+  } catch (err) {
+    console.warn("Wallet balance refresh failed:", err);
+  }
+}
+
+function updateSwapButtonState() {
+  if (!swapButton) return;
+  const provider = getPhantomProvider();
+  if (!provider?.publicKey) {
+    swapButton.textContent = "SWAP " + toToken.symbol;
+    swapButton.disabled = false;
+    return;
+  }
+
+  const requested = Number(solAmountInput?.value || 0);
+  if (requested > 0 && walletTokenBalance !== null && requested > walletTokenBalance) {
+    swapButton.textContent = "INSUFFICIENT " + fromToken.symbol;
+    swapButton.disabled = true;
+    setSwapStatus("Not enough " + fromToken.symbol + " in this wallet.", true);
+    return;
+  }
+
+  swapButton.textContent = "SWAP " + toToken.symbol;
+  swapButton.disabled = false;
+}
+
+async function refreshBalancesSoon() {
+  clearTimeout(balanceRefreshTimer);
+  balanceRefreshTimer = setTimeout(refreshWalletBalances, 120);
+}
 
 let lastSwapResponse = null;
 let gurugDecimals = null;
@@ -251,6 +350,8 @@ function updateTokenButtons() {
     }
   }
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
+  refreshBalancesSoon();
+  updateSwapButtonState();
 }
 
 async function renderTokenList(query = "") {
@@ -394,10 +495,13 @@ if (swapDirectionButton) {
     toToken = oldFrom;
     updateTokenButtons();
     resetQuoteForTokenChange();
+    refreshBalancesSoon();
   });
 }
 
 updateTokenButtons();
+refreshBalancesSoon();
+setInterval(refreshWalletBalances, 30000);
 
 function setSwapStatus(message, error = false, state = "") {
   if (!swapStatus) return;
@@ -545,6 +649,7 @@ if (solAmountInput) {
         txLink.removeAttribute("href");
       }
     }
+    updateSwapButtonState();
     quoteTimer = setTimeout(getQuote, 350);
   });
 }
@@ -560,6 +665,13 @@ async function executeGurugSwap() {
 
   const inputDecimals = await getTokenDecimals(fromToken);
   const amount = parseTokenAmount(solAmountInput?.value, inputDecimals);
+
+  await refreshWalletBalances();
+  const requestedAmount = Number(solAmountInput?.value || 0);
+  if (walletTokenBalance !== null && requestedAmount > walletTokenBalance) {
+    updateSwapButtonState();
+    return;
+  }
   if (!amount) {
     setSwapStatus("Enter an amount first.", true);
     return;
