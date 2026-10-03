@@ -1640,3 +1640,34 @@ body:before{opacity:.028!important}
 @media(max-width:520px){
   .arrow{margin:-11px auto!important}
 }
+
+
+/* --- MAX BUTTON: WALLET BALANCE ACTION --- */
+.balance-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:16px;
+}
+.max-button{
+  border:0;
+  background:transparent;
+  color:#ffe500;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.14em;
+  padding:3px 0 2px;
+  cursor:pointer;
+  opacity:.88;
+}
+.max-button:hover{
+  opacity:1;
+  text-shadow:0 0 10px rgba(255,229,0,.28);
+}
+@media(max-width:520px){
+  .max-button{
+    font-size:8px;
+    padding:4px 0 2px;
+  }
+}
