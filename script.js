@@ -155,220 +155,74 @@ function setBalanceMessage(el, token, amount) {
 
 const BALANCE_RPCS = [
   "https://api.mainnet-beta.solana.com",
+  "https://api.mainnet.solana.com",
   "https://solana-rpc.publicnode.com"
 ];
 
 async function rpcRequest(rpcUrl, method, params) {
-  const res = await fetch(rpcUrl, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({jsonrpc:"2.0", id:1, method, params})
-  });
-  if (!res.ok) throw new Error("RPC HTTP " + res.status);
-  const json = await res.json();
-  if (json?.error) throw new Error(json.error.message || "RPC error");
-  return json.result;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const res = await fetch(rpcUrl, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      cache: "no-store",
+      signal: controller.signal,
+      body: JSON.stringify({jsonrpc:"2.0", id:1, method, params})
+    });
+    if (!res.ok) throw new Error("RPC HTTP " + res.status);
+    const json = await res.json();
+    if (json?.error) throw new Error(json.error.message || "RPC error");
+    return json.result;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function getWalletTokenBalance(token) {
   const provider = getPhantomProvider();
-  if (!provider?.publicKey) return 0;
+  if (!provider?.publicKey) throw new Error("Wallet not connected");
 
   const owner = provider.publicKey.toString();
+  let lastError = null;
 
   for (const rpcUrl of BALANCE_RPCS) {
     try {
       if (token.symbol === "SOL") {
-        const result = await rpcRequest(rpcUrl, "getBalance", [owner, {commitment:"confirmed"}]);
-        const lamports = Number(result?.value);
-        if (Number.isFinite(lamports)) {
-          walletSolBalance = lamports / 1e9;
-          return walletSolBalance;
-        }
-      } else {
-        const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
+        const result = await rpcRequest(rpcUrl, "getBalance", [
           owner,
-          {mint: token.mint},
-          {encoding:"jsonParsed", commitment:"confirmed"}
+          {commitment:"confirmed"}
         ]);
-
-        let total = 0;
-        for (const account of result?.value || []) {
-          const amount = Number(
-            account?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString ??
-            account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount ??
-            0
-          );
-          if (Number.isFinite(amount)) total += amount;
-        }
-        return total;
+        const lamports = Number(result?.value);
+        if (!Number.isFinite(lamports)) throw new Error("Invalid SOL balance response");
+        walletSolBalance = lamports / 1e9;
+        return walletSolBalance;
       }
+
+      const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
+        owner,
+        {mint: token.mint},
+        {encoding:"jsonParsed", commitment:"confirmed"}
+      ]);
+
+      let total = 0;
+      for (const account of result?.value || []) {
+        const amount = Number(
+          account?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString ?? 0
+        );
+        if (Number.isFinite(amount)) total += amount;
+      }
+      return total;
     } catch (err) {
+      lastError = err;
       console.warn("Balance RPC failed:", rpcUrl, token.symbol, err);
     }
   }
 
-  throw new Error("Could not read " + token.symbol + " balance");
-}
-async function refreshWalletBalances(fromSnapshot = fromToken, toSnapshot = toToken) {
-  const provider = getPhantomProvider();
-  const requestId = ++balanceRequestId;
-
-  if (!provider?.publicKey) {
-    walletTokenBalance = null;
-    walletSolBalance = null;
-    if (fromBalanceEl) fromBalanceEl.hidden = true;
-    if (toBalanceEl) toBalanceEl.hidden = true;
-    return;
-  }
-
-  try {
-    // Keep the exact token pair that was selected when this request began.
-    // A later token change invalidates this request immediately.
-    const [fromBalance, toBalance] = await Promise.all([
-      getWalletTokenBalance(fromSnapshot),
-      getWalletTokenBalance(toSnapshot)
-    ]);
-
-    if (requestId !== balanceRequestId) return;
-
-    walletTokenBalance = fromBalance;
-    if (fromBalanceEl) setBalanceMessage(fromBalanceEl, fromSnapshot, fromBalance);
-    if (toBalanceEl) setBalanceMessage(toBalanceEl, toSnapshot, toBalance);
-
-    updateSwapButtonState();
-  } catch (err) {
-    if (requestId !== balanceRequestId) return;
-    console.warn("Wallet balance refresh failed:", err);
-
-    // Keep the UI explicit even if one RPC request fails.
-    if (fromBalanceEl) {
-      fromBalanceEl.hidden = false;
-      fromBalanceEl.textContent = "BALANCE —";
-    }
-    if (toBalanceEl) {
-      toBalanceEl.hidden = false;
-      toBalanceEl.textContent = "BALANCE —";
-    }
-    updateSwapButtonState();
-  }
-}
-function updateSwapButtonState() {
-  if (!swapButton) return;
-  const provider = getPhantomProvider();
-  if (!provider?.publicKey) {
-    swapButton.textContent = "SWAP " + toToken.symbol;
-    swapButton.disabled = false;
-    return;
-  }
-
-  const requested = Number(solAmountInput?.value || 0);
-  if (requested > 0 && walletTokenBalance !== null && requested > walletTokenBalance) {
-    swapButton.textContent = "INSUFFICIENT " + fromToken.symbol;
-    swapButton.disabled = true;
-    setSwapStatus("Not enough " + fromToken.symbol + " in this wallet.", true);
-    return;
-  }
-
-  swapButton.textContent = "SWAP " + toToken.symbol;
-  swapButton.disabled = false;
+  throw lastError || new Error("Could not read " + token.symbol + " balance");
 }
 
-function refreshBalancesSoon() {
-  clearTimeout(balanceRefreshTimer);
-
-  // Invalidate any in-flight request immediately when the selected token changes.
-  balanceRequestId++;
-
-  const fromSnapshot = fromToken;
-  const toSnapshot = toToken;
-
-  balanceRefreshTimer = setTimeout(() => {
-    refreshWalletBalances(fromSnapshot, toSnapshot);
-  }, 120);
-}
-
-let lastSwapResponse = null;
-let gurugDecimals = null;
-
-function getTokenByMint(tokenMint) {
-  return TOKEN_CATALOG.find(token => token.mint === tokenMint) || null;
-}
-
-const JUPITER_TOKEN_SEARCH = "https://lite-api.jup.ag/tokens/v2/search";
-
-function isLikelyMint(value) {
-  const q = value.trim();
-  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q);
-}
-
-async function fetchTokenByMint(tokenMint) {
-  const existing = getTokenByMint(tokenMint);
-  if (existing) return existing;
-
-  // Jupiter's token search accepts a mint address and returns token metadata
-  // such as symbol, name, decimals and icon. If the token is not indexed yet,
-  // fall back to Solana RPC for the mint decimals.
-  try {
-    const res = await fetch(JUPITER_TOKEN_SEARCH + "?query=" + encodeURIComponent(tokenMint), {
-      cache: "no-store"
-    });
-    if (res.ok) {
-      const tokens = await res.json();
-      const match = Array.isArray(tokens)
-        ? tokens.find(token => token?.id === tokenMint)
-        : null;
-
-      if (match) {
-        const token = {
-          symbol: match.symbol || "TOKEN",
-          name: match.name || "Solana Token",
-          mint: tokenMint,
-          decimals: Number.isInteger(match.decimals) ? match.decimals : null,
-          icon: match.icon || match.logoURI || "",
-          verified: !!match.isVerified,
-          source: "jupiter"
-        };
-        if (!TOKEN_CATALOG.some(item => item.mint === token.mint)) TOKEN_CATALOG.push(token);
-        return token;
-      }
-    }
-  } catch (err) {
-    console.warn("Jupiter token lookup failed:", err);
-  }
-
-  try {
-    const res = await fetch("https://api.mainnet-beta.solana.com", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        jsonrpc:"2.0",
-        id:1,
-        method:"getTokenSupply",
-        params:[tokenMint]
-      })
-    });
-    const json = await res.json();
-    const value = json?.result?.value;
-    if (value && Number.isInteger(value.decimals)) {
-      const token = {
-        symbol: tokenMint.slice(0, 4).toUpperCase(),
-        name: "Solana Token",
-        mint: tokenMint,
-        decimals: value.decimals,
-        icon: "",
-        verified: false,
-        source: "onchain"
-      };
-      if (!TOKEN_CATALOG.some(item => item.mint === token.mint)) TOKEN_CATALOG.push(token);
-      return token;
-    }
-  } catch (err) {
-    console.warn("Solana mint lookup failed:", err);
-  }
-
-  return null;
-}
 
 function tokenIconMarkup(token) {
   if (token.icon === "sol") {
