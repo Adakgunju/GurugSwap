@@ -912,6 +912,8 @@ async function renderTokenList(query = "") {
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
+        // Commit the selected TO token to TOKEN INFO immediately.
+        activeTokenInfoMint = token.mint;
         updateTokenInfo(token);
       }
 
@@ -1321,8 +1323,11 @@ function tokenInfoIconMarkup(token) {
 }
 
 let tokenInfoRequestId = 0;
+let activeTokenInfoMint = null;
 
-async function updateTokenInfo(token = toToken) {
+async function updateTokenInfo(token) {
+  if (!token?.mint) return;
+  activeTokenInfoMint = token.mint;
   const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
   const symbolEl = document.getElementById("tokenInfoSymbol");
@@ -1361,7 +1366,7 @@ async function updateTokenInfo(token = toToken) {
   try {
     const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
     const json = await res.json();
-    if (requestId !== tokenInfoRequestId) return;
+    if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint || toToken.mint !== token.mint) return;
     const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
     const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
     const pair = solanaPairs.sort((a,b) =>
