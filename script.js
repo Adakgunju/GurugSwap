@@ -295,14 +295,52 @@ async function getWalletTokenBalance(token) {
         return walletSolBalance;
       }
 
-      // Some public RPC nodes intermittently reject the mint-filter form of
-      // getTokenAccountsByOwner. Read both Solana token programs by owner and
-      // filter the requested mint locally instead.
+      // For SPL tokens, first resolve the deterministic Associated Token
+      // Account (ATA) and ask the RPC directly for that account's balance.
+      // This is much lighter and more reliable than scanning every token
+      // account owned by the wallet.
+      const ownerKey = new solanaWeb3.PublicKey(owner);
+      const mintKey = new solanaWeb3.PublicKey(token.mint);
+      const associatedProgram = new solanaWeb3.PublicKey(
+        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+      );
+
       const tokenPrograms = [
         "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
         "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
       ];
 
+      let foundAccount = false;
+
+      for (const programId of tokenPrograms) {
+        const tokenProgram = new solanaWeb3.PublicKey(programId);
+        const [ata] = solanaWeb3.PublicKey.findProgramAddressSync(
+          [
+            ownerKey.toBuffer(),
+            tokenProgram.toBuffer(),
+            mintKey.toBuffer()
+          ],
+          associatedProgram
+        );
+
+        try {
+          const result = await rpcRequest(rpcUrl, "getTokenAccountBalance", [
+            ata.toBase58(),
+            {commitment:"confirmed"}
+          ]);
+
+          const amount = Number(result?.value?.uiAmountString ?? 0);
+          if (Number.isFinite(amount)) {
+            foundAccount = true;
+            return amount;
+          }
+        } catch (ataError) {
+          lastError = ataError;
+        }
+      }
+
+      // Fallback for wallets that hold the token in an ancillary account
+      // rather than the standard ATA.
       let total = 0;
       let successfulProgramReads = 0;
 
@@ -324,15 +362,11 @@ async function getWalletTokenBalance(token) {
             if (Number.isFinite(amount)) total += amount;
           }
         } catch (programError) {
-          console.warn("Token program balance read failed:", rpcUrl, programId, programError);
+          lastError = programError;
         }
       }
 
-      if (successfulProgramReads === 0) {
-        throw new Error("Token balance RPC unavailable");
-      }
-
-      return total;
+      if (successfulProgramReads > 0) return total;
     } catch (err) {
       lastError = err;
       console.warn("Balance RPC failed:", rpcUrl, token.symbol, err);
