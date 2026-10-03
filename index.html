@@ -35,7 +35,7 @@
         <div class="swap-card">
           <div class="card-head"><span>GURUG SWAP</span><span class="live-dot">● LIVE ROUTE</span></div>
           <div class="token-box">
-            <div><small id="fromLabel">YOU PAY</small><input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.001" placeholder="0.00"><div id="fromBalance" class="token-balance" hidden></div></div>
+            <div><small id="fromLabel">YOU PAY</small><input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.001" placeholder="0.00"><div class="balance-row"><div id="fromBalance" class="token-balance" hidden></div><button id="maxButton" class="max-button" type="button">MAX</button></div></div>
             <button class="token token-select sol-token" id="fromTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><span class="sol-logo" aria-hidden="true"><i></i><i></i><i></i></span><span id="fromTokenSymbol">SOL</span><b>⌄</b></button>
           </div>
           <button class="arrow" id="swapDirection" type="button" aria-label="Swap direction">↓</button>
@@ -50,7 +50,7 @@
             <div id="tokenList" class="token-list"></div>
           </div>
           <div class="swap-meta"><span>SLIPPAGE</span><select id="slippage"><option value="0.5">0.5%</option><option value="1">1%</option><option value="2">2%</option></select></div>
-          <button class="connect" id="swapButton" type="button">SWAP GURUG</button>
+          <button class="connect" id="swapButton" type="button">SWAP</button>
           <div id="swapStatus" class="swap-status">
             <div class="swap-status-top"><span class="swap-status-dot"></span><span id="swapStatusLabel">READY TO SWAP</span></div>
             <div class="swap-progress"><span id="swapProgressFill"></span></div>
@@ -90,6 +90,6 @@
     </section>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=21"></script>
+  <script src="script.js?v=22"></script>
 </body>
 </html>
