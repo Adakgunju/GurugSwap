@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090909">
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
-  <link rel="stylesheet" href="style.css?v=22">
+  <link rel="stylesheet" href="style.css?v=23">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -62,6 +62,36 @@
       </div>
     </section>
 
+    <section id="token-info" class="token-info-section" aria-label="Token information">
+      <div class="token-info-card">
+        <div class="token-info-head">
+          <span>TOKEN INFO</span>
+          <span id="tokenInfoStatus" class="token-info-status">LIVE MARKET</span>
+        </div>
+        <div class="token-info-main">
+          <div id="tokenInfoIdentity" class="token-info-identity">
+            <span class="token-info-icon token-info-placeholder">?</span>
+            <div><strong id="tokenInfoName">GURUG</strong><small id="tokenInfoSymbol">GURUG</small></div>
+          </div>
+          <button id="tokenInfoSwap" class="token-info-swap" type="button">SWAP</button>
+        </div>
+        <div class="token-info-contract">
+          <span>CONTRACT</span>
+          <button id="tokenInfoCopy" type="button"><code id="tokenInfoMint">—</code><b id="tokenInfoCopyText">COPY</b></button>
+        </div>
+        <div class="token-info-stats">
+          <div><span>PRICE</span><strong id="tokenInfoPrice">—</strong></div>
+          <div><span>24H</span><strong id="tokenInfoChange">—</strong></div>
+          <div><span>LIQUIDITY</span><strong id="tokenInfoLiquidity">—</strong></div>
+          <div><span>24H VOLUME</span><strong id="tokenInfoVolume">—</strong></div>
+        </div>
+        <div class="token-info-foot">
+          <span id="tokenInfoNetwork">SOLANA</span>
+          <a id="tokenInfoChart" href="#" target="_blank" rel="noopener noreferrer">VIEW CHART ↗</a>
+        </div>
+      </div>
+    </section>
+
     <section id="links" class="links-section">
       <div class="links-heading"><h2>ONE GURUG.<br><span>MANY WORLDS.</span></h2><p>Trade it. Track it. Play it. Follow the chaos.</p></div>
       <div class="link-grid">
@@ -90,6 +120,6 @@
     </section>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=27"></script>
+  <script src="script.js?v=28"></script>
 </body>
 </html>
