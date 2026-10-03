@@ -117,10 +117,8 @@ const TOKEN_CATALOG = [
   {symbol:"SOL", name:"Solana", mint:SOL_MINT, decimals:9, icon:"sol"},
   {symbol:"GURUG", name:"Gurug", mint, decimals:null, icon:"https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"},
   {symbol:"USDC", name:"USD Coin", mint:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", decimals:6},
-  {symbol:"RAY", name:"Raydium", mint:"4k3Dyjzvzp8e3n5pZ4j2t8jJ6Q6J5s6J9s6W6v8m8R4w", decimals:6},
-  {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6},
-  {symbol:"BONK", name:"Bonk", mint:"DezXAZ8z7PnrnRJjz3wXBoRgixCa6b3g4eYJ3W9yF8d7", decimals:5},
-  {symbol:"WIF", name:"dogwifhat", mint:"EKpQGSJtjMFqKZ5kQanSqYXRcF3mJ6Rz3Jf3k5kXjVf", decimals:6}
+  {symbol:"RAY", name:"Raydium", mint:"4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", decimals:6},
+  {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6}
 ];
 
 let fromToken = TOKEN_CATALOG[0];
@@ -354,7 +352,7 @@ async function getQuote() {
     setSwapStatus("Getting live Raydium quote...");
     const slippageBps = Math.round(Number(slippageEl?.value || 0.5) * 100);
     const url = RAYDIUM_API + "/compute/swap-base-in"
-      + "?inputMint=" + encodeURIComponent(SOL_MINT)
+      + "?inputMint=" + encodeURIComponent(fromToken.mint)
       + "&outputMint=" + encodeURIComponent(toToken.mint)
       + "&amount=" + amount
       + "&slippageBps=" + slippageBps
@@ -411,7 +409,7 @@ async function executeGurugSwap() {
   const inputDecimals = await getTokenDecimals(fromToken);
   const amount = parseTokenAmount(solAmountInput?.value, inputDecimals);
   if (!amount) {
-    setSwapStatus("Enter a SOL amount first.", true);
+    setSwapStatus("Enter an amount first.", true);
     return;
   }
 
