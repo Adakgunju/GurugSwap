@@ -213,7 +213,7 @@ function updateSwapButtonState() {
   const hasWallet = !!getPhantomProvider()?.publicKey;
 
   swapButton.textContent = hasWallet
-    ? "SWAP " + toToken.symbol
+    ? "SWAP"
     : "CONNECT WALLET";
 
   // Do not block the existing swap flow just because a public RPC is temporarily
@@ -509,6 +509,38 @@ function setBalanceMessage(el, token, amount) {
   if (!el) return;
   el.hidden = false;
   el.textContent = "BALANCE " + formatBalance(amount, token.decimals ?? 6);
+}
+
+const SOL_MAX_RESERVE = 0.005;
+
+function getMaxSwapAmount() {
+  if (walletTokenBalance === null || !Number.isFinite(walletTokenBalance)) return null;
+
+  const reserve = fromToken.symbol === "SOL" ? SOL_MAX_RESERVE : 0;
+  const maxAmount = Math.max(0, walletTokenBalance - reserve);
+  const decimals = Number.isInteger(fromToken.decimals) ? fromToken.decimals : 6;
+
+  return Number(maxAmount.toFixed(Math.min(decimals, 9)));
+}
+
+function applyMaxAmount() {
+  const maxAmount = getMaxSwapAmount();
+
+  if (maxAmount === null) {
+    setSwapStatus("Connect wallet and wait for your balance to load.", true);
+    return;
+  }
+
+  if (maxAmount <= 0) {
+    setSwapStatus("Not enough " + fromToken.symbol + " balance to swap.", true);
+    return;
+  }
+
+  if (solAmountInput) {
+    solAmountInput.value = String(maxAmount);
+    solAmountInput.dispatchEvent(new Event("input", {bubbles:true}));
+    solAmountInput.focus();
+  }
 }
 
 function tokenIconMarkup(token) {
@@ -907,6 +939,11 @@ async function getQuote() {
 
 let quoteTimer;
 let isSwapping = false;
+const maxButton = document.getElementById("maxButton");
+if (maxButton) {
+  maxButton.addEventListener("click", applyMaxAmount);
+}
+
 if (solAmountInput) {
   solAmountInput.addEventListener("input", () => {
     clearTimeout(quoteTimer);
