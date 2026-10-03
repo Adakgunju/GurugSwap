@@ -741,7 +741,8 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
-  updateTokenInfo(toToken);
+  // Token info is initialized after the full script loads.
+  setTimeout(() => updateTokenInfo(toToken), 0);
   refreshBalancesSoon();
   updateSwapButtonState();
 }
