@@ -140,6 +140,7 @@ const toBalanceEl = document.getElementById("toBalance");
 let walletTokenBalance = null;
 let walletSolBalance = null;
 let balanceRefreshTimer = null;
+let balanceRequestId = 0;
 
 function formatBalance(value, decimals = 6) {
   if (!Number.isFinite(value)) return "0";
@@ -177,6 +178,8 @@ async function getWalletTokenBalance(token) {
 
 async function refreshWalletBalances() {
   const provider = getPhantomProvider();
+  const requestId = ++balanceRequestId;
+
   if (!provider?.publicKey) {
     walletTokenBalance = null;
     walletSolBalance = null;
@@ -185,20 +188,27 @@ async function refreshWalletBalances() {
     return;
   }
 
+  // Capture the selected tokens at the start of this request. Without this,
+  // a slower previous request can write the old SOL balance into a newly
+  // selected token row after the user changes FROM/TO.
+  const currentFromToken = fromToken;
+  const currentToToken = toToken;
+
   try {
-    // Read both sides independently so a missing/invalid token account
-    // cannot prevent the receive-side balance from rendering.
-    const fromBalance = await getWalletTokenBalance(fromToken);
+    const fromBalance = await getWalletTokenBalance(currentFromToken);
+    if (requestId !== balanceRequestId) return;
+
     walletTokenBalance = fromBalance;
-    if (fromBalanceEl) setBalanceMessage(fromBalanceEl, fromToken, fromBalance);
+    if (fromBalanceEl) setBalanceMessage(fromBalanceEl, currentFromToken, fromBalance);
 
-    const toBalance = await getWalletTokenBalance(toToken);
-    if (toBalanceEl) setBalanceMessage(toBalanceEl, toToken, toBalance);
+    const toBalance = await getWalletTokenBalance(currentToToken);
+    if (requestId !== balanceRequestId) return;
 
+    if (toBalanceEl) setBalanceMessage(toBalanceEl, currentToToken, toBalance);
     updateSwapButtonState();
   } catch (err) {
+    if (requestId !== balanceRequestId) return;
     console.warn("Wallet balance refresh failed:", err);
-    // Keep whichever side was already retrieved visible.
     updateSwapButtonState();
   }
 }
@@ -324,35 +334,49 @@ function updateTokenButtons() {
   const toIcon = document.getElementById("toTokenIcon");
   const fromButton = document.getElementById("fromTokenButton");
   const toButton = document.getElementById("toTokenButton");
+
   if (fromSymbol) fromSymbol.textContent = fromToken.symbol;
   if (toSymbol) toSymbol.textContent = toToken.symbol;
+
+  // FROM button: remove the original SOL icon before inserting the
+  // currently selected token icon. This prevents two icons from stacking.
+  if (fromButton) {
+    fromButton.classList.toggle("is-sol", fromToken.symbol === "SOL");
+    fromButton.querySelectorAll(".sol-logo, .token-dynamic-icon").forEach(el => el.remove());
+
+    if (fromToken.symbol === "SOL") {
+      const solLogo = document.createElement("span");
+      solLogo.className = "sol-logo";
+      solLogo.setAttribute("aria-hidden", "true");
+      solLogo.innerHTML = "<i></i><i></i><i></i>";
+      fromButton.insertBefore(solLogo, fromButton.firstChild);
+    } else if (fromToken.icon) {
+      const img = document.createElement("img");
+      img.className = "token-dynamic-icon";
+      img.src = fromToken.icon;
+      img.alt = "";
+      fromButton.insertBefore(img, fromButton.firstChild);
+    } else {
+      const fallback = document.createElement("span");
+      fallback.className = "token-fallback token-dynamic-icon";
+      fallback.textContent = fromToken.symbol.slice(0, 1);
+      fromButton.insertBefore(fallback, fromButton.firstChild);
+    }
+  }
+
+  // TO button uses its existing image element for normal token icons.
+  // SOL has no token image here, so hide it cleanly.
   if (toIcon) {
-    if (toToken.icon && toToken.icon !== "sol") {
+    if (toToken.symbol === "SOL") {
+      toIcon.style.display = "none";
+    } else if (toToken.icon) {
       toIcon.src = toToken.icon;
       toIcon.style.display = "block";
     } else {
       toIcon.style.display = "none";
     }
   }
-  if (fromButton) {
-    fromButton.classList.toggle("is-sol", fromToken.symbol === "SOL");
-    const oldIcon = fromButton.querySelector(".token-dynamic-icon");
-    if (oldIcon) oldIcon.remove();
-    if (fromToken.symbol !== "SOL") {
-      if (fromToken.icon) {
-        const img = document.createElement("img");
-        img.className = "token-dynamic-icon";
-        img.src = fromToken.icon;
-        img.alt = "";
-        fromButton.insertBefore(img, fromButton.firstChild);
-      } else {
-        const fallback = document.createElement("span");
-        fallback.className = "token-fallback token-dynamic-icon";
-        fallback.textContent = fromToken.symbol.slice(0, 1);
-        fromButton.insertBefore(fallback, fromButton.firstChild);
-      }
-    }
-  }
+
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
   refreshBalancesSoon();
   updateSwapButtonState();
