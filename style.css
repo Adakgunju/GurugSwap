@@ -1623,3 +1623,24 @@ body:before{opacity:.028!important}
   .token-option{min-height:52px}
   .token-select{min-width:105px}
 }
+
+/* --- WALLET BALANCES / MAX-READY UI --- */
+.token-balance{
+  margin-top:5px;
+  color:#77786b;
+  font-size:8px;
+  letter-spacing:.08em;
+  line-height:1.2;
+  min-height:10px;
+}
+.swap-input + .token-balance{
+  text-align:left;
+}
+.token-box > div:first-child{
+  min-width:0;
+}
+.connect:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  filter:saturate(.55);
+}
