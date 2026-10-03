@@ -1309,7 +1309,7 @@ function tokenInfoIconMarkup(token) {
     return '<span class="token-info-icon sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
   }
   if (token?.icon) {
-    return '<img class="token-info-icon" src="' + token.icon + '" alt="" onerror="this.outerHTML=\\'<span class="token-info-icon token-info-placeholder">\\' + (String(token.symbol || "?").slice(0,1)) + \\'</span>\\'">';
+    return '<img class="token-info-icon" src="' + token.icon + '" alt="">';
   }
   return '<span class="token-info-icon token-info-placeholder">' + String(token?.symbol || "?").slice(0,1).toUpperCase() + '</span>';
 }
@@ -1334,64 +1334,15 @@ async function updateTokenInfo(token = toToken) {
   symbolEl.textContent = "$" + (token.symbol || "TOKEN");
   mintEl.textContent = token.mint || "—";
   networkEl.textContent = "SOLANA";
-  identityEl.innerHTML = tokenInfoIconMarkup(token) +
-    '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") + '</strong><small id="tokenInfoSymbol">
-async function updateGurugMarketTicker() {
-  const priceEl = document.getElementById("gurugPrice");
-  const changeEl = document.getElementById("gurugChange");
-  if (!priceEl || !changeEl) return;
-
-  try {
-    const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/88a3L9i5KHddtUEPJ1crt8yp8RJNoWrgb7sSGGoU1qqe", {
-      cache: "no-store"
-    });
-    const json = await res.json();
-    const pair = json?.pair;
-    const price = Number(pair?.priceUsd);
-    const change = Number(pair?.priceChange?.h24);
-
-    if (Number.isFinite(price)) {
-      priceEl.textContent = price < 0.000001
-        ? "$" + price.toFixed(10)
-        : price < 0.001
-          ? "$" + price.toFixed(7)
-          : "$" + price.toFixed(6);
-    }
-
-    if (Number.isFinite(change)) {
-      changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
-      changeEl.classList.toggle("down", change < 0);
-    }
-  } catch (err) {
-    console.log("GURUG ticker update failed.", err);
-  }
-}
-
-updateGurugMarketTicker();
-setInterval(updateGurugMarketTicker, 30000);
-
-
-const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
-if (heroConnectWalletBtn) {
-  heroConnectWalletBtn.addEventListener("click", async () => {
-    const provider = getPhantomProvider();
-    if (provider?.publicKey) {
-      try {
-        await provider.disconnect();
-        updateWalletButton(null);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      await connectPhantom();
-    }
-  });
-}
- + (token.symbol || "TOKEN") + '</small></div>';
+  identityEl.innerHTML =
+    tokenInfoIconMarkup(token) +
+    '<div><strong>' + (token.name || "Solana Token") +
+    '</strong><small>$' + (token.symbol || "TOKEN") + '</small></div>';
 
   statusEl.textContent = "LOADING MARKET";
   priceEl.textContent = "—";
   changeEl.textContent = "—";
+  changeEl.style.color = "";
   liquidityEl.textContent = "—";
   volumeEl.textContent = "—";
   chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
