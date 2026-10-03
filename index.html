@@ -163,54 +163,97 @@
         lastSymbol = symbol;
 
         try {
-          const res = await fetch(
-            "https://lite-api.jup.ag/tokens/v2/search?query=" +
-            encodeURIComponent(symbol),
-            {cache:"no-store"}
-          );
-          if (!res.ok) return;
+          const GURUG_MINT = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+          const GURUG_PAIR = "88a3L9i5KHddtUEPJ1crt8yp8RJNoWrgb7sSGGoU1qqe";
 
-          const data = await res.json();
-          const wanted = symbol.toLowerCase();
-          const found = Array.isArray(data)
-            ? data.find(t => String(t?.symbol || "").toLowerCase() === wanted) ||
-              data.find(t => String(t?.name || "").toLowerCase() === wanted)
-            : null;
+          let token;
+          let market;
 
-          if (!found?.id) return;
+          // GURUG is the default TO token. Use its known canonical mint,
+          // logo and live pair directly instead of relying on token-directory
+          // search, which can return incomplete market data for this token.
+          if (symbol === "GURUG") {
+            token = {
+              symbol: "GURUG",
+              name: "Gurug",
+              mint: GURUG_MINT,
+              icon: "https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"
+            };
 
-          const token = {
-            symbol: found.symbol || symbol,
-            name: found.name || symbol,
-            mint: found.id,
-            icon: found.icon || found.logoURI || ""
-          };
+            setText("tokenInfoName", token.name);
+            setText("tokenInfoSymbol", "$" + token.symbol);
+            setText("tokenInfoMint", token.mint);
+            setText("tokenInfoNetwork", "SOLANA");
+            setText("tokenInfoStatus", "LOADING MARKET");
+            setText("tokenInfoPrice", "—");
+            setText("tokenInfoChange", "—");
+            setText("tokenInfoLiquidity", "—");
+            setText("tokenInfoVolume", "—");
+            setTokenIcon(token);
 
-          setText("tokenInfoName", token.name);
-          setText("tokenInfoSymbol", "$" + token.symbol);
-          setText("tokenInfoMint", token.mint);
-          setText("tokenInfoNetwork", "SOLANA");
-          setText("tokenInfoStatus", "LOADING MARKET");
-          setText("tokenInfoPrice", "—");
-          setText("tokenInfoChange", "—");
-          setText("tokenInfoLiquidity", "—");
-          setText("tokenInfoVolume", "—");
-          setTokenIcon(token);
+            const swapEl = document.getElementById("tokenInfoSwap");
+            if (swapEl) swapEl.hidden = false;
 
-          const swapEl = document.getElementById("tokenInfoSwap");
-          if (swapEl) swapEl.hidden = false;
+            const chartEl = document.getElementById("tokenInfoChart");
+            if (chartEl) {
+              chartEl.href = "https://dexscreener.com/solana/" + GURUG_PAIR;
+            }
 
-          const chartEl = document.getElementById("tokenInfoChart");
-          if (chartEl) {
-            chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
+            const marketRes = await fetch(
+              "https://api.dexscreener.com/latest/dex/pairs/solana/" + GURUG_PAIR,
+              {cache:"no-store"}
+            );
+            market = await marketRes.json();
+          } else {
+            const res = await fetch(
+              "https://lite-api.jup.ag/tokens/v2/search?query=" +
+              encodeURIComponent(symbol),
+              {cache:"no-store"}
+            );
+            if (!res.ok) return;
+
+            const data = await res.json();
+            const wanted = symbol.toLowerCase();
+            const found = Array.isArray(data)
+              ? data.find(t => String(t?.symbol || "").toLowerCase() === wanted) ||
+                data.find(t => String(t?.name || "").toLowerCase() === wanted)
+              : null;
+
+            if (!found?.id) return;
+
+            token = {
+              symbol: found.symbol || symbol,
+              name: found.name || symbol,
+              mint: found.id,
+              icon: found.icon || found.logoURI || ""
+            };
+
+            setText("tokenInfoName", token.name);
+            setText("tokenInfoSymbol", "$" + token.symbol);
+            setText("tokenInfoMint", token.mint);
+            setText("tokenInfoNetwork", "SOLANA");
+            setText("tokenInfoStatus", "LOADING MARKET");
+            setText("tokenInfoPrice", "—");
+            setText("tokenInfoChange", "—");
+            setText("tokenInfoLiquidity", "—");
+            setText("tokenInfoVolume", "—");
+            setTokenIcon(token);
+
+            const swapEl = document.getElementById("tokenInfoSwap");
+            if (swapEl) swapEl.hidden = false;
+
+            const chartEl = document.getElementById("tokenInfoChart");
+            if (chartEl) {
+              chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
+            }
+
+            const marketRes = await fetch(
+              "https://api.dexscreener.com/latest/dex/tokens/" +
+              encodeURIComponent(token.mint),
+              {cache:"no-store"}
+            );
+            market = await marketRes.json();
           }
-
-          const marketRes = await fetch(
-            "https://api.dexscreener.com/latest/dex/tokens/" +
-            encodeURIComponent(token.mint),
-            {cache:"no-store"}
-          );
-          const market = await marketRes.json();
 
           // Do not let an older request overwrite a newer TO selection.
           if (toSymbolEl.textContent.trim() !== symbol) return;
