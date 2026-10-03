@@ -1671,3 +1671,29 @@ body:before{opacity:.028!important}
     padding:4px 0 2px;
   }
 }
+
+
+/* --- TOKEN SEARCH 2.0 --- */
+.token-verified{
+  display:inline-grid;
+  place-items:center;
+  width:14px;
+  height:14px;
+  margin-left:4px;
+  border-radius:50%;
+  background:#ffe500;
+  color:#10110d;
+  font-size:9px;
+  font-weight:900;
+  vertical-align:middle;
+}
+.token-recent{
+  color:#aaa997!important;
+  font-size:7px!important;
+  letter-spacing:.08em!important;
+}
+.token-option small{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
