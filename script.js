@@ -709,17 +709,28 @@ function updateTokenButtons() {
     }
   }
 
-  // TO: the existing image is only used for non-SOL tokens.
-  if (toIcon) {
-    if (toToken.symbol === "SOL" || !toToken.icon || toToken.icon === "sol") {
-      toIcon.style.display = "none";
+  // TO: rebuild the icon just like FROM so SOL also gets the real Solana mark.
+  if (toButton) {
+    toButton.querySelectorAll("img, .sol-logo, .token-dynamic-icon, .token-fallback").forEach(el => el.remove());
+
+    if (toToken.symbol === "SOL") {
+      const solLogo = document.createElement("span");
+      solLogo.className = "sol-logo";
+      solLogo.setAttribute("aria-hidden", "true");
+      solLogo.innerHTML = "<i></i><i></i><i></i>";
+      toButton.insertBefore(solLogo, toButton.firstChild);
+    } else if (toToken.icon && toToken.icon !== "sol") {
+      const img = document.createElement("img");
+      img.className = "token-dynamic-icon";
+      img.src = toToken.icon;
+      img.alt = toToken.symbol;
+      attachTokenImageFallback(img, toToken.symbol);
+      toButton.insertBefore(img, toButton.firstChild);
     } else {
-      toIcon.src = toToken.icon;
-      toIcon.alt = toToken.symbol;
-      toIcon.style.display = "block";
-      toIcon.onerror = () => {
-        toIcon.style.display = "none";
-      };
+      const fallback = document.createElement("span");
+      fallback.className = "token-fallback token-dynamic-icon";
+      fallback.textContent = toToken.symbol.slice(0, 1);
+      toButton.insertBefore(fallback, toButton.firstChild);
     }
   }
 
