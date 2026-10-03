@@ -122,16 +122,44 @@
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
   <script src="script.js?v=36"></script>
   <script>
-    // Token-info bridge: keep the info card synchronized with the visible TO token.
+    // Independent TOKEN INFO bridge.
+    // It follows the visible TO token and updates the card directly,
+    // so it does not depend on script.js function scope or async timing.
     (() => {
       const toSymbolEl = document.getElementById("toTokenSymbol");
+      const tokenListEl = document.getElementById("tokenList");
       if (!toSymbolEl) return;
 
-      let lastSymbol = toSymbolEl.textContent.trim();
+      let lastSymbol = "";
 
-      async function syncTokenInfoToVisibleTo() {
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      }
+
+      function setTokenIcon(token) {
+        const identity = document.getElementById("tokenInfoIdentity");
+        if (!identity) return;
+
+        let iconHtml = "";
+        if (token.mint === "So11111111111111111111111111111111111111112") {
+          iconHtml = '<span class="token-info-icon sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
+        } else if (token.icon) {
+          iconHtml = '<img class="token-info-icon" src="' + token.icon + '" alt="">';
+        } else {
+          iconHtml = '<span class="token-info-icon token-info-placeholder">' +
+            String(token.symbol || "?").slice(0, 1).toUpperCase() + '</span>';
+        }
+
+        identity.innerHTML =
+          iconHtml +
+          '<div><strong>' + (token.name || "Solana Token") +
+          '</strong><small>$' + (token.symbol || "TOKEN") + '</small></div>';
+      }
+
+      async function loadVisibleTokenInfo(force = false) {
         const symbol = toSymbolEl.textContent.trim();
-        if (!symbol || symbol === lastSymbol) return;
+        if (!symbol || (!force && symbol === lastSymbol)) return;
         lastSymbol = symbol;
 
         try {
@@ -143,32 +171,122 @@
           if (!res.ok) return;
 
           const data = await res.json();
-          const wanted = String(symbol).toLowerCase();
+          const wanted = symbol.toLowerCase();
           const found = Array.isArray(data)
             ? data.find(t => String(t?.symbol || "").toLowerCase() === wanted) ||
               data.find(t => String(t?.name || "").toLowerCase() === wanted)
             : null;
 
-          if (found && typeof window.updateTokenInfo === "function") {
-            window.updateTokenInfo({
-              symbol: found.symbol || symbol,
-              name: found.name || symbol,
-              mint: found.id,
-              decimals: Number.isInteger(found.decimals) ? found.decimals : null,
-              icon: found.icon || found.logoURI || "",
-              verified: !!found.isVerified
-            });
+          if (!found?.id) return;
+
+          const token = {
+            symbol: found.symbol || symbol,
+            name: found.name || symbol,
+            mint: found.id,
+            icon: found.icon || found.logoURI || ""
+          };
+
+          setText("tokenInfoName", token.name);
+          setText("tokenInfoSymbol", "$" + token.symbol);
+          setText("tokenInfoMint", token.mint);
+          setText("tokenInfoNetwork", "SOLANA");
+          setText("tokenInfoStatus", "LOADING MARKET");
+          setText("tokenInfoPrice", "—");
+          setText("tokenInfoChange", "—");
+          setText("tokenInfoLiquidity", "—");
+          setText("tokenInfoVolume", "—");
+          setTokenIcon(token);
+
+          const swapEl = document.getElementById("tokenInfoSwap");
+          if (swapEl) swapEl.hidden = false;
+
+          const chartEl = document.getElementById("tokenInfoChart");
+          if (chartEl) {
+            chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
           }
+
+          const marketRes = await fetch(
+            "https://api.dexscreener.com/latest/dex/tokens/" +
+            encodeURIComponent(token.mint),
+            {cache:"no-store"}
+          );
+          const market = await marketRes.json();
+
+          // Do not let an older request overwrite a newer TO selection.
+          if (toSymbolEl.textContent.trim() !== symbol) return;
+
+          const pairs = Array.isArray(market?.pairs) ? market.pairs : [];
+          const pair = pairs
+            .filter(p => p?.chainId === "solana")
+            .sort((a,b) =>
+              Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)
+            )[0];
+
+          if (!pair) {
+            setText("tokenInfoStatus", "NO MARKET DATA");
+            return;
+          }
+
+          const price = Number(pair.priceUsd);
+          const change = Number(pair.priceChange?.h24);
+          const liquidity = Number(pair.liquidity?.usd);
+          const volume = Number(pair.volume?.h24);
+
+          const formatPrice = value => {
+            if (!Number.isFinite(value)) return "—";
+            if (value >= 1) return "$" + value.toLocaleString("en-US", {maximumFractionDigits:2});
+            if (value >= 0.01) return "$" + value.toLocaleString("en-US", {maximumFractionDigits:4});
+            return "$" + value.toLocaleString("en-US", {maximumFractionDigits:8});
+          };
+
+          const formatCompact = value => {
+            if (!Number.isFinite(value)) return "—";
+            if (value >= 1000000000) return "$" + (value / 1000000000).toFixed(2) + "B";
+            if (value >= 1000000) return "$" + (value / 1000000).toFixed(2) + "M";
+            if (value >= 1000) return "$" + (value / 1000).toFixed(1) + "K";
+            return "$" + value.toFixed(0);
+          };
+
+          setText("tokenInfoPrice", formatPrice(price));
+          setText("tokenInfoChange",
+            Number.isFinite(change)
+              ? (change >= 0 ? "+" : "") + change.toFixed(2) + "%"
+              : "—"
+          );
+          setText("tokenInfoLiquidity", formatCompact(liquidity));
+          setText("tokenInfoVolume", formatCompact(volume));
+          setText("tokenInfoStatus", "LIVE MARKET");
+
+          const changeEl = document.getElementById("tokenInfoChange");
+          if (changeEl) {
+            changeEl.style.color =
+              Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
+          }
+
+          if (chartEl) chartEl.href = pair.url || chartEl.href;
         } catch (err) {
-          console.warn("Token info bridge failed:", err);
+          console.warn("Independent token-info bridge failed:", err);
+          setText("tokenInfoStatus", "MARKET DATA UNAVAILABLE");
         }
       }
 
-      new MutationObserver(syncTokenInfoToVisibleTo).observe(toSymbolEl, {
+      // Initial state: the default TO token is GURUG, so load its live data too.
+      loadVisibleTokenInfo(true);
+
+      // Watch the visible symbol for normal token-selection updates.
+      new MutationObserver(() => loadVisibleTokenInfo(false)).observe(toSymbolEl, {
         childList: true,
         characterData: true,
         subtree: true
       });
+
+      // Also trigger directly after a token option is clicked.
+      // The existing picker handler runs first and changes the TO token.
+      if (tokenListEl) {
+        tokenListEl.addEventListener("click", () => {
+          setTimeout(() => loadVisibleTokenInfo(true), 0);
+        });
+      }
     })();
   </script>
 </body>
