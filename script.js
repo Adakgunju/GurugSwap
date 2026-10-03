@@ -105,11 +105,149 @@ const TX_VERSION = "V0";
 const solAmountInput = document.getElementById("solAmount");
 const gurugAmountEl = document.getElementById("gurugAmount");
 const slippageEl = document.getElementById("slippage");
+const fromTokenButton = document.getElementById("fromTokenButton");
+const toTokenButton = document.getElementById("toTokenButton");
+const tokenPicker = document.getElementById("tokenPicker");
+const tokenSearch = document.getElementById("tokenSearch");
+const tokenList = document.getElementById("tokenList");
+const closeTokenPicker = document.getElementById("closeTokenPicker");
+const swapDirectionButton = document.getElementById("swapDirection");
+
+const TOKEN_CATALOG = [
+  {symbol:"SOL", name:"Solana", mint:SOL_MINT, decimals:9, icon:"sol"},
+  {symbol:"GURUG", name:"Gurug", mint, decimals:null, icon:"https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"},
+  {symbol:"USDC", name:"USD Coin", mint:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", decimals:6},
+  {symbol:"RAY", name:"Raydium", mint:"4k3Dyjzvzp8e3n5pZ4j2t8jJ6Q6J5s6J9s6W6v8m8R4w", decimals:6},
+  {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6},
+  {symbol:"BONK", name:"Bonk", mint:"DezXAZ8z7PnrnRJjz3wXBoRgixCa6b3g4eYJ3W9yF8d7", decimals:5},
+  {symbol:"WIF", name:"dogwifhat", mint:"EKpQGSJtjMFqKZ5kQanSqYXRcF3mJ6Rz3Jf3k5kXjVf", decimals:6}
+];
+
+let fromToken = TOKEN_CATALOG[0];
+let toToken = TOKEN_CATALOG[1];
 const swapButton = document.getElementById("swapButton");
 const swapStatus = document.getElementById("swapStatus");
 
 let lastSwapResponse = null;
 let gurugDecimals = null;
+
+function getTokenByMint(tokenMint) {
+  return TOKEN_CATALOG.find(token => token.mint === tokenMint) || null;
+}
+
+function tokenIconMarkup(token) {
+  if (token.icon === "sol") {
+    return '<span class="sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
+  }
+  return token.icon ? '<img src="' + token.icon + '" alt="">' : '<span class="token-fallback">' + token.symbol.slice(0,1) + '</span>';
+}
+
+function updateTokenButtons() {
+  const fromSymbol = document.getElementById("fromTokenSymbol");
+  const toSymbol = document.getElementById("toTokenSymbol");
+  const toIcon = document.getElementById("toTokenIcon");
+  const fromButton = document.getElementById("fromTokenButton");
+  const toButton = document.getElementById("toTokenButton");
+  if (fromSymbol) fromSymbol.textContent = fromToken.symbol;
+  if (toSymbol) toSymbol.textContent = toToken.symbol;
+  if (toIcon) {
+    if (toToken.icon && toToken.icon !== "sol") {
+      toIcon.src = toToken.icon;
+      toIcon.style.display = "block";
+    } else {
+      toIcon.style.display = "none";
+    }
+  }
+  if (fromButton) {
+    fromButton.classList.toggle("is-sol", fromToken.symbol === "SOL");
+    const oldIcon = fromButton.querySelector(".token-dynamic-icon");
+    if (oldIcon) oldIcon.remove();
+    if (fromToken.symbol !== "SOL") {
+      const img = document.createElement("img");
+      img.className = "token-dynamic-icon";
+      img.src = fromToken.icon || "";
+      img.alt = "";
+      fromButton.insertBefore(img, fromButton.firstChild);
+    }
+  }
+  if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
+}
+
+function renderTokenList(query = "") {
+  if (!tokenList) return;
+  const q = query.trim().toLowerCase();
+  const matches = TOKEN_CATALOG.filter(token =>
+    !q || token.symbol.toLowerCase().includes(q) || token.name.toLowerCase().includes(q) || token.mint.toLowerCase() === q
+  );
+  tokenList.innerHTML = "";
+  matches.forEach(token => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "token-option";
+    button.innerHTML = tokenIconMarkup(token) + '<span><strong>' + token.symbol + '</strong><small>' + token.name + '</small></span><em>' + (token.mint === fromToken.mint ? "FROM" : token.mint === toToken.mint ? "TO" : "") + '</em>';
+    button.addEventListener("click", () => {
+      if (tokenPicker.dataset.target === "from") {
+        if (token.mint === toToken.mint) toToken = fromToken;
+        fromToken = token;
+      } else {
+        if (token.mint === fromToken.mint) fromToken = toToken;
+        toToken = token;
+      }
+      updateTokenButtons();
+      closeTokenPicker?.click();
+      resetQuoteForTokenChange();
+    });
+    tokenList.appendChild(button);
+  });
+
+  if (!matches.length) {
+    const empty = document.createElement("div");
+    empty.className = "token-empty";
+    empty.textContent = "No token in the starter list. Mint-address search will be added next.";
+    tokenList.appendChild(empty);
+  }
+}
+
+function openTokenPicker(target) {
+  if (!tokenPicker) return;
+  tokenPicker.dataset.target = target;
+  tokenPicker.hidden = false;
+  if (tokenSearch) {
+    tokenSearch.value = "";
+    renderTokenList();
+    setTimeout(() => tokenSearch.focus(), 0);
+  }
+}
+
+function resetQuoteForTokenChange() {
+  clearTimeout(quoteTimer);
+  lastSwapResponse = null;
+  if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
+  if (solAmountInput) {
+    solAmountInput.value = "";
+    solAmountInput.placeholder = "0.00";
+  }
+  setSwapStatus("Select an amount to get a live quote.");
+}
+
+if (fromTokenButton) fromTokenButton.addEventListener("click", () => openTokenPicker("from"));
+if (toTokenButton) toTokenButton.addEventListener("click", () => openTokenPicker("to"));
+if (closeTokenPicker) closeTokenPicker.addEventListener("click", () => { if (tokenPicker) tokenPicker.hidden = true; });
+if (tokenSearch) tokenSearch.addEventListener("input", () => renderTokenList(tokenSearch.value));
+if (tokenPicker) tokenPicker.addEventListener("click", (event) => { if (event.target === tokenPicker) tokenPicker.hidden = true; });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape" && tokenPicker) tokenPicker.hidden = true; });
+
+if (swapDirectionButton) {
+  swapDirectionButton.addEventListener("click", () => {
+    const oldFrom = fromToken;
+    fromToken = toToken;
+    toToken = oldFrom;
+    updateTokenButtons();
+    resetQuoteForTokenChange();
+  });
+}
+
+updateTokenButtons();
 
 function setSwapStatus(message, error = false, state = "") {
   if (!swapStatus) return;
@@ -148,7 +286,7 @@ function showSwapSuccess(solAmount, gurugAmount, signature) {
   swapStatus.classList.add("success");
 
   if (label) label.textContent = "SWAP SUCCESSFUL";
-  if (messageEl) messageEl.textContent = solAmount + " SOL → " + gurugAmount + " GURUG";
+  if (messageEl) messageEl.textContent = solAmount + " " + fromToken.symbol + " → " + gurugAmount + " " + toToken.symbol;
   if (progress) progress.style.width = "100%";
   if (txLink && signature) {
     txLink.href = "https://solscan.io/tx/" + signature;
@@ -183,13 +321,32 @@ function formatToken(raw, decimals) {
   return n.toLocaleString("en-US", {maximumFractionDigits: 4});
 }
 
+function parseTokenAmount(value, decimals) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.round(n * Math.pow(10, decimals)).toString();
+}
+
+async function getTokenDecimals(token) {
+  if (token.decimals !== null && token.decimals !== undefined) return token.decimals;
+  if (token.mint === mint) return await getGurugDecimals();
+  const res = await fetch("https://api.mainnet-beta.solana.com", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({jsonrpc:"2.0",id:1,method:"getTokenSupply",params:[token.mint]})
+  });
+  const json = await res.json();
+  token.decimals = json?.result?.value?.decimals ?? 6;
+  return token.decimals;
+}
+
 async function getQuote() {
   if (isSwapping) return;
-  const amount = parseSolToLamports(solAmountInput?.value);
+  const decimals = await getTokenDecimals(fromToken);
+  const amount = parseTokenAmount(solAmountInput?.value, decimals);
   if (!amount) {
     if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
     lastSwapResponse = null;
-    setSwapStatus("Connect your wallet to swap.");
+    setSwapStatus("Enter an amount to get a live quote.");
     return;
   }
 
@@ -198,7 +355,7 @@ async function getQuote() {
     const slippageBps = Math.round(Number(slippageEl?.value || 0.5) * 100);
     const url = RAYDIUM_API + "/compute/swap-base-in"
       + "?inputMint=" + encodeURIComponent(SOL_MINT)
-      + "&outputMint=" + encodeURIComponent(mint)
+      + "&outputMint=" + encodeURIComponent(toToken.mint)
       + "&amount=" + amount
       + "&slippageBps=" + slippageBps
       + "&txVersion=" + TX_VERSION;
@@ -208,8 +365,8 @@ async function getQuote() {
     if (!res.ok || !json.success || !json.data) throw new Error(json.msg || "Quote failed");
 
     lastSwapResponse = json;
-    const decimals = await getGurugDecimals();
-    if (gurugAmountEl) gurugAmountEl.textContent = formatToken(json.data.outputAmount, decimals);
+    const outputDecimals = await getTokenDecimals(toToken);
+    if (gurugAmountEl) gurugAmountEl.textContent = formatToken(json.data.outputAmount, outputDecimals);
     setSwapStatus("Quote ready. Review the amount, then approve in Phantom.");
   } catch (err) {
     lastSwapResponse = null;
@@ -251,7 +408,8 @@ async function executeGurugSwap() {
     return;
   }
 
-  const amount = parseSolToLamports(solAmountInput?.value);
+  const inputDecimals = await getTokenDecimals(fromToken);
+  const amount = parseTokenAmount(solAmountInput?.value, inputDecimals);
   if (!amount) {
     setSwapStatus("Enter a SOL amount first.", true);
     return;
@@ -280,8 +438,8 @@ async function executeGurugSwap() {
         swapResponse: lastSwapResponse,
         txVersion: TX_VERSION,
         wallet: provider.publicKey.toString(),
-        wrapSol: true,
-        unwrapSol: false
+        wrapSol: fromToken.symbol === "SOL",
+        unwrapSol: toToken.symbol === "SOL"
       })
     });
 
@@ -351,13 +509,11 @@ async function executeGurugSwap() {
       }
     }
 
-    const confirmedSolAmount = Number(solAmountInput?.value || 0).toLocaleString("en-US", {
-      maximumFractionDigits: 6
-    });
-    const confirmedGurugAmount = gurugAmountEl?.textContent || "0.00";
+    const confirmedFromAmount = Number(solAmountInput?.value || 0).toLocaleString("en-US", { maximumFractionDigits: 6 });
+    const confirmedToAmount = gurugAmountEl?.textContent || "0.00";
     const finalSignature = signatures[signatures.length - 1];
 
-    showSwapSuccess(confirmedSolAmount, confirmedGurugAmount, finalSignature);
+    showSwapSuccess(confirmedFromAmount, confirmedToAmount, finalSignature);
 
     lastSwapResponse = null;
     if (solAmountInput) solAmountInput.value = "";
