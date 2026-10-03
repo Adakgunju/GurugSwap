@@ -1491,3 +1491,135 @@ body:before{opacity:.028!important}
     background-position:center,center!important;
   }
 }
+
+
+/* --- MULTI-TOKEN PICKER / V2 FOUNDATION --- */
+.token-select{
+  border:0;
+  cursor:pointer;
+  color:var(--white);
+  background:transparent;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:118px;
+  justify-content:flex-end;
+  padding:0;
+}
+.token-select b{
+  color:var(--yellow);
+  font-size:14px;
+  line-height:1;
+  margin-left:2px;
+}
+.token-select img,
+.token-dynamic-icon{
+  width:28px;
+  height:28px;
+  object-fit:cover;
+  border-radius:50%;
+}
+.token-select .sol-logo{width:28px;height:28px;flex:0 0 28px}
+.token-picker{
+  position:absolute;
+  z-index:30;
+  left:18px;
+  right:18px;
+  top:82px;
+  padding:14px;
+  border:1px solid rgba(255,229,0,.42);
+  border-radius:18px;
+  background:rgba(12,13,10,.98);
+  box-shadow:0 24px 70px rgba(0,0,0,.65);
+  backdrop-filter:blur(18px);
+}
+.token-picker[hidden]{display:none}
+.token-picker-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:var(--yellow);
+  font-size:10px;
+  letter-spacing:.18em;
+  margin-bottom:12px;
+}
+.token-picker-head button{
+  border:0;
+  background:transparent;
+  color:#aaa;
+  font-size:24px;
+  line-height:1;
+  cursor:pointer;
+}
+.token-search{
+  width:100%;
+  border:1px solid rgba(255,229,0,.25);
+  border-radius:11px;
+  padding:12px 13px;
+  outline:0;
+  color:var(--white);
+  background:#10110d;
+  font-size:12px;
+}
+.token-search:focus{border-color:rgba(255,229,0,.58)}
+.token-list{
+  display:grid;
+  gap:6px;
+  margin-top:10px;
+  max-height:310px;
+  overflow:auto;
+}
+.token-option{
+  width:100%;
+  min-height:54px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:12px;
+  background:#11120d;
+  color:var(--white);
+  display:grid;
+  grid-template-columns:34px 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:8px 10px;
+  text-align:left;
+  cursor:pointer;
+}
+.token-option:hover{
+  border-color:rgba(255,229,0,.38);
+  background:#17180f;
+}
+.token-option img,.token-option .sol-logo,.token-fallback{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  object-fit:cover;
+}
+.token-fallback{background:#25271b;color:var(--yellow);font-weight:800}
+.token-option span:nth-child(2){
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.token-option strong{font-size:12px}
+.token-option small{color:#8e8d80;font-size:9px;margin-top:2px}
+.token-option em{font-size:8px;color:var(--yellow);font-style:normal;letter-spacing:.1em}
+.token-empty{
+  padding:18px 10px;
+  color:#8e8d80;
+  text-align:center;
+  font-size:10px;
+  line-height:1.5;
+}
+@media(max-width:520px){
+  .token-picker{
+    left:10px;
+    right:10px;
+    top:76px;
+    padding:12px;
+    border-radius:16px;
+  }
+  .token-option{min-height:52px}
+  .token-select{min-width:105px}
+}
