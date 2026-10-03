@@ -325,6 +325,39 @@ async function getJupiterHoldingBalance(owner, token) {
   return null;
 }
 
+async function getOwnerTokenAccount(token) {
+  const provider = getPhantomProvider();
+  if (!provider?.publicKey || !token || token.symbol === "SOL") return null;
+
+  const owner = provider.publicKey.toString();
+  const tokenPrograms = [
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+  ];
+
+  for (const rpcUrl of BALANCE_RPCS) {
+    for (const programId of tokenPrograms) {
+      try {
+        const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
+          owner,
+          {programId},
+          {encoding:"jsonParsed", commitment:"confirmed"}
+        ]);
+
+        const account = (result?.value || []).find(item =>
+          item?.account?.data?.parsed?.info?.mint === token.mint
+        );
+
+        if (account?.pubkey) return account.pubkey;
+      } catch (err) {
+        console.warn("Token account lookup failed:", token.symbol, rpcUrl, err);
+      }
+    }
+  }
+
+  return null;
+}
+
 async function getWalletTokenBalance(token) {
   const provider = getPhantomProvider();
   if (!provider?.publicKey) throw new Error("Wallet not connected");
@@ -1004,6 +1037,20 @@ async function executeGurugSwap() {
     const feeJson = await feeRes.json();
     const priorityFee = String(feeJson?.data?.default?.h || feeJson?.data?.default?.m || 0);
 
+    // Raydium needs the user's actual SPL token accounts when SOL is not
+    // the input/output side. Native SOL is handled by wrapSol/unwrapSol.
+    const inputAccount = fromToken.symbol === "SOL"
+      ? undefined
+      : await getOwnerTokenAccount(fromToken);
+
+    const outputAccount = toToken.symbol === "SOL"
+      ? undefined
+      : await getOwnerTokenAccount(toToken);
+
+    if (fromToken.symbol !== "SOL" && !inputAccount) {
+      throw new Error("Could not find your " + fromToken.symbol + " token account.");
+    }
+
     const txRes = await fetch(RAYDIUM_API + "/transaction/swap-base-in", {
       method: "POST",
       headers: {"Content-Type":"application/json"},
@@ -1013,7 +1060,9 @@ async function executeGurugSwap() {
         txVersion: TX_VERSION,
         wallet: provider.publicKey.toString(),
         wrapSol: fromToken.symbol === "SOL",
-        unwrapSol: toToken.symbol === "SOL"
+        unwrapSol: toToken.symbol === "SOL",
+        inputAccount,
+        outputAccount
       })
     });
 
