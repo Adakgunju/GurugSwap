@@ -121,5 +121,55 @@
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
   <script src="script.js?v=36"></script>
+  <script>
+    // Token-info bridge: keep the info card synchronized with the visible TO token.
+    (() => {
+      const toSymbolEl = document.getElementById("toTokenSymbol");
+      if (!toSymbolEl) return;
+
+      let lastSymbol = toSymbolEl.textContent.trim();
+
+      async function syncTokenInfoToVisibleTo() {
+        const symbol = toSymbolEl.textContent.trim();
+        if (!symbol || symbol === lastSymbol) return;
+        lastSymbol = symbol;
+
+        try {
+          const res = await fetch(
+            "https://lite-api.jup.ag/tokens/v2/search?query=" +
+            encodeURIComponent(symbol),
+            {cache:"no-store"}
+          );
+          if (!res.ok) return;
+
+          const data = await res.json();
+          const wanted = String(symbol).toLowerCase();
+          const found = Array.isArray(data)
+            ? data.find(t => String(t?.symbol || "").toLowerCase() === wanted) ||
+              data.find(t => String(t?.name || "").toLowerCase() === wanted)
+            : null;
+
+          if (found && typeof window.updateTokenInfo === "function") {
+            window.updateTokenInfo({
+              symbol: found.symbol || symbol,
+              name: found.name || symbol,
+              mint: found.id,
+              decimals: Number.isInteger(found.decimals) ? found.decimals : null,
+              icon: found.icon || found.logoURI || "",
+              verified: !!found.isVerified
+            });
+          }
+        } catch (err) {
+          console.warn("Token info bridge failed:", err);
+        }
+      }
+
+      new MutationObserver(syncTokenInfoToVisibleTo).observe(toSymbolEl, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+    })();
+  </script>
 </body>
 </html>
