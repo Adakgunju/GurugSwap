@@ -35,12 +35,12 @@
         <div class="swap-card">
           <div class="card-head"><span>GURUG SWAP</span><span class="live-dot">● LIVE ROUTE</span></div>
           <div class="token-box">
-            <div><small id="fromLabel">YOU PAY</small><input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.001" placeholder="0.00"></div>
+            <div><small id="fromLabel">YOU PAY</small><input id="solAmount" class="swap-input" inputmode="decimal" type="number" min="0" step="0.001" placeholder="0.00"><div id="fromBalance" class="token-balance" hidden></div></div>
             <button class="token token-select sol-token" id="fromTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><span class="sol-logo" aria-hidden="true"><i></i><i></i><i></i></span><span id="fromTokenSymbol">SOL</span><b>⌄</b></button>
           </div>
           <button class="arrow" id="swapDirection" type="button" aria-label="Swap direction">↓</button>
           <div class="token-box">
-            <div><small id="toLabel">YOU RECEIVE</small><strong id="gurugAmount">0.00</strong></div>
+            <div><small id="toLabel">YOU RECEIVE</small><strong id="gurugAmount">0.00</strong><div id="toBalance" class="token-balance" hidden></div></div>
             <button class="token token-select gurug-token" id="toTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><img id="toTokenIcon" src="https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png" alt=""><span id="toTokenSymbol">GURUG</span><b>⌄</b></button>
           </div>
 
@@ -90,6 +90,6 @@
     </section>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=8"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
