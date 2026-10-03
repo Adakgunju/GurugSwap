@@ -295,19 +295,43 @@ async function getWalletTokenBalance(token) {
         return walletSolBalance;
       }
 
-      const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
-        owner,
-        {mint: token.mint},
-        {encoding:"jsonParsed", commitment:"confirmed"}
-      ]);
+      // Some public RPC nodes intermittently reject the mint-filter form of
+      // getTokenAccountsByOwner. Read both Solana token programs by owner and
+      // filter the requested mint locally instead.
+      const tokenPrograms = [
+        "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+      ];
 
       let total = 0;
-      for (const account of result?.value || []) {
-        const amount = Number(
-          account?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString ?? 0
-        );
-        if (Number.isFinite(amount)) total += amount;
+      let successfulProgramReads = 0;
+
+      for (const programId of tokenPrograms) {
+        try {
+          const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
+            owner,
+            {programId},
+            {encoding:"jsonParsed", commitment:"confirmed"}
+          ]);
+
+          successfulProgramReads++;
+
+          for (const account of result?.value || []) {
+            const info = account?.account?.data?.parsed?.info;
+            if (info?.mint !== token.mint) continue;
+
+            const amount = Number(info?.tokenAmount?.uiAmountString ?? 0);
+            if (Number.isFinite(amount)) total += amount;
+          }
+        } catch (programError) {
+          console.warn("Token program balance read failed:", rpcUrl, programId, programError);
+        }
       }
+
+      if (successfulProgramReads === 0) {
+        throw new Error("Token balance RPC unavailable");
+      }
+
       return total;
     } catch (err) {
       lastError = err;
