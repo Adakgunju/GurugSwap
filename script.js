@@ -713,19 +713,37 @@ function updateTokenButtons() {
   refreshBalancesSoon();
   updateSwapButtonState();
 }
+const TOKEN_RECENTS_KEY = "gurugSwap.recentTokens";
+
+function getRecentTokenMints() {
+  try {
+    const data = JSON.parse(localStorage.getItem(TOKEN_RECENTS_KEY) || "[]");
+    return Array.isArray(data) ? data.filter(isLikelyMint).slice(0, 6) : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberToken(token) {
+  if (!token?.mint) return;
+  try {
+    const next = [token.mint, ...getRecentTokenMints().filter(mint => mint !== token.mint)].slice(0, 6);
+    localStorage.setItem(TOKEN_RECENTS_KEY, JSON.stringify(next));
+  } catch {}
+}
+
+function tokenSearchLabel(token) {
+  const symbol = token.symbol || "TOKEN";
+  const name = token.name || "Solana Token";
+  return symbol === name ? symbol : symbol + " · " + name;
+}
+
 async function renderTokenList(query = "") {
   if (!tokenList) return;
   const q = query.trim().toLowerCase();
 
-  const catalogMatches = TOKEN_CATALOG.filter(token =>
-    !q ||
-    token.symbol.toLowerCase().includes(q) ||
-    token.name.toLowerCase().includes(q) ||
-    token.mint.toLowerCase() === q
-  );
-
-  let matches = catalogMatches;
-  if (q.length >= 2 && !isLikelyMint(q)) {
+  let remoteTokens = [];
+  if (q.length >= 2) {
     try {
       const res = await fetch(JUPITER_TOKEN_SEARCH + "?query=" + encodeURIComponent(query.trim()), {
         cache: "no-store"
@@ -733,7 +751,7 @@ async function renderTokenList(query = "") {
       if (res.ok) {
         const remote = await res.json();
         if (Array.isArray(remote)) {
-          const remoteTokens = remote
+          remoteTokens = remote
             .filter(token => token?.id && token?.symbol)
             .map(token => ({
               symbol: token.symbol,
@@ -744,21 +762,6 @@ async function renderTokenList(query = "") {
               verified: !!token.isVerified,
               source: "jupiter"
             }));
-
-          remoteTokens.forEach(token => {
-            const existing = TOKEN_CATALOG.find(item => item.mint === token.mint);
-            if (existing) Object.assign(existing, token);
-            else TOKEN_CATALOG.push(token);
-          });
-
-          const seen = new Set();
-          matches = [...catalogMatches, ...remoteTokens]
-            .filter(token => {
-              if (seen.has(token.mint)) return false;
-              seen.add(token.mint);
-              return true;
-            })
-            .slice(0, 30);
         }
       }
     } catch (err) {
@@ -766,40 +769,55 @@ async function renderTokenList(query = "") {
     }
   }
 
-  tokenList.innerHTML = "";
-
-  matches.forEach(token => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "token-option";
-    const trust = token.verified ? " ✓" : "";
-    button.innerHTML =
-      tokenIconMarkup(token) +
-      '<span><strong>' + token.symbol + trust + '</strong><small>' +
-      token.name + '</small></span><em>' +
-      (token.mint === fromToken.mint ? "FROM" : token.mint === toToken.mint ? "TO" : "") +
-      '</em>';
-
-    button.addEventListener("click", async () => {
-      // Search results already carry Jupiter's icon URL. Catalog tokens such
-      // as USDC/RAY/JUP may not, so enrich them automatically by mint.
-      await hydrateTokenIcon(token);
-
-      if (tokenPicker.dataset.target === "from") {
-        if (token.mint === toToken.mint) toToken = fromToken;
-        fromToken = token;
-      } else {
-        if (token.mint === fromToken.mint) fromToken = toToken;
-        toToken = token;
-      }
-      // Close immediately after a token is selected.
-      if (tokenPicker) tokenPicker.hidden = true;
-      updateTokenButtons();
-      resetQuoteForTokenChange();
-    });
-
-    tokenList.appendChild(button);
+  remoteTokens.forEach(token => {
+    const existing = TOKEN_CATALOG.find(item => item.mint === token.mint);
+    if (existing) Object.assign(existing, token);
+    else TOKEN_CATALOG.push(token);
   });
+
+  const all = [...TOKEN_CATALOG, ...remoteTokens];
+  const seen = new Set();
+  let matches = all.filter(token => {
+    if (seen.has(token.mint)) return false;
+    seen.add(token.mint);
+    if (!q) return true;
+    return token.symbol.toLowerCase().includes(q) ||
+      token.name.toLowerCase().includes(q) ||
+      token.mint.toLowerCase() === q;
+  });
+
+  const recentMints = getRecentTokenMints();
+  const recentRank = mint => recentMints.indexOf(mint);
+  const pinnedMints = new Set(TOKEN_CATALOG.slice(0, 3).map(token => token.mint));
+
+  matches.sort((a, b) => {
+    if (!q) {
+      const ap = pinnedMints.has(a.mint);
+      const bp = pinnedMints.has(b.mint);
+      if (ap !== bp) return ap ? -1 : 1;
+
+      const ar = recentRank(a.mint);
+      const br = recentRank(b.mint);
+      if (ar !== -1 || br !== -1) {
+        if (ar === -1) return 1;
+        if (br === -1) return -1;
+        return ar - br;
+      }
+      return 0;
+    }
+
+    const aExact = a.symbol.toLowerCase() === q || a.name.toLowerCase() === q;
+    const bExact = b.symbol.toLowerCase() === q || b.name.toLowerCase() === q;
+    if (aExact !== bExact) return aExact ? -1 : 1;
+
+    const av = !!a.verified;
+    const bv = !!b.verified;
+    if (av !== bv) return av ? -1 : 1;
+    return 0;
+  });
+
+  matches = matches.slice(0, 30);
+  tokenList.innerHTML = "";
 
   if (!matches.length) {
     const empty = document.createElement("div");
@@ -817,8 +835,54 @@ async function renderTokenList(query = "") {
         empty.textContent = "Mint address not found or not a supported token.";
       }
     }
+    return;
   }
+
+  matches.forEach(token => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "token-option";
+
+    const badge = token.verified
+      ? '<span class="token-verified" title="Verified token">✓</span>'
+      : "";
+    const recent = !q && recentMints.includes(token.mint)
+      ? '<span class="token-recent">RECENT</span>'
+      : "";
+    const side = token.mint === fromToken.mint
+      ? "FROM"
+      : token.mint === toToken.mint
+        ? "TO"
+        : "";
+
+    button.innerHTML =
+      tokenIconMarkup(token) +
+      '<span><strong>' + token.symbol + badge + '</strong><small>' +
+      tokenSearchLabel(token) + '</small></span><em>' +
+      (side || recent) +
+      '</em>';
+
+    button.addEventListener("click", async () => {
+      await hydrateTokenIcon(token);
+      rememberToken(token);
+
+      if (tokenPicker.dataset.target === "from") {
+        if (token.mint === toToken.mint) toToken = fromToken;
+        fromToken = token;
+      } else {
+        if (token.mint === fromToken.mint) fromToken = toToken;
+        toToken = token;
+      }
+
+      if (tokenPicker) tokenPicker.hidden = true;
+      updateTokenButtons();
+      resetQuoteForTokenChange();
+    });
+
+    tokenList.appendChild(button);
+  });
 }
+
 function openTokenPicker(target) {
   if (!tokenPicker) return;
   tokenPicker.dataset.target = target;
