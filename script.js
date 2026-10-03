@@ -741,8 +741,9 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
-  // Token info is initialized after the full script loads.
-  setTimeout(() => updateTokenInfo(toToken), 0);
+  // Keep TOKEN INFO locked to the currently selected TO token.
+  // Call directly so token selection cannot leave stale GURUG data behind.
+  updateTokenInfo(toToken);
   refreshBalancesSoon();
   updateSwapButtonState();
 }
