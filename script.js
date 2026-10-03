@@ -741,6 +741,7 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
+  updateTokenInfo(toToken);
   refreshBalancesSoon();
   updateSwapButtonState();
 }
@@ -1281,6 +1282,178 @@ async function executeGurugSwap() {
 
 if (swapButton) swapButton.addEventListener("click", executeGurugSwap);
 
+
+/* --- TOKEN INFO / LIVE MARKET PANEL --- */
+const TOKEN_INFO_DEX = "https://api.dexscreener.com/latest/dex/tokens/";
+
+function formatUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  if (n >= 1) return "$" + n.toLocaleString("en-US", {maximumFractionDigits:2});
+  if (n >= 0.01) return "$" + n.toLocaleString("en-US", {maximumFractionDigits:4});
+  return "$" + n.toLocaleString("en-US", {maximumFractionDigits:8});
+}
+
+function formatCompactUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  if (n >= 1000000000) return "$" + (n / 1000000000).toFixed(2) + "B";
+  if (n >= 1000000) return "$" + (n / 1000000).toFixed(2) + "M";
+  if (n >= 1000) return "$" + (n / 1000).toFixed(1) + "K";
+  return "$" + n.toFixed(0);
+}
+
+function tokenInfoIconMarkup(token) {
+  applyCanonicalTokenIcon(token);
+  if (token?.symbol === "SOL") {
+    return '<span class="token-info-icon sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
+  }
+  if (token?.icon) {
+    return '<img class="token-info-icon" src="' + token.icon + '" alt="" onerror="this.outerHTML=\\'<span class="token-info-icon token-info-placeholder">\\' + (String(token.symbol || "?").slice(0,1)) + \\'</span>\\'">';
+  }
+  return '<span class="token-info-icon token-info-placeholder">' + String(token?.symbol || "?").slice(0,1).toUpperCase() + '</span>';
+}
+
+async function updateTokenInfo(token = toToken) {
+  const nameEl = document.getElementById("tokenInfoName");
+  const symbolEl = document.getElementById("tokenInfoSymbol");
+  const identityEl = document.getElementById("tokenInfoIdentity");
+  const mintEl = document.getElementById("tokenInfoMint");
+  const statusEl = document.getElementById("tokenInfoStatus");
+  const priceEl = document.getElementById("tokenInfoPrice");
+  const changeEl = document.getElementById("tokenInfoChange");
+  const liquidityEl = document.getElementById("tokenInfoLiquidity");
+  const volumeEl = document.getElementById("tokenInfoVolume");
+  const networkEl = document.getElementById("tokenInfoNetwork");
+  const chartEl = document.getElementById("tokenInfoChart");
+
+  if (!nameEl || !token) return;
+
+  applyCanonicalTokenIcon(token);
+  nameEl.textContent = token.name || "Solana Token";
+  symbolEl.textContent = "$" + (token.symbol || "TOKEN");
+  mintEl.textContent = token.mint || "—";
+  networkEl.textContent = "SOLANA";
+  identityEl.innerHTML = tokenInfoIconMarkup(token) +
+    '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") + '</strong><small id="tokenInfoSymbol">
+async function updateGurugMarketTicker() {
+  const priceEl = document.getElementById("gurugPrice");
+  const changeEl = document.getElementById("gurugChange");
+  if (!priceEl || !changeEl) return;
+
+  try {
+    const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/88a3L9i5KHddtUEPJ1crt8yp8RJNoWrgb7sSGGoU1qqe", {
+      cache: "no-store"
+    });
+    const json = await res.json();
+    const pair = json?.pair;
+    const price = Number(pair?.priceUsd);
+    const change = Number(pair?.priceChange?.h24);
+
+    if (Number.isFinite(price)) {
+      priceEl.textContent = price < 0.000001
+        ? "$" + price.toFixed(10)
+        : price < 0.001
+          ? "$" + price.toFixed(7)
+          : "$" + price.toFixed(6);
+    }
+
+    if (Number.isFinite(change)) {
+      changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
+      changeEl.classList.toggle("down", change < 0);
+    }
+  } catch (err) {
+    console.log("GURUG ticker update failed.", err);
+  }
+}
+
+updateGurugMarketTicker();
+setInterval(updateGurugMarketTicker, 30000);
+
+
+const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
+if (heroConnectWalletBtn) {
+  heroConnectWalletBtn.addEventListener("click", async () => {
+    const provider = getPhantomProvider();
+    if (provider?.publicKey) {
+      try {
+        await provider.disconnect();
+        updateWalletButton(null);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      await connectPhantom();
+    }
+  });
+}
+ + (token.symbol || "TOKEN") + '</small></div>';
+
+  statusEl.textContent = "LOADING MARKET";
+  priceEl.textContent = "—";
+  changeEl.textContent = "—";
+  liquidityEl.textContent = "—";
+  volumeEl.textContent = "—";
+  chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
+
+  try {
+    const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
+    const json = await res.json();
+    const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
+    const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
+    const pair = solanaPairs.sort((a,b) =>
+      Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)
+    )[0];
+
+    if (!pair) {
+      statusEl.textContent = "NO MARKET DATA";
+      return;
+    }
+
+    const price = Number(pair.priceUsd);
+    const change = Number(pair.priceChange?.h24);
+    const liquidity = Number(pair.liquidity?.usd);
+    const volume = Number(pair.volume?.h24);
+
+    priceEl.textContent = formatUsd(price);
+    changeEl.textContent = Number.isFinite(change)
+      ? (change >= 0 ? "+" : "") + change.toFixed(2) + "%"
+      : "—";
+    changeEl.style.color = Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
+    liquidityEl.textContent = formatCompactUsd(liquidity);
+    volumeEl.textContent = formatCompactUsd(volume);
+    statusEl.textContent = "LIVE MARKET";
+    chartEl.href = pair.url || chartEl.href;
+  } catch (err) {
+    console.warn("Token info market lookup failed:", err);
+    statusEl.textContent = "MARKET DATA UNAVAILABLE";
+  }
+}
+
+const tokenInfoCopyButton = document.getElementById("tokenInfoCopy");
+if (tokenInfoCopyButton) {
+  tokenInfoCopyButton.addEventListener("click", async () => {
+    const value = document.getElementById("tokenInfoMint")?.textContent || "";
+    if (!value || value === "—") return;
+    try {
+      await navigator.clipboard.writeText(value);
+      const label = document.getElementById("tokenInfoCopyText");
+      if (label) {
+        label.textContent = "COPIED!";
+        setTimeout(() => label.textContent = "COPY", 1400);
+      }
+    } catch {
+      alert(value);
+    }
+  });
+}
+
+const tokenInfoSwapButton = document.getElementById("tokenInfoSwap");
+if (tokenInfoSwapButton) {
+  tokenInfoSwapButton.addEventListener("click", () => {
+    document.getElementById("swap")?.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
 
 /* --- LIVE GURUG MARKET TICKER --- */
 async function updateGurugMarketTicker() {
