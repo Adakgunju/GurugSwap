@@ -518,6 +518,57 @@ function tokenIconMarkup(token) {
   return token.icon ? '<img src="' + token.icon + '" alt="">' : '<span class="token-fallback">' + token.symbol.slice(0,1) + '</span>';
 }
 
+const TOKEN_ICON_CACHE = new Map(
+  TOKEN_CATALOG
+    .filter(token => token.icon && token.icon !== "sol")
+    .map(token => [token.mint, token.icon])
+);
+
+async function hydrateTokenIcon(token) {
+  if (!token || token.icon === "sol" || token.icon) return token;
+
+  const cached = TOKEN_ICON_CACHE.get(token.mint);
+  if (cached) {
+    token.icon = cached;
+    return token;
+  }
+
+  try {
+    const found = await fetchTokenByMint(token.mint);
+    if (found?.icon) {
+      token.icon = found.icon;
+      token.name = found.name || token.name;
+      token.decimals = found.decimals ?? token.decimals;
+      token.verified = found.verified ?? token.verified;
+      TOKEN_ICON_CACHE.set(token.mint, found.icon);
+
+      const catalogToken = TOKEN_CATALOG.find(item => item.mint === token.mint);
+      if (catalogToken) Object.assign(catalogToken, token);
+    }
+  } catch (err) {
+    console.warn("Token icon lookup failed:", token.symbol, err);
+  }
+
+  return token;
+}
+
+function attachTokenImageFallback(img, symbol) {
+  img.addEventListener("error", () => {
+    const fallback = document.createElement("span");
+    fallback.className = "token-fallback token-dynamic-icon";
+    fallback.textContent = String(symbol || "?").slice(0, 1).toUpperCase();
+    img.replaceWith(fallback);
+  }, {once:true});
+}
+
+async function hydrateCatalogIcons() {
+  const targets = TOKEN_CATALOG.filter(token =>
+    token.symbol !== "SOL" && token.icon !== "sol" && !token.icon
+  );
+  await Promise.allSettled(targets.map(token => hydrateTokenIcon(token)));
+  updateTokenButtons();
+}
+
 function updateTokenButtons() {
   const fromSymbol = document.getElementById("fromTokenSymbol");
   const toSymbol = document.getElementById("toTokenSymbol");
@@ -543,6 +594,7 @@ function updateTokenButtons() {
       img.className = "token-dynamic-icon";
       img.src = fromToken.icon;
       img.alt = "";
+      attachTokenImageFallback(img, fromToken.symbol);
       fromButton.insertBefore(img, fromButton.firstChild);
     } else {
       const fallback = document.createElement("span");
@@ -558,7 +610,11 @@ function updateTokenButtons() {
       toIcon.style.display = "none";
     } else {
       toIcon.src = toToken.icon;
+      toIcon.alt = toToken.symbol;
       toIcon.style.display = "block";
+      toIcon.onerror = () => {
+        toIcon.style.display = "none";
+      };
     }
   }
 
@@ -634,7 +690,11 @@ async function renderTokenList(query = "") {
       (token.mint === fromToken.mint ? "FROM" : token.mint === toToken.mint ? "TO" : "") +
       '</em>';
 
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
+      // Search results already carry Jupiter's icon URL. Catalog tokens such
+      // as USDC/RAY/JUP may not, so enrich them automatically by mint.
+      await hydrateTokenIcon(token);
+
       if (tokenPicker.dataset.target === "from") {
         if (token.mint === toToken.mint) toToken = fromToken;
         fromToken = token;
@@ -715,6 +775,7 @@ if (swapDirectionButton) {
 
 updateTokenButtons();
 refreshBalancesSoon();
+hydrateCatalogIcons();
 setInterval(refreshWalletBalances, 30000);
 
 function setSwapStatus(message, error = false, state = "") {
