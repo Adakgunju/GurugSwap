@@ -130,6 +130,18 @@ const TOKEN_CATALOG = [
   {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6}
 ];
 
+const CANONICAL_TOKEN_ICONS = new Map([
+  [SOL_MINT, "sol"],
+  [mint, "https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"]
+]);
+
+function applyCanonicalTokenIcon(token) {
+  if (!token) return token;
+  const canonicalIcon = CANONICAL_TOKEN_ICONS.get(token.mint);
+  if (canonicalIcon) token.icon = canonicalIcon;
+  return token;
+}
+
 let fromToken = TOKEN_CATALOG[0];
 let toToken = TOKEN_CATALOG[1];
 const swapButton = document.getElementById("swapButton");
@@ -615,7 +627,10 @@ const TOKEN_ICON_CACHE = new Map(
 );
 
 async function hydrateTokenIcon(token) {
-  if (!token || token.icon === "sol" || token.icon) return token;
+  if (!token) return token;
+
+  applyCanonicalTokenIcon(token);
+  if (token.icon === "sol" || token.icon) return token;
 
   const cached = TOKEN_ICON_CACHE.get(token.mint);
   if (cached) {
@@ -770,9 +785,15 @@ async function renderTokenList(query = "") {
   }
 
   remoteTokens.forEach(token => {
+    applyCanonicalTokenIcon(token);
+
     const existing = TOKEN_CATALOG.find(item => item.mint === token.mint);
-    if (existing) Object.assign(existing, token);
-    else TOKEN_CATALOG.push(token);
+    if (existing) {
+      Object.assign(existing, token);
+      applyCanonicalTokenIcon(existing);
+    } else {
+      TOKEN_CATALOG.push(token);
+    }
   });
 
   const all = [...TOKEN_CATALOG, ...remoteTokens];
@@ -839,6 +860,8 @@ async function renderTokenList(query = "") {
   }
 
   matches.forEach(token => {
+    applyCanonicalTokenIcon(token);
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "token-option";
