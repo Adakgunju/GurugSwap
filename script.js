@@ -335,12 +335,15 @@ async function getOwnerTokenAccount(token) {
     "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
   ];
 
+  // Query by mint directly instead of scanning every token account.
+  // This is more reliable for wallets with many SPL holdings and avoids
+  // RPC providers returning incomplete owner-account scans.
   for (const rpcUrl of BALANCE_RPCS) {
     for (const programId of tokenPrograms) {
       try {
         const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
           owner,
-          {programId},
+          {mint: token.mint},
           {encoding:"jsonParsed", commitment:"confirmed"}
         ]);
 
@@ -353,6 +356,28 @@ async function getOwnerTokenAccount(token) {
         console.warn("Token account lookup failed:", token.symbol, rpcUrl, err);
       }
     }
+  }
+
+  // Final fallback: derive the standard ATA. Raydium can use it when the
+  // account already exists, even if an RPC provider did not return it above.
+  try {
+    const ownerKey = new solanaWeb3.PublicKey(owner);
+    const mintKey = new solanaWeb3.PublicKey(token.mint);
+    const associatedProgram = new solanaWeb3.PublicKey(
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+    );
+    const tokenProgram = new solanaWeb3.PublicKey(
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    );
+
+    const [ata] = solanaWeb3.PublicKey.findProgramAddressSync(
+      [ownerKey.toBuffer(), tokenProgram.toBuffer(), mintKey.toBuffer()],
+      associatedProgram
+    );
+
+    return ata.toBase58();
+  } catch (err) {
+    console.warn("ATA derivation failed:", token.symbol, err);
   }
 
   return null;
