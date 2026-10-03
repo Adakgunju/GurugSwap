@@ -240,9 +240,10 @@ function setBalanceUnavailable(el) {
 }
 
 const BALANCE_RPCS = [
-  "https://solana-rpc.publicnode.com",
+  "https://rpc.solanatracker.io/public",
+  "https://api.mainnet-beta.solana.com",
   "https://api.mainnet.solana.com",
-  "https://api.mainnet-beta.solana.com"
+  "https://solana-rpc.publicnode.com"
 ];
 
 async function rpcRequest(rpcUrl, method, params) {
