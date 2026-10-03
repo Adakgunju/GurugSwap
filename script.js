@@ -1335,6 +1335,7 @@ async function updateTokenInfo(token = toToken) {
   const volumeEl = document.getElementById("tokenInfoVolume");
   const networkEl = document.getElementById("tokenInfoNetwork");
   const chartEl = document.getElementById("tokenInfoChart");
+  const swapEl = document.getElementById("tokenInfoSwap");
 
   if (!nameEl || !token) return;
 
@@ -1343,6 +1344,7 @@ async function updateTokenInfo(token = toToken) {
   symbolEl.textContent = "$" + (token.symbol || "TOKEN");
   mintEl.textContent = token.mint || "—";
   networkEl.textContent = "SOLANA";
+  if (swapEl) swapEl.hidden = false;
   identityEl.innerHTML =
     tokenInfoIconMarkup(token) +
     '<div><strong>' + (token.name || "Solana Token") +
