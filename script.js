@@ -133,6 +133,81 @@ function getTokenByMint(tokenMint) {
   return TOKEN_CATALOG.find(token => token.mint === tokenMint) || null;
 }
 
+const JUPITER_TOKEN_SEARCH = "https://lite-api.jup.ag/tokens/v2/search";
+
+function isLikelyMint(value) {
+  const q = value.trim();
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q);
+}
+
+async function fetchTokenByMint(tokenMint) {
+  const existing = getTokenByMint(tokenMint);
+  if (existing) return existing;
+
+  // Jupiter's token search accepts a mint address and returns token metadata
+  // such as symbol, name, decimals and icon. If the token is not indexed yet,
+  // fall back to Solana RPC for the mint decimals.
+  try {
+    const res = await fetch(JUPITER_TOKEN_SEARCH + "?query=" + encodeURIComponent(tokenMint), {
+      cache: "no-store"
+    });
+    if (res.ok) {
+      const tokens = await res.json();
+      const match = Array.isArray(tokens)
+        ? tokens.find(token => token?.id === tokenMint)
+        : null;
+
+      if (match) {
+        const token = {
+          symbol: match.symbol || "TOKEN",
+          name: match.name || "Solana Token",
+          mint: tokenMint,
+          decimals: Number.isInteger(match.decimals) ? match.decimals : null,
+          icon: match.icon || match.logoURI || "",
+          verified: !!match.isVerified,
+          source: "jupiter"
+        };
+        if (!TOKEN_CATALOG.some(item => item.mint === token.mint)) TOKEN_CATALOG.push(token);
+        return token;
+      }
+    }
+  } catch (err) {
+    console.warn("Jupiter token lookup failed:", err);
+  }
+
+  try {
+    const res = await fetch("https://api.mainnet-beta.solana.com", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        jsonrpc:"2.0",
+        id:1,
+        method:"getTokenSupply",
+        params:[tokenMint]
+      })
+    });
+    const json = await res.json();
+    const value = json?.result?.value;
+    if (value && Number.isInteger(value.decimals)) {
+      const token = {
+        symbol: tokenMint.slice(0, 4).toUpperCase(),
+        name: "Solana Token",
+        mint: tokenMint,
+        decimals: value.decimals,
+        icon: "",
+        verified: false,
+        source: "onchain"
+      };
+      if (!TOKEN_CATALOG.some(item => item.mint === token.mint)) TOKEN_CATALOG.push(token);
+      return token;
+    }
+  } catch (err) {
+    console.warn("Solana mint lookup failed:", err);
+  }
+
+  return null;
+}
+
 function tokenIconMarkup(token) {
   if (token.icon === "sol") {
     return '<span class="sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
@@ -161,28 +236,90 @@ function updateTokenButtons() {
     const oldIcon = fromButton.querySelector(".token-dynamic-icon");
     if (oldIcon) oldIcon.remove();
     if (fromToken.symbol !== "SOL") {
-      const img = document.createElement("img");
-      img.className = "token-dynamic-icon";
-      img.src = fromToken.icon || "";
-      img.alt = "";
-      fromButton.insertBefore(img, fromButton.firstChild);
+      if (fromToken.icon) {
+        const img = document.createElement("img");
+        img.className = "token-dynamic-icon";
+        img.src = fromToken.icon;
+        img.alt = "";
+        fromButton.insertBefore(img, fromButton.firstChild);
+      } else {
+        const fallback = document.createElement("span");
+        fallback.className = "token-fallback token-dynamic-icon";
+        fallback.textContent = fromToken.symbol.slice(0, 1);
+        fromButton.insertBefore(fallback, fromButton.firstChild);
+      }
     }
   }
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 }
 
-function renderTokenList(query = "") {
+async function renderTokenList(query = "") {
   if (!tokenList) return;
   const q = query.trim().toLowerCase();
-  const matches = TOKEN_CATALOG.filter(token =>
-    !q || token.symbol.toLowerCase().includes(q) || token.name.toLowerCase().includes(q) || token.mint.toLowerCase() === q
+
+  const catalogMatches = TOKEN_CATALOG.filter(token =>
+    !q ||
+    token.symbol.toLowerCase().includes(q) ||
+    token.name.toLowerCase().includes(q) ||
+    token.mint.toLowerCase() === q
   );
+
+  let matches = catalogMatches;
+  if (q.length >= 2 && !isLikelyMint(q)) {
+    try {
+      const res = await fetch(JUPITER_TOKEN_SEARCH + "?query=" + encodeURIComponent(query.trim()), {
+        cache: "no-store"
+      });
+      if (res.ok) {
+        const remote = await res.json();
+        if (Array.isArray(remote)) {
+          const remoteTokens = remote
+            .filter(token => token?.id && token?.symbol)
+            .map(token => ({
+              symbol: token.symbol,
+              name: token.name || "Solana Token",
+              mint: token.id,
+              decimals: Number.isInteger(token.decimals) ? token.decimals : null,
+              icon: token.icon || token.logoURI || "",
+              verified: !!token.isVerified,
+              source: "jupiter"
+            }));
+
+          remoteTokens.forEach(token => {
+            const existing = TOKEN_CATALOG.find(item => item.mint === token.mint);
+            if (existing) Object.assign(existing, token);
+            else TOKEN_CATALOG.push(token);
+          });
+
+          const seen = new Set();
+          matches = [...catalogMatches, ...remoteTokens]
+            .filter(token => {
+              if (seen.has(token.mint)) return false;
+              seen.add(token.mint);
+              return true;
+            })
+            .slice(0, 30);
+        }
+      }
+    } catch (err) {
+      console.warn("Token search failed:", err);
+    }
+  }
+
   tokenList.innerHTML = "";
+
   matches.forEach(token => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "token-option";
-    button.innerHTML = tokenIconMarkup(token) + '<span><strong>' + token.symbol + '</strong><small>' + token.name + '</small></span><em>' + (token.mint === fromToken.mint ? "FROM" : token.mint === toToken.mint ? "TO" : "") + '</em>';
+    const trust = token.verified ? " ✓" : "";
+    button.innerHTML =
+      tokenIconMarkup(token) +
+      '<span><strong>' + token.symbol + trust + '</strong><small>' +
+      token.name + '</small></span><em>' +
+      (token.mint === fromToken.mint ? "FROM" : token.mint === toToken.mint ? "TO" : "") +
+      '</em>';
+
     button.addEventListener("click", () => {
       if (tokenPicker.dataset.target === "from") {
         if (token.mint === toToken.mint) toToken = fromToken;
@@ -195,17 +332,28 @@ function renderTokenList(query = "") {
       closeTokenPicker?.click();
       resetQuoteForTokenChange();
     });
+
     tokenList.appendChild(button);
   });
 
   if (!matches.length) {
     const empty = document.createElement("div");
     empty.className = "token-empty";
-    empty.textContent = "No token in the starter list. Mint-address search will be added next.";
+    empty.textContent = isLikelyMint(q)
+      ? "Looking up this mint address..."
+      : "No matching Solana token found.";
     tokenList.appendChild(empty);
+
+    if (isLikelyMint(q)) {
+      const token = await fetchTokenByMint(query.trim());
+      if (token) {
+        renderTokenList(token.symbol);
+      } else {
+        empty.textContent = "Mint address not found or not a supported token.";
+      }
+    }
   }
 }
-
 function openTokenPicker(target) {
   if (!tokenPicker) return;
   tokenPicker.dataset.target = target;
@@ -231,7 +379,11 @@ function resetQuoteForTokenChange() {
 if (fromTokenButton) fromTokenButton.addEventListener("click", () => openTokenPicker("from"));
 if (toTokenButton) toTokenButton.addEventListener("click", () => openTokenPicker("to"));
 if (closeTokenPicker) closeTokenPicker.addEventListener("click", () => { if (tokenPicker) tokenPicker.hidden = true; });
-if (tokenSearch) tokenSearch.addEventListener("input", () => renderTokenList(tokenSearch.value));
+let tokenSearchTimer;
+if (tokenSearch) tokenSearch.addEventListener("input", () => {
+  clearTimeout(tokenSearchTimer);
+  tokenSearchTimer = setTimeout(() => renderTokenList(tokenSearch.value), 250);
+});
 if (tokenPicker) tokenPicker.addEventListener("click", (event) => { if (event.target === tokenPicker) tokenPicker.hidden = true; });
 document.addEventListener("keydown", (event) => { if (event.key === "Escape" && tokenPicker) tokenPicker.hidden = true; });
 
