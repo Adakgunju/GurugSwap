@@ -1697,3 +1697,172 @@ body:before{opacity:.028!important}
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
+
+/* --- TOKEN INFO / LIVE MARKET PANEL --- */
+.token-info-section{
+  padding:0 5vw 42px;
+}
+.token-info-card{
+  max-width:760px;
+  margin:0 auto;
+  padding:20px;
+  border:1px solid rgba(255,229,0,.34);
+  border-radius:22px;
+  background:linear-gradient(145deg,rgba(27,29,17,.94),rgba(12,14,9,.94));
+  box-shadow:0 18px 55px rgba(0,0,0,.34),inset 0 0 35px rgba(255,229,0,.018);
+}
+.token-info-head,.token-info-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.token-info-head{
+  color:var(--yellow);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.18em;
+  margin-bottom:18px;
+}
+.token-info-status{
+  color:#aaa997;
+  font-size:8px;
+  letter-spacing:.10em;
+}
+.token-info-main{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.token-info-identity{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+}
+.token-info-icon{
+  width:46px;
+  height:46px;
+  flex:0 0 46px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  object-fit:cover;
+}
+.token-info-identity strong{
+  display:block;
+  color:var(--white);
+  font-size:18px;
+  line-height:1.1;
+}
+.token-info-identity small{
+  display:block;
+  margin-top:4px;
+  color:#8f8f82;
+  font-size:9px;
+  letter-spacing:.12em;
+}
+.token-info-placeholder{
+  background:#25271b;
+  color:var(--yellow);
+  font-weight:900;
+}
+.token-info-swap{
+  border:1px solid rgba(255,229,0,.42);
+  border-radius:10px;
+  background:#ffe500;
+  color:#10110d;
+  min-height:38px;
+  padding:0 17px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.12em;
+  cursor:pointer;
+}
+.token-info-contract{
+  margin-top:18px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:11px;
+  background:#10110d;
+}
+.token-info-contract>span{
+  display:block;
+  color:#7f8074;
+  font-size:7px;
+  letter-spacing:.14em;
+  margin-bottom:6px;
+}
+.token-info-contract button{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border:0;
+  background:transparent;
+  color:var(--white);
+  padding:0;
+  cursor:pointer;
+}
+.token-info-contract code{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#cfcfc4;
+  font-size:9px;
+}
+.token-info-contract b{
+  flex:0 0 auto;
+  color:var(--yellow);
+  font-size:8px;
+  letter-spacing:.10em;
+}
+.token-info-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+.token-info-stats>div{
+  min-width:0;
+  padding:12px 10px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:11px;
+  background:#11120d;
+}
+.token-info-stats span{
+  display:block;
+  color:#7f8074;
+  font-size:7px;
+  letter-spacing:.11em;
+}
+.token-info-stats strong{
+  display:block;
+  margin-top:7px;
+  color:var(--white);
+  font-size:11px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.token-info-foot{
+  margin-top:14px;
+  color:#7f8074;
+  font-size:8px;
+  letter-spacing:.11em;
+}
+.token-info-foot a{
+  color:var(--yellow);
+  text-decoration:none;
+}
+@media(max-width:520px){
+  .token-info-section{padding:0 18px 30px}
+  .token-info-card{padding:16px;border-radius:18px}
+  .token-info-stats{grid-template-columns:repeat(2,1fr)}
+  .token-info-identity strong{font-size:16px}
+  .token-info-swap{min-height:36px;padding:0 14px}
+}
