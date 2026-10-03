@@ -186,16 +186,20 @@ async function refreshWalletBalances() {
   }
 
   try {
-    const [fromBalance, toBalance] = await Promise.all([
-      getWalletTokenBalance(fromToken),
-      getWalletTokenBalance(toToken)
-    ]);
+    // Read both sides independently so a missing/invalid token account
+    // cannot prevent the receive-side balance from rendering.
+    const fromBalance = await getWalletTokenBalance(fromToken);
     walletTokenBalance = fromBalance;
     if (fromBalanceEl) setBalanceMessage(fromBalanceEl, fromToken, fromBalance);
+
+    const toBalance = await getWalletTokenBalance(toToken);
     if (toBalanceEl) setBalanceMessage(toBalanceEl, toToken, toBalance);
+
     updateSwapButtonState();
   } catch (err) {
     console.warn("Wallet balance refresh failed:", err);
+    // Keep whichever side was already retrieved visible.
+    updateSwapButtonState();
   }
 }
 
