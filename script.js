@@ -142,6 +142,241 @@ let walletSolBalance = null;
 let balanceRefreshTimer = null;
 let balanceRequestId = 0;
 
+let gurugDecimals = null;
+let lastSwapResponse = null;
+
+const JUPITER_TOKEN_SEARCH = "https://lite-api.jup.ag/tokens/v2/search";
+
+function isLikelyMint(value) {
+  const q = String(value || "").trim();
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q);
+}
+
+async function fetchTokenByMint(mintAddress) {
+  const address = String(mintAddress || "").trim();
+  if (!isLikelyMint(address)) return null;
+
+  try {
+    const res = await fetch(
+      JUPITER_TOKEN_SEARCH + "?query=" + encodeURIComponent(address),
+      {cache:"no-store"}
+    );
+    if (res.ok) {
+      const data = await res.json();
+      const found = Array.isArray(data)
+        ? data.find(token => token?.id === address)
+        : null;
+
+      if (found) {
+        return {
+          symbol: found.symbol || "TOKEN",
+          name: found.name || "Solana Token",
+          mint: found.id,
+          decimals: Number.isInteger(found.decimals) ? found.decimals : null,
+          icon: found.icon || found.logoURI || "",
+          verified: !!found.isVerified,
+          source: "jupiter"
+        };
+      }
+    }
+  } catch (err) {
+    console.warn("Mint lookup failed:", err);
+  }
+
+  // Keep mint-address lookup usable even if the token directory is unavailable.
+  try {
+    const supply = await rpcRequest(BALANCE_RPCS[0], "getTokenSupply", [address]);
+    const decimals = Number(supply?.value?.decimals);
+    if (Number.isInteger(decimals)) {
+      return {
+        symbol: address.slice(0, 4) + "…",
+        name: "Solana Token",
+        mint: address,
+        decimals,
+        icon: "",
+        verified: false,
+        source: "rpc"
+      };
+    }
+  } catch (err) {
+    console.warn("Mint RPC lookup failed:", err);
+  }
+
+  return null;
+}
+
+function updateSwapButtonState() {
+  if (!swapButton) return;
+
+  const amount = Number(solAmountInput?.value || 0);
+  const hasAmount = Number.isFinite(amount) && amount > 0;
+  const hasWallet = !!getPhantomProvider()?.publicKey;
+
+  swapButton.textContent = hasWallet
+    ? "SWAP " + toToken.symbol
+    : "CONNECT WALLET";
+
+  // Do not block the existing swap flow just because a public RPC is temporarily
+  // unavailable. When a balance is available, enforce the insufficient-balance check.
+  const insufficient =
+    hasAmount &&
+    walletTokenBalance !== null &&
+    amount > walletTokenBalance;
+
+  swapButton.disabled = insufficient;
+
+  if (insufficient) {
+    setSwapStatus(
+      "INSUFFICIENT " + fromToken.symbol + " BALANCE",
+      true
+    );
+  }
+}
+
+function setBalanceUnavailable(el) {
+  if (!el) return;
+  el.hidden = false;
+  el.textContent = "BALANCE UNAVAILABLE";
+}
+
+const BALANCE_RPCS = [
+  "https://solana-rpc.publicnode.com",
+  "https://api.mainnet.solana.com",
+  "https://api.mainnet-beta.solana.com"
+];
+
+async function rpcRequest(rpcUrl, method, params) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const res = await fetch(rpcUrl, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      cache: "no-store",
+      signal: controller.signal,
+      body: JSON.stringify({
+        jsonrpc:"2.0",
+        id:1,
+        method,
+        params
+      })
+    });
+
+    if (!res.ok) throw new Error("RPC HTTP " + res.status);
+
+    const json = await res.json();
+    if (json?.error) throw new Error(json.error.message || "RPC error");
+    return json.result;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function getWalletTokenBalance(token) {
+  const provider = getPhantomProvider();
+  if (!provider?.publicKey) throw new Error("Wallet not connected");
+
+  const owner = provider.publicKey.toString();
+  let lastError = null;
+
+  for (const rpcUrl of BALANCE_RPCS) {
+    try {
+      if (token.symbol === "SOL") {
+        const result = await rpcRequest(rpcUrl, "getBalance", [
+          owner,
+          {commitment:"confirmed"}
+        ]);
+        const lamports = Number(result?.value);
+        if (!Number.isFinite(lamports)) {
+          throw new Error("Invalid SOL balance response");
+        }
+        walletSolBalance = lamports / 1e9;
+        return walletSolBalance;
+      }
+
+      const result = await rpcRequest(rpcUrl, "getTokenAccountsByOwner", [
+        owner,
+        {mint: token.mint},
+        {encoding:"jsonParsed", commitment:"confirmed"}
+      ]);
+
+      let total = 0;
+      for (const account of result?.value || []) {
+        const amount = Number(
+          account?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString ?? 0
+        );
+        if (Number.isFinite(amount)) total += amount;
+      }
+      return total;
+    } catch (err) {
+      lastError = err;
+      console.warn("Balance RPC failed:", rpcUrl, token.symbol, err);
+    }
+  }
+
+  throw lastError || new Error("Could not read " + token.symbol + " balance");
+}
+
+async function refreshWalletBalances(fromSnapshot = fromToken, toSnapshot = toToken) {
+  const provider = getPhantomProvider();
+  const requestId = ++balanceRequestId;
+
+  if (!provider?.publicKey) {
+    walletTokenBalance = null;
+    walletSolBalance = null;
+    if (fromBalanceEl) {
+      fromBalanceEl.hidden = false;
+      fromBalanceEl.textContent = "BALANCE —";
+    }
+    if (toBalanceEl) {
+      toBalanceEl.hidden = false;
+      toBalanceEl.textContent = "BALANCE —";
+    }
+    updateSwapButtonState();
+    return;
+  }
+
+  const results = await Promise.allSettled([
+    getWalletTokenBalance(fromSnapshot),
+    getWalletTokenBalance(toSnapshot)
+  ]);
+
+  if (requestId !== balanceRequestId) return;
+
+  const fromResult = results[0];
+  const toResult = results[1];
+
+  if (fromResult.status === "fulfilled") {
+    walletTokenBalance = fromResult.value;
+    setBalanceMessage(fromBalanceEl, fromSnapshot, fromResult.value);
+  } else {
+    setBalanceUnavailable(fromBalanceEl);
+    console.warn("FROM balance failed:", fromResult.reason);
+  }
+
+  if (toResult.status === "fulfilled") {
+    setBalanceMessage(toBalanceEl, toSnapshot, toResult.value);
+  } else {
+    setBalanceUnavailable(toBalanceEl);
+    console.warn("TO balance failed:", toResult.reason);
+  }
+
+  updateSwapButtonState();
+}
+
+function refreshBalancesSoon() {
+  clearTimeout(balanceRefreshTimer);
+  balanceRequestId++;
+
+  const fromSnapshot = fromToken;
+  const toSnapshot = toToken;
+
+  balanceRefreshTimer = setTimeout(() => {
+    refreshWalletBalances(fromSnapshot, toSnapshot);
+  }, 120);
+}
+
 function formatBalance(value, decimals = 6) {
   if (!Number.isFinite(value)) return "0";
   return value.toLocaleString("en-US", {maximumFractionDigits: Math.min(decimals, 6)});
@@ -355,8 +590,9 @@ async function renderTokenList(query = "") {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
       }
+      // Close immediately after a token is selected.
+      if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
-      closeTokenPicker?.click();
       resetQuoteForTokenChange();
     });
 
