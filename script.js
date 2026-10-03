@@ -741,9 +741,6 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
-  // Keep TOKEN INFO locked to the currently selected TO token.
-  // Call directly so token selection cannot leave stale GURUG data behind.
-  updateTokenInfo(toToken);
   refreshBalancesSoon();
   updateSwapButtonState();
 }
@@ -905,27 +902,27 @@ async function renderTokenList(query = "") {
       '</em>';
 
     button.addEventListener("click", async () => {
-      await hydrateTokenIcon(token);
-      rememberToken(token);
+      const target = tokenPicker.dataset.target;
 
-      if (tokenPicker.dataset.target === "from") {
+      // Update the selected token immediately. TOKEN INFO uses this exact
+      // selected object, so it cannot fall back to the initial GURUG token.
+      if (target === "from") {
         if (token.mint === toToken.mint) toToken = fromToken;
         fromToken = token;
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
+        updateTokenInfo(token);
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
-
-      // Update the token UI immediately after selection. TOKEN INFO is
-      // explicitly driven by the selected TO token, not by a delayed refresh.
       updateTokenButtons();
-      if (tokenPicker.dataset.target === "to") {
-        updateTokenInfo(toToken);
-      }
-
       resetQuoteForTokenChange();
+
+      // Hydrate the icon after selection without changing which token
+      // TOKEN INFO is showing.
+      await hydrateTokenIcon(token);
+      rememberToken(token);
     });
 
     tokenList.appendChild(button);
