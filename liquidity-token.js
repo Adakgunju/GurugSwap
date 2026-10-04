@@ -37,6 +37,49 @@
       .liq-note{border-top:1px solid rgba(255,255,255,.1);margin-top:22px;padding-top:18px;color:#9e9e9e;font-size:12px;line-height:1.55}
       .liq-link{color:#ffe500;text-decoration:none}
       @media(max-width:760px){#liquidity.gurug-liquidity{padding:44px 14px 24px}.liquidity-grid{grid-template-columns:1fr}.liquidity-card,.liquidity-help{padding:22px}.liquidity-title{font-size:29px}.liq-row{grid-template-columns:1fr}.liq-pair{grid-template-columns:1fr}.liq-input{font-size:17px}}
+
+      /* Keep 03 heading separate from its function cards. */
+      #liquidity.gurug-liquidity .liquidity-grid{
+        display:block!important;
+      }
+      #liquidity.gurug-liquidity .liquidity-heading{
+        width:100%!important;
+        margin:0 0 28px!important;
+        padding:0!important;
+        text-align:left!important;
+      }
+      #liquidity.gurug-liquidity .liquidity-kicker{
+        display:block!important;
+        margin:0 0 12px!important;
+        text-align:left!important;
+      }
+      #liquidity.gurug-liquidity .liquidity-title{
+        display:block!important;
+        margin:0 0 14px!important;
+        text-align:left!important;
+      }
+      #liquidity.gurug-liquidity .liquidity-sub{
+        display:block!important;
+        margin:0!important;
+        max-width:760px!important;
+        text-align:left!important;
+      }
+      #liquidity.gurug-liquidity .liquidity-card{
+        width:calc(100% - 332px)!important;
+        margin:0!important;
+      }
+      #liquidity.gurug-liquidity .liquidity-help{
+        width:calc(100% - 332px)!important;
+        margin:24px 0 0 auto!important;
+      }
+      @media(max-width:900px){
+        #liquidity.gurug-liquidity .liquidity-card,
+        #liquidity.gurug-liquidity .liquidity-help{
+          width:100%!important;
+          margin-left:0!important;
+          margin-right:0!important;
+        }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -99,10 +142,10 @@
         </aside>
       </div>
     `;
-    const tokenInfo = document.getElementById("token-info");
+    const swapIntro = document.querySelector(".swap-intro");
     const swap = document.getElementById("swap");
-    const anchor = tokenInfo || swap;
-    if (anchor?.parentNode) anchor.parentNode.insertBefore(section, anchor.nextSibling);
+    const anchor = swapIntro || swap;
+    if (anchor?.parentNode) anchor.parentNode.insertBefore(section, anchor);
     else document.querySelector("main")?.appendChild(section);
   }
 
