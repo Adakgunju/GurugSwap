@@ -498,22 +498,45 @@
     return {umi, modules};
   }
 
-  async function createLegacyWebBundlr(provider) {
-    // The legacy browser bundle can expose the constructor under different
-    // global names depending on the bundle build. Resolve it at runtime.
-    const BundlrConstructor =
+  let bundlrConstructorPromise = null;
+
+  async function getBundlrConstructor() {
+    const direct =
       globalThis.WebBundlr ||
       globalThis.Bundlr ||
       globalThis.BundlrClient ||
       null;
 
-    if (typeof BundlrConstructor !== "function") {
+    if (typeof direct === "function") return direct;
+
+    if (!bundlrConstructorPromise) {
+      bundlrConstructorPromise = import(
+        "https://esm.sh/@bundlr-network/client@0.11.17?bundle&target=es2020"
+      ).then(mod => {
+        const ctor = mod?.WebBundlr || mod?.default || mod?.Bundlr || null;
+        if (typeof ctor !== "function") {
+          throw new Error("Bundlr browser module loaded, but WebBundlr was not exported.");
+        }
+        globalThis.WebBundlr = ctor;
+        return ctor;
+      });
+    }
+
+    return bundlrConstructorPromise;
+  }
+
+  async function createLegacyWebBundlr(provider) {
+    let BundlrConstructor;
+    try {
+      BundlrConstructor = await getBundlrConstructor();
+    } catch (loadError) {
       const available = Object.keys(globalThis)
         .filter(key => /bundlr/i.test(key))
         .slice(0, 12);
       throw new Error(
         "Irys storage client failed to load." +
-        (available.length ? " Detected: " + available.join(", ") : " Please refresh the page and try again.")
+        (available.length ? " Detected: " + available.join(", ") : "") +
+        (loadError?.message ? " " + loadError.message : " Please refresh the page and try again.")
       );
     }
 
