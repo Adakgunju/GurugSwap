@@ -1843,3 +1843,35 @@ main{padding-top:82px!important}
   overflow:hidden!important;
 }
 .gurug-rain i{position:absolute!important}
+
+/* === GURUG SNOW: DIRECT VIEWPORT POSITIONING === */
+.gurug-rain i{
+  position:fixed!important;
+  left:auto!important;
+  top:0!important;
+  z-index:1!important;
+}
+.gurug-rain i:nth-child(1){left:4vw!important}
+.gurug-rain i:nth-child(2){left:9vw!important}
+.gurug-rain i:nth-child(3){left:15vw!important}
+.gurug-rain i:nth-child(4){left:21vw!important}
+.gurug-rain i:nth-child(5){left:28vw!important}
+.gurug-rain i:nth-child(6){left:34vw!important}
+.gurug-rain i:nth-child(7){left:40vw!important}
+.gurug-rain i:nth-child(8){left:46vw!important}
+.gurug-rain i:nth-child(9){left:52vw!important}
+.gurug-rain i:nth-child(10){left:58vw!important}
+.gurug-rain i:nth-child(11){left:64vw!important}
+.gurug-rain i:nth-child(12){left:70vw!important}
+.gurug-rain i:nth-child(13){left:76vw!important}
+.gurug-rain i:nth-child(14){left:82vw!important}
+.gurug-rain i:nth-child(15){left:88vw!important}
+.gurug-rain i:nth-child(16){left:94vw!important}
+.gurug-rain i:nth-child(17){left:12vw!important}
+.gurug-rain i:nth-child(18){left:31vw!important}
+.gurug-rain i:nth-child(19){left:55vw!important}
+.gurug-rain i:nth-child(20){left:73vw!important}
+.gurug-rain i:nth-child(21){left:86vw!important}
+.gurug-rain i:nth-child(22){left:97vw!important}
+.gurug-rain i:nth-child(23){left:24vw!important}
+.gurug-rain i:nth-child(24){left:67vw!important}
