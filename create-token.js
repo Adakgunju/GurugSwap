@@ -31,7 +31,7 @@
   const UMI_CDN = "https://esm.sh/@metaplex-foundation/umi@1.5.1?bundle";
   const UMI_DEFAULTS_CDN = "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@1.5.1?bundle";
   const UMI_WALLET_CDN = "https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.5.1?bundle";
-  const UMI_IRYS_CDN = "https://cdn.jsdelivr.net/npm/@metaplex-foundation/umi-uploader-irys@1.5.0/web/+esm";
+  const UMI_IRYS_CDN = "https://esm.unpkg.com/@metaplex-foundation/umi-uploader-irys@1.5.0/web?target=es2022";
   const MPL_METADATA_CDN = "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.4.0?bundle";
   const MPL_TOOLBOX_CDN = "https://esm.sh/@metaplex-foundation/mpl-toolbox@0.11.4?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
