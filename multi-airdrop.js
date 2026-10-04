@@ -63,10 +63,20 @@
     return String(document.getElementById("multiAirdropAmount")?.value || "").trim();
   }
 
+  function updateLineNumbers() {
+    const input = document.getElementById("multiAirdropAddresses");
+    const gutter = document.getElementById("multiAirdropLineNumbers");
+    if (!input || !gutter) return;
+    const lineCount = Math.max(1, input.value.split("\n").length);
+    gutter.textContent = Array.from({ length: lineCount }, (_, i) => String(i + 1)).join("\n");
+    gutter.scrollTop = input.scrollTop;
+  }
+
   function renderRecipients() {
     const host = document.getElementById("multiAirdropAddresses");
     if (!host) return;
     host.value = recipientAddresses.join("\n");
+    updateLineNumbers();
     updateSummary();
   }
 
@@ -209,10 +219,9 @@
     try {
       const message = tx.compileMessage();
       const fee = await connection.getFeeForMessage(message, "confirmed");
-      return Number(fee?.value || 0);
-    } catch {
-      return 0;
-    }
+      if (fee?.value != null) return Number(fee.value);
+    } catch {}
+    return 5000;
   }
 
   async function showResults(batchResults) {
@@ -434,7 +443,7 @@
       lamports += newAtas * ataRent;
 
       if (requestId !== costEstimateRequest) return;
-      costEl.textContent = (lamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL est.";
+      costEl.textContent = (lamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL";
     } catch (error) {
       if (requestId !== costEstimateRequest) return;
       costEl.textContent = "ESTIMATE AVAILABLE AT SEND";
@@ -472,8 +481,11 @@
       .multi-airdrop-input:focus{border-color:#77786f}
       .multi-airdrop-controls{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
       .multi-airdrop-secondary{background:#20221e;color:#ffe500;border:1px solid #494a44;border-radius:9px;padding:10px 13px;font-weight:800;font-size:10px;letter-spacing:.08em;cursor:pointer}
-      .multi-airdrop-addresses{width:100%;min-height:330px;box-sizing:border-box;resize:vertical;padding:15px;background:#0f100e;border:1px solid #3a3b36;border-radius:10px;color:#fff;outline:0;font:500 13px/1.65 monospace}
-      .multi-airdrop-addresses:focus{border-color:#77786f}
+      .multi-airdrop-address-editor{display:grid;grid-template-columns:48px minmax(0,1fr);min-height:330px;border:1px solid #3a3b36;border-radius:10px;overflow:hidden;background:#0f100e}
+      .multi-airdrop-line-numbers{padding:15px 10px 15px 0;background:#0b0c0a;color:#686a63;text-align:right;font:500 13px/1.65 monospace;user-select:none;overflow:hidden;white-space:pre}
+      .multi-airdrop-addresses{width:100%;min-height:330px;box-sizing:border-box;resize:vertical;padding:15px;background:#0f100e;border:0;border-radius:0;color:#fff;outline:0;font:500 13px/1.65 monospace;overflow:auto}
+      .multi-airdrop-address-editor:focus-within{border-color:#77786f}
+      .multi-airdrop-addresses:focus{border-color:transparent}
       .multi-airdrop-addresses::placeholder{color:#777871}
       .multi-airdrop-amount-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-top:18px}
       .multi-airdrop-amount-wrap{min-width:0}
@@ -496,7 +508,8 @@
       .multi-airdrop-result p{margin:9px 0 0;color:#ffb4b4;font-size:10px}
       .multi-airdrop-help h3{margin:0 0 20px;color:#fff;font-size:26px}.multi-airdrop-help-step{display:grid;grid-template-columns:30px 1fr;gap:11px;padding:13px 0;border-top:1px solid rgba(255,255,255,.08)}.multi-airdrop-help-num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,229,0,.3);color:#ffe500;font-size:10px;font-weight:800}.multi-airdrop-help-step strong{display:block;color:#f5f5ef;font-size:12px;margin-bottom:4px}.multi-airdrop-help-step span{display:block;color:#a5a69e;font-size:10px;line-height:1.55}
       @media(max-width:900px){.multi-airdrop-shell{grid-template-columns:1fr}.multi-airdrop-card,.multi-airdrop-help{padding:22px}}
-      @media(max-width:600px){.multi-airdrop-summary{grid-template-columns:1fr 1fr}.multi-airdrop-card,.multi-airdrop-help{padding:18px}.multi-airdrop-addresses{min-height:260px}.multi-airdrop-amount-row{grid-template-columns:1fr}}
+      @media(max-width:600px){.multi-airdrop-address-editor{grid-template-columns:38px minmax(0,1fr)}
+      .multi-airdrop-line-numbers{padding-right:8px;font-size:12px}.multi-airdrop-addresses{min-height:260px;font-size:12px}.multi-airdrop-summary{grid-template-columns:1fr 1fr}.multi-airdrop-card,.multi-airdrop-help{padding:18px}.multi-airdrop-addresses{min-height:260px}.multi-airdrop-amount-row{grid-template-columns:1fr}}
       @media(max-width:430px){.multi-airdrop-summary{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);
@@ -519,7 +532,10 @@
           </div>
 
           <label class="multi-airdrop-label" for="multiAirdropAddresses" style="margin-top:24px">RECIPIENT WALLET ADDRESSES</label>
-          <textarea id="multiAirdropAddresses" class="multi-airdrop-addresses" placeholder="Paste wallet addresses here — one address per line.\n\nYou can paste hundreds or thousands of addresses at once." spellcheck="false"></textarea>
+          <div class="multi-airdrop-address-editor">
+            <div id="multiAirdropLineNumbers" class="multi-airdrop-line-numbers" aria-hidden="true">1</div>
+            <textarea id="multiAirdropAddresses" class="multi-airdrop-addresses" placeholder="Paste wallet addresses here — one address per line.\n\nYou can paste hundreds or thousands of addresses at once." spellcheck="false"></textarea>
+          </div>
           <div class="multi-airdrop-hint">One wallet address per line. Commas and spaces are also accepted. The same amount will be sent to every wallet.</div>
 
           <div class="multi-airdrop-amount-row">
@@ -557,8 +573,14 @@
 
     document.getElementById("multiAirdropAddresses")?.addEventListener("input", event => {
       recipientAddresses = event.target.value.split(/[,\s]+/).map(v => v.trim()).filter(Boolean);
+      updateLineNumbers();
       updateSummary();
       scheduleCostEstimate();
+    });
+
+    document.getElementById("multiAirdropAddresses")?.addEventListener("scroll", event => {
+      const gutter = document.getElementById("multiAirdropLineNumbers");
+      if (gutter) gutter.scrollTop = event.target.scrollTop;
     });
 
     document.getElementById("multiAirdropMint")?.addEventListener("input", () => scheduleCostEstimate());
@@ -571,6 +593,7 @@
       recipientAddresses = [];
       const input = document.getElementById("multiAirdropAddresses");
       if (input) input.value = "";
+      updateLineNumbers();
       const amount = document.getElementById("multiAirdropAmount");
       if (amount) amount.value = "";
       document.getElementById("multiAirdropResults").innerHTML = "";
