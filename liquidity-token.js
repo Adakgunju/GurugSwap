@@ -155,10 +155,24 @@
     return raw.length > 220 ? raw.slice(0, 217) + "…" : raw;
   }
 
-  function getRpcConnection() {
+  async function getRpcConnection() {
     const Web3 = window.solanaWeb3;
     if (!Web3?.Connection) throw new Error("Solana web3 library is not available.");
-    const rpcs = ["https://api.mainnet-beta.solana.com","https://solana-rpc.publicnode.com","https://api.mainnet.solana.com"]; let lastError = null; for (const rpc of rpcs) { try { const conn = new Web3.Connection(rpc, "confirmed"); await conn.getLatestBlockhash("confirmed"); return conn; } catch (e) { lastError = e; } } throw new Error("No Solana RPC endpoint is currently available. " + (lastError?.message || ""));
+    const rpcs = [
+      "https://rpc.solanatracker.io/public",
+      "https://api.mainnet.solana.com"
+    ];
+    let lastError = null;
+    for (const rpc of rpcs) {
+      try {
+        const conn = new Web3.Connection(rpc, "confirmed");
+        await conn.getLatestBlockhash("confirmed");
+        return conn;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    throw new Error("No Solana RPC endpoint is currently available. " + (lastError?.message || ""));
   }
 
   async function loadRaydiumSdk() {
@@ -202,7 +216,7 @@
     if (!sdk?.Raydium || !sdk?.TxVersion) throw new Error("Raydium browser SDK failed to load.");
 
     const owner = new Web3.PublicKey(provider.publicKey.toString());
-    const connection = getRpcConnection();
+    const connection = await getRpcConnection();
 
     setStatus("Reading token mint and wallet balances…");
     const mintA = await getMintInfo(connection, mintAddress);
