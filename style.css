@@ -2124,3 +2124,8 @@ body{background:#151714!important}
   .workspace-main>#partner-ads .partner-ads-grid{grid-template-columns:1fr!important}
   .workspace-main>#partner-ads .partner-ad-card{min-height:145px!important}
 }
+
+/* === PARTNER ADS SECTION ORDER === */
+.workspace-main>#links{order:7!important}
+.workspace-main>#partner-ads{order:8!important}
+.workspace-main>#about{order:9!important}
