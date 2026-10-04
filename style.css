@@ -1600,3 +1600,19 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-top:40px!important;
   }
 }
+
+
+/* === 06 / GURUG NETWORK: SINGLE-LINE TITLE === */
+@media(min-width:851px){
+  .workspace-main>#links .links-heading h2{
+    white-space:nowrap!important;
+    font-size:46px!important;
+    line-height:1!important;
+    letter-spacing:-.045em!important;
+  }
+}
+@media(max-width:850px){
+  .workspace-main>#links .links-heading h2{
+    white-space:nowrap!important;
+  }
+}
