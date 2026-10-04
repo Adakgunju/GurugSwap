@@ -194,3 +194,60 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-right:0!important;
   }
 }
+
+
+/* --- DISTRIBUTE SECTION: REMOVE OUTER FRAME --- */
+@media(min-width:851px){
+  .workspace-main>#distributeTokens{
+    padding:0!important;
+    border:0!important;
+    border-top:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-wrap{
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+
+  /* Section heading stays outside the two functional cards. */
+  .workspace-main>#distributeTokens .distribute-kicker{
+    margin:0 0 10px!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-title{
+    margin:0 0 16px!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-lead{
+    margin:0!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-grid{
+    margin-top:28px!important;
+  }
+}
+
+@media(max-width:850px){
+  .workspace-main>#distributeTokens{
+    padding:0!important;
+    border:0!important;
+    border-top:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-wrap{
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+}
