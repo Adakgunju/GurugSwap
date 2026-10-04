@@ -53,11 +53,12 @@
     section.className = "gurug-liquidity";
     section.innerHTML = `
       <div class="liquidity-grid">
-        <div class="liquidity-card">
+        <div class="liquidity-heading">
           <div class="liquidity-kicker">03 / LIQUIDITY POOL</div>
           <h2 class="liquidity-title">CREATE A RAYDIUM POOL.</h2>
           <p class="liquidity-sub">Seed your new Solana token with SOL and create a permissionless CPMM pool.</p>
-
+        </div>
+        <div class="liquidity-card">
           <label class="liq-label" for="liqMint">TOKEN MINT ADDRESS</label>
           <input id="liqMint" class="liq-input" placeholder="Paste your token mint address">
 
