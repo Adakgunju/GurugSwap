@@ -205,6 +205,7 @@
       const destinationInfo = await connection.getAccountInfo(destinationAta, "confirmed");
 
       if (!destinationInfo) {
+        newAtaCount++;
         tx.add(spl.createAssociatedTokenAccountInstruction(
           owner,
           destinationAta,
@@ -232,7 +233,7 @@
       prepared.push({ ...item, rawAmount, destinationAta });
     }
 
-    return { tx, prepared };
+    return { tx, prepared, newAtaCount };
   }
 
   async function estimateFee(connection, tx) {
@@ -313,6 +314,37 @@
     setStatus(`Ready: ${preparedRows.length} recipient(s) in ${batches.length} transaction(s).`, "active");
 
     const results = [];
+    let estimatedLamports = 0;
+    let estimatedNewAtas = 0;
+    const ataRent = await connection.getMinimumBalanceForRentExemption(165);
+    for (const batch of batches) {
+      const preview = await buildBatch(
+        connection,
+        provider.publicKey,
+        mint,
+        batch,
+        mintInfo.decimals,
+        mintInfo.tokenProgram,
+        mintInfo.sourceAta,
+        spl
+      );
+      estimatedNewAtas += preview.newAtaCount;
+      estimatedLamports += await estimateFee(connection, preview.tx);
+    }
+    estimatedLamports += estimatedNewAtas * ataRent;
+
+    const solBalance = await connection.getBalance(provider.publicKey, "confirmed");
+    const costEl = document.getElementById("multiAirdropCost");
+    if (costEl) {
+      costEl.textContent = (estimatedLamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL est.";
+    }
+    if (solBalance < estimatedLamports) {
+      throw new Error(
+        "Not enough SOL for the estimated network cost and new recipient token accounts. " +
+        "You need at least " + (estimatedLamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL."
+      );
+    }
+
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       setStatus(`Preparing batch ${i + 1} of ${batches.length}...`, "active");
@@ -329,12 +361,6 @@
           mintInfo.sourceAta,
           spl
         );
-
-        const feeLamports = await estimateFee(connection, built.tx);
-        const costEl = document.getElementById("multiAirdropCost");
-        if (costEl && feeLamports) {
-          costEl.textContent = (feeLamports * batches.length / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL est.";
-        }
 
         setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom...`, "active");
         const signed = await provider.signTransaction(built.tx);
