@@ -702,28 +702,47 @@
 
     const rpc = await getWorkingRpc();
     const connection = new window.solanaWeb3.Connection(rpc, "confirmed");
-    const latest = await connection.getLatestBlockhash("confirmed");
-    const transaction = new window.solanaWeb3.Transaction({
-      recentBlockhash: latest.blockhash,
-      feePayer: new window.solanaWeb3.PublicKey(address)
-    }).add(
-      window.solanaWeb3.SystemProgram.transfer({
-        fromPubkey: new window.solanaWeb3.PublicKey(address),
-        toPubkey: new window.solanaWeb3.PublicKey(destination),
-        lamports: Number(amount)
-      })
-    );
+    // The wallet popup can remain open long enough for a recent blockhash to expire.
+    // Fetch the blockhash immediately before signing and rebuild the transaction if needed.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const latest = await connection.getLatestBlockhash("confirmed");
+      const transaction = new window.solanaWeb3.Transaction({
+        recentBlockhash: latest.blockhash,
+        feePayer: new window.solanaWeb3.PublicKey(address)
+      }).add(
+        window.solanaWeb3.SystemProgram.transfer({
+          fromPubkey: new window.solanaWeb3.PublicKey(address),
+          toPubkey: new window.solanaWeb3.PublicKey(destination),
+          lamports: Number(amount)
+        })
+      );
 
-    setStatus("STEP 1/4 — Approve the Irys storage funding transaction in Phantom...", "active");
-    const signed = await provider.signTransaction(transaction);
-    const signature = await connection.sendRawTransaction(signed.serialize(), {skipPreflight:false});
-    await waitForConfirmation(connection, signature);
+      setStatus(
+        attempt === 1
+          ? "STEP 1/4 — Approve the Irys storage funding transaction in Phantom..."
+          : "STEP 1/4 — The funding transaction expired. Refreshing it — please approve again...",
+        "active"
+      );
 
-    await irysRequest("/account/balance/solana", {
-      method: "POST",
-      headers: {"content-type":"application/json"},
-      body: JSON.stringify({tx_id: signature})
-    });
+      try {
+        const signed = await provider.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signed.serialize(), {
+          skipPreflight: false,
+          preflightCommitment: "confirmed",
+          maxRetries: 0
+        });
+        await waitForConfirmation(connection, signature);
+
+        await irysRequest("/account/balance/solana", {
+          method: "POST",
+          headers: {"content-type":"application/json"},
+          body: JSON.stringify({tx_id: signature})
+        });
+        return;
+      } catch (error) {
+        if (attempt === 2 || !isBlockhashExpiredError(error)) throw error;
+      }
+    }
   }
 
   async function uploadToPermanentStorage(irys, provider, data, contentType, label) {
@@ -771,11 +790,27 @@
     };
   }
 
+  function isBlockhashExpiredError(error) {
+    const message = String(error?.message || error || "").toLowerCase();
+    return (
+      message.includes("block height exceeded") ||
+      message.includes("blockhash expired") ||
+      message.includes("blockhash not found") ||
+      message.includes("transactionexpiredblockheight")
+    );
+  }
+
   async function waitForConfirmation(connection, signature) {
     for (let i = 0; i < 40; i++) {
       const result = await connection.getSignatureStatuses([signature], {searchTransactionHistory:true});
       const status = result?.value?.[0];
-      if (status?.err) throw new Error("Transaction failed on-chain.");
+      if (status?.err) {
+        const detail = typeof status.err === "string" ? status.err : JSON.stringify(status.err);
+        if (String(detail).toLowerCase().includes("blockhash")) {
+          throw new Error("Transaction expired: blockhash is no longer valid.");
+        }
+        throw new Error("Transaction failed on-chain.");
+      }
       if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") return;
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
@@ -975,15 +1010,45 @@
 
     setStatus("STEP 3/4 — Approve the actual token creation transaction in Phantom...", "active");
     let result;
-    try {
-      result = await withTimeout(
-        finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}}),
-        180000,
-        "Token creation timed out. Check Phantom/Solscan before retrying."
-      );
-    } catch (error) {
-      console.error("TOKEN CREATION transaction failed:", error);
-      throw new Error(error?.message || "Token creation transaction failed or was cancelled. No success was recorded.");
+    let lastError = null;
+
+    // Solana recent blockhashes normally remain valid for roughly 60–90 seconds.
+    // If the wallet popup or RPC path takes too long, rebuild the transaction with
+    // a fresh blockhash instead of making the user restart the entire token flow.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        result = await withTimeout(
+          finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}}),
+          180000,
+          "Token creation timed out. Check Phantom/Solscan before retrying."
+        );
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        console.error("TOKEN CREATION transaction attempt " + attempt + " failed:", error);
+
+        if (!isBlockhashExpiredError(error) || attempt === 2) break;
+
+        // Before asking Phantom to sign again, check whether the mint already landed.
+        const retryRpc = await getWorkingRpc();
+        const retryConnection = new window.solanaWeb3.Connection(retryRpc, "confirmed");
+        const existingMint = await retryConnection.getAccountInfo(
+          new window.solanaWeb3.PublicKey(mint.publicKey.toString()),
+          "confirmed"
+        );
+        if (existingMint) {
+          result = {signature: null};
+          lastError = null;
+          break;
+        }
+
+        setStatus("STEP 3/4 — The token transaction expired. Refreshing it — please approve again...", "active");
+      }
+    }
+
+    if (lastError) {
+      throw new Error(lastError?.message || "Token creation transaction failed or was cancelled. No success was recorded.");
     }
 
     const mintAddress = mint.publicKey.toString();
