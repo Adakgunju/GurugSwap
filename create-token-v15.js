@@ -170,7 +170,6 @@
 @media(max-width:900px){.create-token-shell{grid-template-columns:1fr}.create-token-help{position:static}}
 @media(max-width:560px){#create-token{padding:34px 18px 18px}.create-token-card,.create-token-help{padding:21px}.create-token-title{font-size:25px}.create-token-copy{font-size:14px}.create-token-grid{grid-template-columns:1fr}.create-token-field.full{grid-column:auto}.create-token-logo-wrap{grid-template-columns:1fr 100px}.create-token-logo-upload{min-height:100px}}
 
-}
 /* Final section-heading layout: kicker, title, and description are stacked vertically. */
 #create-token .create-token-head{
   position:relative!important;
@@ -209,6 +208,66 @@
     position:static!important;
     display:inline-block!important;
     margin-top:16px!important;
+  }
+}
+
+/* Keep the original two-column function layout. Only the section heading stacks. */
+#create-token .create-token-shell{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.05fr) minmax(330px,.78fr)!important;
+  column-gap:28px!important;
+  row-gap:28px!important;
+  align-items:start!important;
+}
+#create-token .create-token-head{
+  grid-column:1 / -1!important;
+  grid-row:1!important;
+}
+#create-token .create-token-card{
+  grid-column:1!important;
+  grid-row:2!important;
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+}
+#create-token .create-token-help{
+  grid-column:2!important;
+  grid-row:2!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin:0!important;
+}
+#create-token .create-token-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:12px!important;
+}
+#create-token .create-token-field.full{
+  grid-column:1 / -1!important;
+}
+@media(max-width:900px){
+  #create-token .create-token-shell{
+    grid-template-columns:1fr!important;
+    row-gap:22px!important;
+  }
+  #create-token .create-token-head{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  #create-token .create-token-card{
+    grid-column:1!important;
+    grid-row:2!important;
+  }
+  #create-token .create-token-help{
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+  #create-token .create-token-grid{
+    grid-template-columns:1fr!important;
+  }
+  #create-token .create-token-field.full{
+    grid-column:auto!important;
   }
 }
 `;
