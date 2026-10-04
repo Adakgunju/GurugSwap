@@ -570,6 +570,21 @@
     return actualAmount;
   }
 
+  async function uploadToIrys(uploader, buffer, fileName, contentType) {
+    const irys = await uploader.irys();
+    const transaction = irys.createTransaction(buffer, {
+      tags: [{name: "Content-Type", value: contentType}]
+    });
+    await transaction.sign();
+    const response = await irys.uploader.uploadTransaction(transaction);
+    const status = Number(response?.status || 0);
+    const id = response?.data?.id;
+    if (status >= 300 || !id) {
+      throw new Error("Irys upload failed" + (status ? " (HTTP " + status + ")" : "") + ".");
+    }
+    return "https://gateway.irys.xyz/" + id;
+  }
+
   async function createToken() {
     const logoInput = document.getElementById("createTokenLogo");
     const logoFile = logoInput?.files?.[0];
@@ -624,21 +639,19 @@
     if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
 
     setStatus("STEP 1/4 — Approve storage payment in Phantom...", "active");
-    let imageUris;
+    let imageUri;
     try {
-      imageUris = await withTimeout(
-        uploader.upload([imageFile]),
+      imageUri = await withTimeout(
+        uploadToIrys(uploader, imageBuffer, logoFile.name, logoFile.type),
         120000,
         "Logo storage timed out after the wallet payment. Please try again."
       );
     } catch (error) {
       console.error("IRYS logo upload failed:", error);
       throw new Error(
-        "Storage payment was processed, but the logo upload did not finish. No token was created. Please try again."
+        "Logo upload failed after storage payment. " + (error?.message || "Please try again.") + " No token was created."
       );
     }
-    const imageUri = imageUris?.[0];
-    if (!imageUri) throw new Error("Storage payment was processed, but Irys returned no logo URI. No token was created.");
 
     const metadataJson = {
       name,
@@ -664,8 +677,9 @@
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
 
     setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
+    const metadataBuffer = new TextEncoder().encode(JSON.stringify(metadataJson));
     const metadataUri = await withTimeout(
-      uploader.uploadJson(metadataJson),
+      uploadToIrys(uploader, metadataBuffer, "metadata.json", "application/json"),
       120000,
       "Metadata storage timed out. No token was created."
     );
