@@ -38,13 +38,18 @@
       .liq-link{color:#ffe500;text-decoration:none}
       @media(max-width:760px){#liquidity.gurug-liquidity{padding:44px 14px 24px}.liquidity-grid{grid-template-columns:1fr}.liquidity-card,.liquidity-help{padding:22px}.liquidity-title{font-size:29px}.liq-row{grid-template-columns:1fr}.liq-pair{grid-template-columns:1fr}.liq-input{font-size:17px}}
 
-      /* Keep 03 heading separate from its function cards. */
+      /* Keep 03 heading separate while preserving the two-column function boxes. */
       #liquidity.gurug-liquidity .liquidity-grid{
-        display:block!important;
+        display:grid!important;
+        grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr)!important;
+        gap:24px!important;
+        align-items:start!important;
       }
       #liquidity.gurug-liquidity .liquidity-heading{
+        grid-column:1 / -1!important;
+        grid-row:1!important;
         width:100%!important;
-        margin:0 0 28px!important;
+        margin:0 0 4px!important;
         padding:0!important;
         text-align:left!important;
       }
@@ -65,19 +70,35 @@
         text-align:left!important;
       }
       #liquidity.gurug-liquidity .liquidity-card{
-        width:calc(100% - 332px)!important;
+        grid-column:1!important;
+        grid-row:2!important;
+        width:100%!important;
         margin:0!important;
+        box-sizing:border-box!important;
       }
       #liquidity.gurug-liquidity .liquidity-help{
-        width:calc(100% - 332px)!important;
-        margin:24px 0 0 auto!important;
+        grid-column:2!important;
+        grid-row:2!important;
+        width:100%!important;
+        margin:0!important;
+        box-sizing:border-box!important;
       }
       @media(max-width:900px){
-        #liquidity.gurug-liquidity .liquidity-card,
+        #liquidity.gurug-liquidity .liquidity-grid{
+          grid-template-columns:1fr!important;
+          gap:22px!important;
+        }
+        #liquidity.gurug-liquidity .liquidity-heading{
+          grid-column:1!important;
+          grid-row:1!important;
+        }
+        #liquidity.gurug-liquidity .liquidity-card{
+          grid-column:1!important;
+          grid-row:2!important;
+        }
         #liquidity.gurug-liquidity .liquidity-help{
-          width:100%!important;
-          margin-left:0!important;
-          margin-right:0!important;
+          grid-column:1!important;
+          grid-row:3!important;
         }
       }
     `;
