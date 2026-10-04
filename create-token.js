@@ -669,6 +669,7 @@
 
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
     setStatus("TOKEN CREATED SUCCESSFULLY — token, metadata and logo are live on Solana.", "success");
+    window.dispatchEvent(new CustomEvent("gurug:token-created", { detail: { mintAddress, metadataUri, signature: result?.signature || null } }));
     return {mintAddress, metadataUri, signature: result?.signature || null};
   }
 
