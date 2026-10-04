@@ -1821,3 +1821,8 @@ footer{
 main{padding-top:82px!important}
 @media(max-width:850px){main{padding-top:82px!important}}
 @media(max-width:520px){main{padding-top:76px!important}}
+
+/* === HEADER / HERO SPACING FINAL === */
+.platform-header.hero{
+  margin-top:0!important;
+}
