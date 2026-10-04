@@ -77,6 +77,7 @@
   function addSection() {
     if (document.getElementById("distributeTokens")) return;
     const swap = document.getElementById("swap");
+    const swapIntro = document.querySelector(".swap-intro");
     if (!swap) return;
 
     const section = document.createElement("section");
@@ -127,7 +128,8 @@
       </div>
     `;
 
-    swap.parentNode.insertBefore(section, swap);
+    const insertBefore = swapIntro || swap;
+    insertBefore.parentNode.insertBefore(section, insertBefore);
   }
 
   function setStatus(message, state = "") {
