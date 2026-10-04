@@ -2035,3 +2035,92 @@ body{background:#151714!important}
   bottom:20px!important;
   margin:0!important;
 }
+
+/* === PARTNER ADS / PAID BANNER AREA === */
+.workspace-main>#partner-ads{
+  flex:none!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+  margin:0 0 52px!important;
+  padding:0!important;
+}
+.workspace-main>#partner-ads .partner-ads-heading{
+  display:block!important;
+  text-align:left!important;
+  margin:0 0 28px!important;
+}
+.workspace-main>#partner-ads .partner-ads-heading h2{
+  font-family:'Space Grotesk',sans-serif!important;
+  font-size:46px!important;
+  line-height:1!important;
+  letter-spacing:-.045em!important;
+  font-weight:700!important;
+  margin:0 0 14px!important;
+  text-transform:none!important;
+}
+.workspace-main>#partner-ads .partner-ads-heading h2 span{color:#ffe500!important}
+.workspace-main>#partner-ads .partner-ads-heading p{
+  color:#c9c9c4!important;
+  font-size:16px!important;
+  line-height:1.6!important;
+  font-weight:400!important;
+  max-width:760px!important;
+  margin:0!important;
+}
+.workspace-main>#partner-ads .partner-ads-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+.workspace-main>#partner-ads .partner-ad-card{
+  min-height:175px!important;
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:center!important;
+  text-align:center!important;
+  padding:24px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:18px!important;
+  background:rgba(27,29,25,.96)!important;
+  color:#f7f7f2!important;
+  box-shadow:0 22px 65px rgba(0,0,0,.42)!important;
+  text-decoration:none!important;
+  transition:.2s!important;
+}
+.workspace-main>#partner-ads .partner-ad-card:hover{
+  border-color:rgba(255,229,0,.42)!important;
+  transform:translateY(-3px)!important;
+}
+.workspace-main>#partner-ads .partner-ad-card span{
+  font-size:8px!important;
+  letter-spacing:.18em!important;
+  color:#c9c9c4!important;
+  margin-bottom:18px!important;
+}
+.workspace-main>#partner-ads .partner-ad-card strong{
+  font-family:'Space Grotesk',sans-serif!important;
+  font-size:25px!important;
+  line-height:1!important;
+  letter-spacing:-.04em!important;
+  color:#f7f7f2!important;
+}
+.workspace-main>#partner-ads .partner-ad-card em{
+  position:absolute!important;
+  right:22px!important;
+  bottom:20px!important;
+  color:#ffe500!important;
+  font-style:normal!important;
+  font-size:18px!important;
+}
+@media(max-width:850px){
+  .workspace-main>#partner-ads{margin-bottom:40px!important}
+  .workspace-main>#partner-ads .partner-ads-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:520px){
+  .workspace-main>#partner-ads .partner-ads-heading h2{font-size:40px!important}
+  .workspace-main>#partner-ads .partner-ads-heading p{font-size:14px!important}
+  .workspace-main>#partner-ads .partner-ads-grid{grid-template-columns:1fr!important}
+  .workspace-main>#partner-ads .partner-ad-card{min-height:145px!important}
+}
