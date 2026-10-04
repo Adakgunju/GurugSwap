@@ -5,7 +5,29 @@
  * receives or stores the user's private key.
  */
 (() => {
-  const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
+  const SOLANA_RPCS = [
+    "https://solana-rpc.publicnode.com",
+    "https://api.mainnet.solana.com",
+    "https://api.mainnet-beta.solana.com"
+  ];
+
+  async function getWorkingRpc() {
+    for (const rpc of SOLANA_RPCS) {
+      try {
+        const response = await fetch(rpc, {
+          method: "POST",
+          headers: {"content-type": "application/json"},
+          body: JSON.stringify({jsonrpc:"2.0",id:1,method:"getHealth",params:[]}),
+          cache: "no-store"
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.result === "ok" || data?.result === "healthy") return rpc;
+        }
+      } catch {}
+    }
+    throw new Error("No Solana RPC endpoint is currently available. Please try again.");
+  }
   const UMI_CDN = "https://esm.sh/@metaplex-foundation/umi@1.6.0?bundle";
   const UMI_DEFAULTS_CDN = "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@1.6.0?bundle";
   const UMI_WALLET_CDN = "https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.6.0?bundle";
@@ -460,7 +482,8 @@
     const { irysUploader } = modules.irys;
 
     const wallet = createPhantomWalletAdapter(provider);
-    const umi = createUmi(SOLANA_RPC)
+    const rpc = await getWorkingRpc();
+    const umi = createUmi(rpc)
       .use(walletAdapterIdentity(wallet))
       .use(mplTokenMetadata())
       .use(mplToolbox())
@@ -486,7 +509,8 @@
   async function refreshCreationCost() {
     try {
       if (!window.solanaWeb3) return;
-      const connection = new window.solanaWeb3.Connection(SOLANA_RPC, "confirmed");
+      const rpc = await getWorkingRpc();
+      const connection = new window.solanaWeb3.Connection(rpc, "confirmed");
       const mintRent = await connection.getMinimumBalanceForRentExemption(82);
       const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(165);
       const recentFee = await connection.getFeeForMessage(
