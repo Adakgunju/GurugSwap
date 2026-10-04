@@ -86,7 +86,7 @@
     section.innerHTML = `
       <div class="distribute-wrap">
         <div class="distribute-kicker">02 / TOKEN DISTRIBUTION</div>
-        <h2 class="distribute-title">SEND TOKENS<br>TO ANY WALLET.</h2>
+        <h2 class="distribute-title">Send tokens<br>to any wallet.</h2>
         <p class="distribute-lead">Distribute your SPL tokens directly from your wallet. Add recipient wallets, review the batch, then approve the transfers in Phantom.</p>
 
         <div class="distribute-grid">
