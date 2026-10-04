@@ -1569,7 +1569,7 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
   .workspace-main>#distributeTokens .distribute-title,
   .workspace-main>#swap .swap-intro-inner h2{
     white-space:nowrap!important;
-    font-size:46px!important;
+    font-size:42px!important;
     line-height:1!important;
     letter-spacing:-.045em!important;
   }
