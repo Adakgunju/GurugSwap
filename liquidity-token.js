@@ -158,7 +158,7 @@
   function getRpcConnection() {
     const Web3 = window.solanaWeb3;
     if (!Web3?.Connection) throw new Error("Solana web3 library is not available.");
-    return new Web3.Connection("https://solana-rpc.publicnode.com", "confirmed");
+    const rpcs = ["https://api.mainnet-beta.solana.com","https://api.mainnet.solana.com"]; return new Web3.Connection(rpcs[0], "confirmed");
   }
 
   async function loadRaydiumSdk() {
