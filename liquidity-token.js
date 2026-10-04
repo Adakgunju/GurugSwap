@@ -159,8 +159,9 @@
     const Web3 = window.solanaWeb3;
     if (!Web3?.Connection) throw new Error("Solana web3 library is not available.");
     const rpcs = [
-      "https://rpc.solanatracker.io/public",
-      "https://api.mainnet.solana.com"
+      "https://api.mainnet-beta.solana.com",
+      "https://solana-rpc.publicnode.com",
+      "https://rpc.solanatracker.io/public"
     ];
     let lastError = null;
     for (const rpc of rpcs) {
@@ -230,6 +231,12 @@
     const solRaw = decimalToRawExact(solAmount, 9);
     if (tokenRaw <= 0n || solRaw <= 0n) throw new Error("Liquidity amounts must be greater than zero.");
 
+    // Raydium SDK V2 expects BN amounts for CPMM createPool.
+    const bnModule = await import("https://esm.sh/bn.js@5.2.1");
+    const BN = bnModule.default || bnModule;
+    const tokenAmountBN = new BN(tokenRaw.toString());
+    const solAmountBN = new BN(solRaw.toString());
+
     // Do not use getTokenAccountsByOwner here. Public RPC endpoints may
     // block indexed/token-account queries. Derive the associated token
     // account directly and query it with getTokenAccountBalance instead.
@@ -274,17 +281,22 @@
       }
     });
 
-    const feeResponse = await fetch(RAYDIUM_API + "/main/cpmm-config", { cache: "no-store" });
-    if (!feeResponse.ok) throw new Error("Unable to load Raydium CPMM fee configuration.");
-    const feeJson = await feeResponse.json();
-    const feeConfigs = Array.isArray(feeJson?.data) ? feeJson.data.filter(x => x?.showWithUI !== false) : [];
-    const targetRate = Math.round(feeTier * 10000);
-    let feeConfig = feeConfigs.find(x => Number(x.tradeFeeRate) === targetRate);
-    if (!feeConfig) {
-      const allConfigs = Array.isArray(feeJson?.data) ? feeJson.data : [];
-      feeConfig = allConfigs.find(x => Number(x.tradeFeeRate) === targetRate);
+    setStatus("Loading live Raydium CPMM fee configuration…");
+    const feeConfigs = await raydium.api.getCpmmConfigs();
+    if (!Array.isArray(feeConfigs) || !feeConfigs.length) {
+      throw new Error("Raydium returned no CPMM fee configurations.");
     }
-    if (!feeConfig) throw new Error("Selected fee tier is not available in Raydium's current CPMM configuration.");
+
+    const targetRate = Math.round(feeTier * 10000);
+    const feeConfig = feeConfigs.find(x => Number(x.tradeFeeRate) === targetRate);
+    if (!feeConfig) {
+      const available = feeConfigs
+        .map(x => Number(x.tradeFeeRate) / 10000)
+        .filter(Number.isFinite)
+        .map(x => x + "%")
+        .join(", ");
+      throw new Error("Selected fee tier is unavailable. Available tiers: " + available);
+    }
 
     const programId = sdk.CREATE_CPMM_POOL_PROGRAM;
     const poolFeeAccount = sdk.CREATE_CPMM_POOL_FEE_ACC;
@@ -308,9 +320,9 @@
       poolFeeAccount,
       mintA: mintAInfo,
       mintB: mintBInfo,
-      mintAAmount: tokenRaw,
-      mintBAmount: solRaw,
-      startTime: 0n,
+      mintAAmount: tokenAmountBN,
+      mintBAmount: solAmountBN,
+      startTime: new BN(0),
       feeConfig,
       associatedOnly: true,
       ownerInfo: {
