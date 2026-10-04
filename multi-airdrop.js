@@ -1,10 +1,11 @@
 (() => {
   "use strict";
 
+  // Avoid indexed-RPC endpoints here. Multi Airdrop needs token-account queries
+  // such as getParsedAccountInfo/getTokenAccountBalance.
   const RPCS = [
-    "https://solana-rpc.publicnode.com",
-    "https://api.mainnet.solana.com",
-    "https://api.mainnet-beta.solana.com"
+    "https://api.mainnet-beta.solana.com",
+    "https://rpc.solanatracker.io/public"
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const MAX_RECIPIENTS_PER_TX = 5;
