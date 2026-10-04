@@ -10,7 +10,7 @@
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
-  <div class="site-glow"></div><div class="gurug-rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="site-glow"></div><div class="gurug-rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <header class="topbar">
     <a class="brand" href="#"><img class="brand-logo" src="https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png" alt="Gurug"><span>GURUG<span class="accent">SWAP</span></span></a>
     <nav class="desktop-nav" aria-label="Primary">
@@ -154,7 +154,7 @@
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
   <script src="script.js?v=37"></script>
-<script src="create-token-v15.js?v=19"></script>
+  <script src="create-token-v15.js?v=19"></script>
   <script src="distribute-token.js?v=2"></script>
   <script src="liquidity-token.js?v=13"></script>
   <script>
@@ -173,6 +173,69 @@
         button.setAttribute("aria-expanded", "false");
         button.textContent = "MENU";
       }));
+    })();
+
+    // Keep every platform menu in sync with the section currently in view.
+    // This is UI-only: existing feature scripts and their DOM IDs are untouched.
+    (() => {
+      const navLinks = Array.from(document.querySelectorAll(
+        ".workspace-nav, .desktop-nav a, #mobileMenu a"
+      ));
+      if (!navLinks.length) return;
+
+      const linksByTarget = new Map();
+      navLinks.forEach(link => {
+        const target = link.getAttribute("href");
+        if (!target || !target.startsWith("#")) return;
+        if (!linksByTarget.has(target)) linksByTarget.set(target, []);
+        linksByTarget.get(target).push(link);
+      });
+
+      function setActive(target) {
+        navLinks.forEach(link => {
+          const active = link.getAttribute("href") === target;
+          link.classList.toggle("active", active);
+          if (active) link.setAttribute("aria-current", "page");
+          else link.removeAttribute("aria-current");
+        });
+      }
+
+      function activateFromHash() {
+        const hash = window.location.hash;
+        if (hash && linksByTarget.has(hash)) setActive(hash);
+      }
+
+      navLinks.forEach(link => {
+        link.addEventListener("click", () => {
+          const target = link.getAttribute("href");
+          if (target && linksByTarget.has(target)) setActive(target);
+        });
+      });
+
+      const sectionIds = Array.from(linksByTarget.keys())
+        .map(hash => hash.slice(1))
+        .filter(id => document.getElementById(id));
+
+      const sections = sectionIds.map(id => document.getElementById(id));
+
+      if ("IntersectionObserver" in window && sections.length) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+          if (visible) setActive("#" + visible.target.id);
+        }, {
+          root: null,
+          rootMargin: "-120px 0px -55% 0px",
+          threshold: [0.05, 0.25, 0.5, 0.75]
+        });
+
+        sections.forEach(section => observer.observe(section));
+      }
+
+      window.addEventListener("hashchange", activateFromHash);
+      activateFromHash();
     })();
 
     // Independent TOKEN INFO bridge.
@@ -222,9 +285,6 @@
           let token;
           let market;
 
-          // GURUG is the default TO token. Use its known canonical mint,
-          // logo and live pair directly instead of relying on token-directory
-          // search, which can return incomplete market data for this token.
           if (symbol === "GURUG") {
             token = {
               symbol: "GURUG",
@@ -308,7 +368,6 @@
             market = await marketRes.json();
           }
 
-          // Do not let an older request overwrite a newer TO selection.
           if (toSymbolEl.textContent.trim() !== symbol) return;
 
           const pairs = Array.isArray(market?.pairs) ? market.pairs : [];
@@ -359,6 +418,7 @@
               Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
           }
 
+          const chartEl = document.getElementById("tokenInfoChart");
           if (chartEl) chartEl.href = pair.url || chartEl.href;
         } catch (err) {
           console.warn("Independent token-info bridge failed:", err);
@@ -366,18 +426,14 @@
         }
       }
 
-      // Initial state: the default TO token is GURUG, so load its live data too.
       loadVisibleTokenInfo(true);
 
-      // Watch the visible symbol for normal token-selection updates.
       new MutationObserver(() => loadVisibleTokenInfo(false)).observe(toSymbolEl, {
         childList: true,
         characterData: true,
         subtree: true
       });
 
-      // Also trigger directly after a token option is clicked.
-      // The existing picker handler runs first and changes the TO token.
       if (tokenListEl) {
         tokenListEl.addEventListener("click", () => {
           setTimeout(() => loadVisibleTokenInfo(true), 0);
