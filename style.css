@@ -291,3 +291,46 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
   max-height:30px!important;
   flex:0 0 30px!important;
 }
+
+
+/* --- SWAP TOKEN BUTTON FINAL ICON RESET --- */
+.swap-card .token-select{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:7px!important;
+  overflow:hidden!important;
+}
+.swap-card #fromTokenButton > img.token-dynamic-icon,
+.swap-card #fromTokenButton > img:not([id]),
+.swap-card #toTokenButton > img.token-dynamic-icon,
+.swap-card #toTokenButton > img:not([id]){
+  display:block!important;
+  position:static!important;
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  min-height:30px!important;
+  max-width:30px!important;
+  max-height:30px!important;
+  aspect-ratio:1/1!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:50%!important;
+  box-shadow:none!important;
+}
+.swap-card #toTokenButton > img#toTokenIcon{
+  width:31px!important;
+  height:31px!important;
+  min-width:31px!important;
+  min-height:31px!important;
+  max-width:31px!important;
+  max-height:31px!important;
+}
+.swap-card #fromTokenButton > .sol-logo,
+.swap-card #toTokenButton > .sol-logo{
+  flex:0 0 30px!important;
+}
