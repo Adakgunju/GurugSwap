@@ -1914,3 +1914,21 @@ main{padding-top:82px!important}
   backdrop-filter:blur(3px)!important;
   -webkit-backdrop-filter:blur(3px)!important;
 }
+
+/* === PLATFORM BACKGROUND / CARD CONTRAST === */
+body{background:#151714!important}
+.workspace-shell,.workspace-main{background:transparent!important}
+.platform-header.hero{background:rgba(18,20,16,.82)!important}
+.workspace-main>#create-token .create-token-card,
+.workspace-main>#create-token .create-token-help,
+.workspace-main>#distributeTokens .distribute-card,
+.workspace-main>#distributeTokens .distribute-help,
+.workspace-main>#liquidity .liquidity-card,
+.workspace-main>#liquidity .liquidity-help,
+.workspace-main>#swap .swap-card,
+.workspace-main>#token-info .token-info-card,
+.workspace-main>#multi-airdrop .platform-placeholder-card{
+  background:rgba(27,29,25,.96)!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:0 22px 65px rgba(0,0,0,.42)!important;
+}
