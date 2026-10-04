@@ -1616,3 +1616,9 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     white-space:nowrap!important;
   }
 }
+
+
+/* === PLATFORM SECTION TITLE ACCENT === */
+.section-title-accent{
+  color:#ffe500!important;
+}
