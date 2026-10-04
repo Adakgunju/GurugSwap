@@ -31,7 +31,6 @@
   const UMI_CDN = "https://esm.sh/@metaplex-foundation/umi@1.5.1?bundle";
   const UMI_DEFAULTS_CDN = "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@1.5.1?bundle";
   const UMI_WALLET_CDN = "https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.5.1?bundle";
-  const UMI_IRYS_CDN = "https://esm.sh/@metaplex-foundation/umi-uploader-irys@1.5.0/web?bundle&deps=@irys/bundles@0.0.5,@irys/upload-core@0.0.10,@irys/web-upload@0.0.15,@irys/web-upload-solana@0.1.8,starknet@6.24.0";
   const MPL_METADATA_CDN = "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.4.0?bundle";
   const MPL_TOOLBOX_CDN = "https://esm.sh/@metaplex-foundation/mpl-toolbox@0.11.4?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
@@ -435,7 +434,6 @@
         import(UMI_CDN),
         import(UMI_DEFAULTS_CDN),
         import(UMI_WALLET_CDN),
-        import(UMI_IRYS_CDN),
         import(MPL_METADATA_CDN),
         import(MPL_TOOLBOX_CDN),
         import(BUFFER_CDN)
@@ -445,7 +443,6 @@
           umi,
           defaults,
           walletAdapters,
-          irys,
           metadata,
           toolbox
         };
@@ -505,6 +502,60 @@
       }));
 
     return {umi, modules};
+  }
+
+  async function createLegacyWebBundlr(provider) {
+    if (typeof WebBundlr !== "function") {
+      throw new Error("Irys storage client is not available. Please refresh the page and try again.");
+    }
+    const rpc = await getWorkingRpc();
+    const bundlr = new WebBundlr(
+      "https://node1.irys.xyz",
+      "solana",
+      provider,
+      { providerUrl: rpc }
+    );
+    await withTimeout(
+      bundlr.ready(),
+      60000,
+      "Irys storage connection timed out. Please try again."
+    );
+    return bundlr;
+  }
+
+  async function uploadToPermanentStorage(bundlr, data, contentType, label) {
+    const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
+    const price = await bundlr.getPrice(bytes.length);
+    const priceAtomic = price?.toString ? price.toString() : String(price);
+    if (!priceAtomic || priceAtomic === "0") {
+      throw new Error(label + " storage price could not be calculated.");
+    }
+
+    const currentBalance = await bundlr.getLoadedBalance();
+    if (currentBalance.lt(price)) {
+      const funding = await withTimeout(
+        bundlr.fund(price.minus(currentBalance)),
+        120000,
+        label + " storage payment timed out after wallet approval."
+      );
+      if (!funding) throw new Error(label + " storage funding failed.");
+    }
+
+    const tx = bundlr.createTransaction(bytes, {
+      tags: [{name: "Content-Type", value: contentType}]
+    });
+    await withTimeout(tx.sign(), 120000, label + " storage signing timed out.");
+    const receipt = await withTimeout(
+      tx.upload(),
+      180000,
+      label + " storage upload timed out."
+    );
+    const id = receipt?.id || tx?.id;
+    if (!id) throw new Error(label + " upload completed without a storage ID.");
+    return {
+      uri: "https://arweave.net/" + id,
+      atomicCost: priceAtomic
+    };
   }
 
   async function waitForConfirmation(connection, signature) {
@@ -623,27 +674,18 @@
       contentType: logoFile.type
     });
 
-    const uploader = umi.uploader;
-    const imagePrice = await uploader.getUploadPrice([imageFile]).catch(() => null);
-    const imagePriceSol = solAmountToNumber(imagePrice);
-    if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
-
+    const bundlr = await createLegacyWebBundlr(provider);
     setStatus("STEP 1/4 — Uploading logo to permanent storage...", "active");
-    let imageUris;
-    try {
-      imageUris = await withTimeout(
-        uploader.upload([imageFile]),
-        120000,
-        "Logo storage timed out after the wallet payment. Please try again."
-      );
-    } catch (error) {
-      console.error("IRYS logo upload failed:", error);
-      throw new Error(
-        "Logo upload failed after storage payment. " + (error?.message || "Please try again.") + " No token was created."
-      );
-    }
-    const imageUri = Array.isArray(imageUris) ? imageUris[0] : imageUris?.[0] || imageUris;
-    if (!imageUri) throw new Error("Logo upload completed without a storage URI. No token was created.");
+
+    const imageData = new Uint8Array(await logoFile.arrayBuffer());
+    const imageUpload = await uploadToPermanentStorage(
+      bundlr,
+      imageData,
+      logoFile.type,
+      "Logo"
+    );
+    const imageUri = imageUpload.uri;
+    updateStorageCost(Number(imageUpload.atomicCost) / 1e9);
 
     const metadataJson = {
       name,
@@ -656,25 +698,17 @@
       }
     };
 
-    const metadataFile = createGenericFile(
-      new TextEncoder().encode(JSON.stringify(metadataJson)),
-      "metadata.json",
-      {contentType: "application/json"}
-    );
-
-    const metadataPrice = await uploader.getUploadPrice([metadataFile]).catch(() => null);
-    const metadataPriceSol = solAmountToNumber(metadataPrice);
-    const storageSol = (Number.isFinite(imagePriceSol) ? imagePriceSol : 0) +
-      (Number.isFinite(metadataPriceSol) ? metadataPriceSol : 0);
-    updateStorageCost(storageSol > 0 ? storageSol : NaN);
-
     setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
-    const metadataUri = await withTimeout(
-      uploader.uploadJson(metadataJson),
-      120000,
-      "Metadata storage timed out. No token was created."
+    const metadataUpload = await uploadToPermanentStorage(
+      bundlr,
+      JSON.stringify(metadataJson),
+      "application/json",
+      "Metadata"
     );
-    if (!metadataUri) throw new Error("Metadata upload failed: no storage URI was returned.");
+    const metadataUri = metadataUpload.uri;
+    const totalStorageAtomic =
+      BigInt(imageUpload.atomicCost) + BigInt(metadataUpload.atomicCost);
+    updateStorageCost(Number(totalStorageAtomic) / 1e9);
 
     setStatus("STEP 3/4 — Building the token creation transaction...", "active");
 
