@@ -895,3 +895,183 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     text-align:left!important;
   }
 }
+
+
+/* === FINAL SECTION SYSTEM: 01–05 ===
+   Every section follows: kicker → title → description → function boxes.
+   Keep existing function-card layouts intact. */
+@media(min-width:851px){
+  .workspace-main{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+
+  /* Common heading rhythm */
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>.swap-intro{
+    padding-top:34px!important;
+    padding-bottom:0!important;
+    margin-top:0!important;
+    margin-bottom:36px!important;
+    border-top:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* 01 */
+  .workspace-main>#create-token .create-token-head{
+    display:block!important;
+    width:100%!important;
+    margin:0 0 28px!important;
+    padding:0!important;
+    text-align:left!important;
+  }
+  .workspace-main>#create-token .create-token-kicker,
+  .workspace-main>#create-token .create-token-title,
+  .workspace-main>#create-token .create-token-copy{
+    display:block!important;
+    width:100%!important;
+    text-align:left!important;
+  }
+  .workspace-main>#create-token .create-token-kicker{margin:0 0 12px!important}
+  .workspace-main>#create-token .create-token-title{margin:0 0 14px!important}
+  .workspace-main>#create-token .create-token-copy{margin:0!important;max-width:760px!important}
+
+  /* 02 */
+  .workspace-main>#distributeTokens .distribute-wrap{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:left!important;
+  }
+  .workspace-main>#distributeTokens .distribute-kicker{
+    display:block!important;
+    margin:0 0 12px!important;
+  }
+  .workspace-main>#distributeTokens .distribute-title{
+    display:block!important;
+    margin:0 0 14px!important;
+    text-align:left!important;
+  }
+  .workspace-main>#distributeTokens .distribute-lead{
+    display:block!important;
+    margin:0 0 28px!important;
+    max-width:760px!important;
+    text-align:left!important;
+  }
+  .workspace-main>#distributeTokens .distribute-grid{
+    margin-top:0!important;
+  }
+
+  /* 03 */
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-heading{
+    margin:0 0 28px!important;
+    padding:0!important;
+    text-align:left!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-kicker{
+    display:block!important;
+    margin:0 0 12px!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-title{
+    display:block!important;
+    margin:0 0 14px!important;
+    text-align:left!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-sub{
+    display:block!important;
+    margin:0!important;
+    max-width:760px!important;
+    text-align:left!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-grid{
+    row-gap:0!important;
+  }
+
+  /* 04 heading + function card: visually one section */
+  .workspace-main>.swap-intro{
+    margin-bottom:0!important;
+  }
+  .workspace-main>.swap-intro .swap-intro-inner{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    text-align:left!important;
+  }
+  .workspace-main>.swap-intro .swap-intro-kicker{
+    display:block!important;
+    margin:0 0 12px!important;
+  }
+  .workspace-main>.swap-intro h2{
+    display:block!important;
+    margin:0 0 14px!important;
+    text-align:left!important;
+  }
+  .workspace-main>.swap-intro p{
+    display:block!important;
+    margin:0!important;
+    max-width:760px!important;
+    text-align:left!important;
+  }
+  .workspace-main>.swap-section{
+    margin:0 0 36px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .workspace-main>.swap-section .swap-layout{
+    margin-top:0!important;
+    justify-content:flex-start!important;
+  }
+
+  /* Equal gap between completed sections */
+  .workspace-main>#create-token + #distributeTokens,
+  .workspace-main>#distributeTokens + #liquidity,
+  .workspace-main>#liquidity + .swap-intro{
+    margin-top:0!important;
+  }
+}
+
+@media(max-width:850px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>.swap-intro{
+    padding-top:28px!important;
+    padding-bottom:0!important;
+    margin-top:0!important;
+    margin-bottom:28px!important;
+  }
+
+  .workspace-main>#create-token .create-token-head,
+  .workspace-main>#distributeTokens .distribute-wrap,
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-heading,
+  .workspace-main>.swap-intro .swap-intro-inner{
+    text-align:left!important;
+  }
+
+  .workspace-main>#create-token .create-token-head,
+  .workspace-main>#distributeTokens .distribute-lead,
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-heading{
+    margin-bottom:22px!important;
+  }
+
+  .workspace-main>.swap-intro{
+    margin-bottom:0!important;
+  }
+  .workspace-main>.swap-section{
+    margin:0 0 28px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  .workspace-main>.swap-section .swap-layout{
+    margin-top:0!important;
+    justify-content:flex-start!important;
+  }
+}
