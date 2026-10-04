@@ -1878,3 +1878,48 @@ body:before{opacity:.028!important}
   .swap-intro h2{font-size:25px}
   .swap-intro p{font-size:14px;line-height:1.55}
 }
+
+
+/* --- PLATFORM NAV / RESPONSIVE MENU REFRESH --- */
+.top-actions{display:flex;align-items:center;gap:12px}
+.desktop-nav{display:flex;align-items:center;gap:30px}
+.mobile-menu-btn{display:none;border:1px solid rgba(255,229,0,.35);background:#11120d;color:#ffe500;border-radius:999px;padding:10px 14px;font-size:9px;font-weight:900;letter-spacing:.14em;cursor:pointer}
+.mobile-menu{display:none}
+.hero-identity{position:relative;z-index:2}
+.hero-tagline{color:var(--yellow);font-size:11px;font-weight:900;letter-spacing:.2em;margin:0}
+.hero-network{color:#aaa99f;font-size:12px;font-weight:700;letter-spacing:.16em;margin:0 0 24px}
+.hero h1{font-size:clamp(68px,8.7vw,132px);letter-spacing:-.09em;margin:22px 0 24px}
+.hero h1 span{color:var(--yellow)}
+.platform-note{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;color:#77776f;font-size:8px;font-weight:800;letter-spacing:.15em}
+.platform-note span+span:before{content:"/";color:#3e3e37;margin-right:18px}
+@media(max-width:850px){
+  .desktop-nav{display:none}
+  .mobile-menu-btn{display:block}
+  .top-actions{gap:8px}
+  .market-ticker{display:none}
+  .mobile-menu{
+    position:fixed;top:72px;left:12px;right:12px;z-index:45;
+    display:grid;gap:2px;padding:10px;
+    border:1px solid rgba(255,229,0,.28);border-radius:18px;
+    background:rgba(10,11,8,.96);backdrop-filter:blur(18px);
+    box-shadow:0 22px 60px rgba(0,0,0,.6)
+  }
+  .mobile-menu[hidden]{display:none}
+  .mobile-menu a{
+    padding:16px 14px;border-radius:11px;color:#dddcd4;
+    font-size:11px;font-weight:800;letter-spacing:.15em
+  }
+  .mobile-menu a:hover{background:#17180f;color:var(--yellow)}
+  .hero-tagline{font-size:9px;letter-spacing:.16em}
+  .hero-network{font-size:10px;line-height:1.6;letter-spacing:.11em;max-width:310px}
+  .platform-note{gap:10px;line-height:1.5}
+  .platform-note span+span:before{margin-right:10px}
+}
+@media(max-width:520px){
+  .topbar{height:72px}
+  .top-wallet{padding:10px 12px;min-height:40px}
+  .mobile-menu{top:68px}
+  .hero h1{font-size:58px;line-height:.82;margin:20px 0 20px}
+  .hero-network{margin-bottom:18px}
+  .platform-note{font-size:7px}
+}
