@@ -394,15 +394,29 @@
     }
 
     const status = document.getElementById("liqStatus");
-    if (status && txId) {
-      const txLink = document.createElement("a");
-      txLink.className = "liq-link";
-      txLink.href = "https://solscan.io/tx/" + txId;
-      txLink.target = "_blank";
-      txLink.rel = "noopener noreferrer";
-      txLink.textContent = "VIEW TRANSACTION ↗";
-      status.appendChild(document.createTextNode(" "));
-      status.appendChild(txLink);
+    if (status && (txId || poolId)) {
+      status.textContent = "";
+      if (txId) {
+        const txLink = document.createElement("a");
+        txLink.className = "liq-link";
+        txLink.href = "https://solscan.io/tx/" + txId;
+        txLink.target = "_blank";
+        txLink.rel = "noopener noreferrer";
+        txLink.textContent = "VIEW TRANSACTION ↗";
+        status.appendChild(txLink);
+      }
+      if (txId && poolId) {
+        status.appendChild(document.createTextNode("  "));
+      }
+      if (poolId) {
+        const poolLink = document.createElement("a");
+        poolLink.className = "liq-link";
+        poolLink.href = "https://raydium.io/liquidity/increase/?mode=add&pool_id=" + encodeURIComponent(poolId);
+        poolLink.target = "_blank";
+        poolLink.rel = "noopener noreferrer";
+        poolLink.textContent = "VIEW RAYDIUM POOL ↗";
+        status.appendChild(poolLink);
+      }
     }
     if (poolId) {
       const existing = document.getElementById("liqExisting");
