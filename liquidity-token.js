@@ -54,7 +54,7 @@
     section.innerHTML = `
       <div class="liquidity-grid">
         <div class="liquidity-card">
-          <div class="liquidity-kicker">04 / LIQUIDITY</div>
+          <div class="liquidity-kicker">03 / LIQUIDITY POOL</div>
           <h2 class="liquidity-title">CREATE A RAYDIUM POOL.</h2>
           <p class="liquidity-sub">Seed your new Solana token with SOL and create a permissionless CPMM pool.</p>
 
