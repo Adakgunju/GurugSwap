@@ -639,3 +639,64 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     line-height:1!important;
   }
 }
+
+
+/* --- SECTION STACK: HEADING FIRST, FUNCTION CARDS BELOW --- */
+.create-token-shell{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.05fr) minmax(330px,.78fr)!important;
+  gap:28px!important;
+  align-items:start!important;
+  position:relative!important;
+}
+.create-token-shell .create-token-head{
+  grid-column:1 / -1!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+}
+.create-token-shell .create-token-card{
+  grid-column:1!important;
+  grid-row:2!important;
+  width:100%!important;
+  margin:0!important;
+}
+.create-token-shell .create-token-help{
+  grid-column:2!important;
+  grid-row:2!important;
+  width:100%!important;
+  margin:0!important;
+}
+.create-token-shell .create-token-network{
+  position:absolute!important;
+  top:0!important;
+  right:0!important;
+}
+.distribute-wrap .distribute-grid{
+  margin-top:0!important;
+}
+.liquidity-heading{
+  width:100%!important;
+  margin:0 0 28px!important;
+}
+.liquidity-card{
+  margin-top:0!important;
+}
+@media(max-width:900px){
+  .create-token-shell{
+    grid-template-columns:1fr!important;
+    gap:22px!important;
+  }
+  .create-token-shell .create-token-head{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  .create-token-shell .create-token-card{
+    grid-column:1!important;
+    grid-row:2!important;
+  }
+  .create-token-shell .create-token-help{
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+}
