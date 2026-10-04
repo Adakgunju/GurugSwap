@@ -538,6 +538,38 @@
     }
   }
 
+  async function withTimeout(promise, ms, message) {
+    let timer;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(message)), ms);
+        })
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function verifyCreatedToken(mintAddress, ataAddress, expectedAmount) {
+    if (!window.solanaWeb3) throw new Error("Solana Web3 library is not available for verification.");
+    const rpc = await getWorkingRpc();
+    const connection = new window.solanaWeb3.Connection(rpc, "confirmed");
+    const mintInfo = await connection.getAccountInfo(new window.solanaWeb3.PublicKey(mintAddress), "confirmed");
+    if (!mintInfo) throw new Error("Token mint was not found on Solana after confirmation.");
+
+    const balance = await connection.getTokenAccountBalance(
+      new window.solanaWeb3.PublicKey(ataAddress),
+      "confirmed"
+    );
+    const actualAmount = BigInt(balance?.value?.amount || "0");
+    if (actualAmount !== expectedAmount) {
+      throw new Error("Token creation transaction was confirmed, but the initial token balance could not be verified.");
+    }
+    return actualAmount;
+  }
+
   async function createToken() {
     const logoInput = document.getElementById("createTokenLogo");
     const logoFile = logoInput?.files?.[0];
@@ -567,7 +599,7 @@
 
     if (!window.solanaWeb3) throw new Error("Solana Web3 library is not available.");
 
-    setStatus("Preparing permanent metadata storage...", "active");
+    setStatus("STEP 1/4 — Preparing permanent metadata storage...", "active");
     const {umi, modules} = await createUmiForWallet(provider);
     const {createGenericFile, generateSigner, percentAmount, some} = modules.umi;
     const {createV1, TokenStandard} = modules.metadata;
@@ -591,10 +623,22 @@
     const imagePriceSol = solAmountToNumber(imagePrice);
     if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
 
-    setStatus("Uploading token logo to permanent storage...", "active");
-    const imageUris = await uploader.upload([imageFile]);
+    setStatus("STEP 1/4 — Approve storage payment in Phantom...", "active");
+    let imageUris;
+    try {
+      imageUris = await withTimeout(
+        uploader.upload([imageFile]),
+        120000,
+        "Logo storage timed out after the wallet payment. Please try again."
+      );
+    } catch (error) {
+      console.error("IRYS logo upload failed:", error);
+      throw new Error(
+        "Storage payment was processed, but the logo upload did not finish. No token was created. Please try again."
+      );
+    }
     const imageUri = imageUris?.[0];
-    if (!imageUri) throw new Error("Logo upload failed: Irys returned no storage URI.");
+    if (!imageUri) throw new Error("Storage payment was processed, but Irys returned no logo URI. No token was created.");
 
     const metadataJson = {
       name,
@@ -619,11 +663,15 @@
       (Number.isFinite(metadataPriceSol) ? metadataPriceSol : 0);
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
 
-    setStatus("Uploading token metadata JSON...", "active");
-    const metadataUri = await uploader.uploadJson(metadataJson);
+    setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
+    const metadataUri = await withTimeout(
+      uploader.uploadJson(metadataJson),
+      120000,
+      "Metadata storage timed out. No token was created."
+    );
     if (!metadataUri) throw new Error("Metadata upload failed: Irys returned no storage URI.");
 
-    setStatus("Building the token creation transaction...", "active");
+    setStatus("STEP 3/4 — Building the token creation transaction...", "active");
 
     const tokenBuilder = createMint(umi, {
       mint,
@@ -671,8 +719,18 @@
         )
       : tokenBuilder;
 
-    setStatus("Review the token, metadata and storage transactions in Phantom and approve...", "active");
-    const result = await finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}});
+    setStatus("STEP 3/4 — Approve the actual token creation transaction in Phantom...", "active");
+    let result;
+    try {
+      result = await withTimeout(
+        finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}}),
+        180000,
+        "Token creation timed out. Check Phantom/Solscan before retrying."
+      );
+    } catch (error) {
+      console.error("TOKEN CREATION transaction failed:", error);
+      throw new Error(error?.message || "Token creation transaction failed or was cancelled. No success was recorded.");
+    }
 
     const mintAddress = mint.publicKey.toString();
     const ata = findAssociatedTokenPda(umi, {
@@ -680,6 +738,9 @@
       owner: umi.identity.publicKey
     });
     const ataAddress = ata?.toString ? ata.toString() : String(ata);
+
+    setStatus("STEP 4/4 — Verifying the token mint and initial balance on Solana...", "active");
+    await verifyCreatedToken(mintAddress, ataAddress, amount);
 
     const solscan = "https://solscan.io/token/" + mintAddress;
     const account = "https://solscan.io/account/" + ataAddress;
@@ -700,7 +761,7 @@
     if (resultEl) resultEl.hidden = false;
 
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
-    setStatus("TOKEN CREATED SUCCESSFULLY — token, metadata and logo are live on Solana.", "success");
+    setStatus("TOKEN CREATED SUCCESSFULLY — token, metadata, logo and initial balance are verified on Solana.", "success");
     window.dispatchEvent(new CustomEvent("gurug:token-created", { detail: { mintAddress, metadataUri, signature: result?.signature || null } }));
     return {mintAddress, metadataUri, signature: result?.signature || null};
   }
