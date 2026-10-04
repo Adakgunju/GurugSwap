@@ -187,16 +187,14 @@
     swap.insertAdjacentHTML("beforebegin", `
       <section id="create-token" aria-label="Create a Solana token">
         <div class="create-token-shell">
-        <div class="create-token-card">
           <div class="create-token-head">
-            <div>
-              <div class="create-token-kicker">01 / CREATE TOKEN</div>
-              <h2 class="create-token-title">CREATE YOUR SPL TOKEN.</h2>
-              <p class="create-token-copy">Create a new standard SPL Token mint directly from GurugSwap. Your wallet signs the transaction — GurugSwap never receives your private key.</p>
+            <div class="create-token-kicker">01 / TOKEN CREATION</div>
+            <h2 class="create-token-title">CREATE YOUR SPL TOKEN.</h2>
+            <p class="create-token-copy">Create a new standard SPL Token mint directly from GurugSwap. Your wallet signs the transaction — GurugSwap never receives your private key.</p>
             </div>
             <span class="create-token-network">SOLANA MAINNET</span>
           </div>
-
+          <div class="create-token-card">
           <div class="create-token-grid">
             <div class="create-token-field">
               <label for="createTokenName">TOKEN NAME</label>
@@ -296,6 +294,7 @@
           <div class="swap-intro-kicker">04 / TOKEN SWAP</div>
           <h2>TRADE TOKENS ON SOLANA.</h2>
           <p>Swap SOL, GURUG and supported Solana tokens with a simple, transparent trading interface.</p>
+        </div>
         </div>
       </section>
     `);
