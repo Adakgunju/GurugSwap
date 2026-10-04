@@ -117,3 +117,80 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-right:0!important;
   }
 }
+
+
+/* --- UNIFY CREATE / DISTRIBUTE PANELS WITH WORKSPACE WIDTH --- */
+@media(min-width:851px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens{
+    width:1180px!important;
+    max-width:1180px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-sizing:border-box!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    border:none!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  .workspace-main>#create-token .create-token-shell{
+    width:1180px!important;
+    max-width:1180px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  .workspace-main>#create-token .create-token-card{
+    width:100%!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-wrap{
+    width:1180px!important;
+    max-width:1180px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Remove the extra large outer frame around section 02.
+     Keep only the two functional cards inside. */
+  .workspace-main>#distributeTokens .distribute-grid{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-card,
+  .workspace-main>#distributeTokens .distribute-help{
+    box-sizing:border-box!important;
+  }
+}
+
+@media(max-width:850px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    border:none!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  .workspace-main>#create-token .create-token-shell,
+  .workspace-main>#distributeTokens .distribute-wrap{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
