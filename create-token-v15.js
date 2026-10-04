@@ -862,7 +862,7 @@
     const rpc = await getWorkingRpc();
     const connection = new window.solanaWeb3.Connection(rpc, "confirmed");
 
-    for (let attempt = 0; attempt < 6; attempt++) {
+    for (let attempt = 0; attempt < 24; attempt++) {
       try {
         const mintInfo = await connection.getAccountInfo(
           new window.solanaWeb3.PublicKey(mintAddress),
@@ -882,7 +882,7 @@
         console.warn("Created-token recovery check failed:", error);
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     return false;
@@ -1087,17 +1087,17 @@
     const ataAddress = ata?.toString ? ata.toString() : String(ata);
 
     if (lastError) {
-      // The transaction may already be committed even if the client-side
-      // confirmation path reports an expired blockhash. Verify the actual
-      // mint + initial balance before showing a red error.
-      setStatus("STEP 4/4 — Checking whether the token transaction was already confirmed...", "active");
+      // sendAndConfirm can time out even after Solana has accepted the transaction.
+      // Never show a failure until the mint and expected ATA balance have been checked on-chain.
+      setStatus("STEP 4/4 — Checking the Solana blockchain for your token...", "active");
       const recovered = await recoverCreatedTokenIfPresent(mintAddress, ataAddress, amount);
 
       if (!recovered) {
-        throw new Error(lastError?.message || "Token creation transaction failed or was cancelled. No success was recorded.");
+        console.error("Token creation could not be recovered after client error:", lastError);
+        throw new Error(lastError?.message || "Token creation could not be confirmed on Solana. Check Solscan before retrying.");
       }
 
-      console.warn("Token creation recovered after confirmation error:", lastError);
+      console.warn("Token creation recovered from client-side confirmation error:", lastError);
     }
 
     setStatus("STEP 4/4 — Verifying the token mint and initial balance on Solana...", "active");
