@@ -47,6 +47,44 @@
 .create-token-note{margin-top:13px;color:#66685f;font-size:8px;line-height:1.55}
 @media(max-width:520px){#create-token{padding:30px 18px 14px}.create-token-card{padding:17px;border-radius:18px}.create-token-head{gap:10px}.create-token-title{font-size:21px}.create-token-grid{grid-template-columns:1fr}.create-token-field.full{grid-column:auto}.create-token-network{font-size:7px}.create-token-button{min-height:46px}}
 /* GurugSwap Create Token visual upgrade */
+/* Mobile readability pass */
+#create-token .create-token-title{color:#ffffff!important}
+#create-token .create-token-copy{color:#f2f2ec!important;font-weight:600}
+#create-token .create-token-field label{color:#f1f1e9!important;font-size:15px!important}
+#create-token .create-token-field small{color:#c8c9bd!important;font-size:13px!important}
+#create-token .create-token-field input{color:#ffffff!important;background:#0b0d0a!important;border-color:rgba(255,255,255,.22)!important}
+#create-token .create-token-field input::placeholder{color:#bfc0b8!important;opacity:1!important}
+#create-token .create-token-options-title,
+#create-token .create-token-check strong,
+#create-token .create-token-cost-title{color:#ffffff!important}
+#create-token .create-token-check span{color:#d2d3c9!important;font-size:14px!important}
+#create-token .create-token-warning{color:#c9cabf!important;font-size:13px!important}
+#create-token .create-token-cost-row{color:#d4d5ca!important;font-size:14px!important}
+#create-token .create-token-cost-row strong{color:#ffffff!important}
+#create-token .create-token-help h3,
+#create-token .create-token-help-section h4{color:#ffffff!important}
+#create-token .create-token-help-step strong{color:#f5f5ee!important}
+#create-token .create-token-help-step span,
+#create-token .create-token-help-section p{color:#d0d1c7!important}
+#create-token .create-token-note{color:#bfc0b6!important;font-size:13px!important}
+@media(max-width:560px){
+  #create-token{padding:28px 14px 18px!important}
+  #create-token .create-token-card{padding:22px 18px!important}
+  #create-token .create-token-title{font-size:28px!important;line-height:1.08!important}
+  #create-token .create-token-copy{font-size:15px!important;line-height:1.65!important}
+  #create-token .create-token-network{font-size:10px!important}
+  #create-token .create-token-field label{font-size:15px!important}
+  #create-token .create-token-field input{font-size:17px!important;min-height:56px!important}
+  #create-token .create-token-field small{font-size:13px!important}
+  #create-token .create-token-check strong{font-size:16px!important}
+  #create-token .create-token-check span{font-size:14px!important}
+  #create-token .create-token-cost-row{font-size:14px!important}
+  #create-token .create-token-cost-total{font-size:16px!important}
+  #create-token .create-token-cost-total strong{font-size:20px!important}
+  #create-token .create-token-button{font-size:15px!important;min-height:56px!important}
+  #create-token .create-token-status{font-size:14px!important}
+}
+
 #create-token{padding:54px 5vw 24px}
 .create-token-card{max-width:1180px;margin:0 auto;padding:30px}
 .create-token-head{margin-bottom:28px}
