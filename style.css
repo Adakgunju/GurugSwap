@@ -1587,3 +1587,16 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-bottom:40px!important;
   }
 }
+
+
+/* === FINAL GAP: 03 LIQUIDITY → 04 TOKEN SWAP === */
+@media(min-width:851px){
+  .workspace-main>#swap{
+    margin-top:52px!important;
+  }
+}
+@media(max-width:850px){
+  .workspace-main>#swap{
+    margin-top:40px!important;
+  }
+}
