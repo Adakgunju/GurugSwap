@@ -512,38 +512,139 @@
     return {umi, modules};
   }
 
-  let irysBundlesPromise = null;
-
-  function ensureBrowserPolyfills() {
-    if (globalThis.Buffer == null && globalThis.buffer?.Buffer) {
-      globalThis.Buffer = globalThis.buffer.Buffer;
-    }
-    if (typeof window !== "undefined" && window.Buffer == null && globalThis.Buffer) {
-      window.Buffer = globalThis.Buffer;
-    }
-    if (globalThis.process == null) {
-      globalThis.process = { env: {} };
-    } else if (globalThis.process.env == null) {
-      globalThis.process.env = {};
-    }
-    if (globalThis.global == null) globalThis.global = globalThis;
+  function utf8(value) {
+    return new TextEncoder().encode(String(value));
   }
 
-  async function loadIrysBundles() {
-    if (!irysBundlesPromise) {
-      ensureBrowserPolyfills();
-      irysBundlesPromise = import("https://esm.sh/@irys/bundles@0.0.5/web?bundle&target=es2020")
-        .then(modules => {
-          const createData = modules?.createData;
-          const HexInjectedSolanaSigner =
-            modules?.HexInjectedSolanaSigner || modules?.default?.HexInjectedSolanaSigner;
-          if (typeof createData !== "function" || typeof HexInjectedSolanaSigner !== "function") {
-            throw new Error("Irys browser bundle loaded without the Solana DataItem signer.");
-          }
-          return {createData, HexInjectedSolanaSigner};
-        });
+  function concatBytes(...arrays) {
+    const total = arrays.reduce((sum, a) => sum + a.length, 0);
+    const out = new Uint8Array(total);
+    let offset = 0;
+    for (const a of arrays) {
+      out.set(a, offset);
+      offset += a.length;
     }
-    return irysBundlesPromise;
+    return out;
+  }
+
+  function littleEndianNumber(value, bytes) {
+    const out = new Uint8Array(bytes);
+    let n = Number(value);
+    for (let i = 0; i < bytes; i++) {
+      out[i] = n & 255;
+      n = Math.floor(n / 256);
+    }
+    return out;
+  }
+
+  function avscLong(value) {
+    let n = Number(value);
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error("Invalid Irys tag length.");
+    let m = n * 2;
+    const out = [];
+    do {
+      let b = m % 128;
+      m = Math.floor(m / 128);
+      if (m) b |= 128;
+      out.push(b);
+    } while (m);
+    return new Uint8Array(out);
+  }
+
+  function serializeIrysTags(tags) {
+    if (!tags?.length) return new Uint8Array(0);
+    const parts = [avscLong(tags.length)];
+    for (const tag of tags) {
+      const name = utf8(tag.name);
+      const value = utf8(tag.value);
+      parts.push(avscLong(name.length), name, avscLong(value.length), value);
+    }
+    parts.push(avscLong(0));
+    return concatBytes(...parts);
+  }
+
+  async function sha256(bytes) {
+    return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  }
+
+  async function sha384(bytes) {
+    return new Uint8Array(await crypto.subtle.digest("SHA-384", bytes));
+  }
+
+  async function irysDeepHash(data) {
+    if (Array.isArray(data)) {
+      let acc = await sha384(concatBytes(utf8("list"), utf8(String(data.length))));
+      for (const item of data) {
+        const child = await irysDeepHash(item);
+        acc = await sha384(concatBytes(acc, child));
+      }
+      return acc;
+    }
+
+    const bytes = data instanceof Uint8Array ? data : utf8(data);
+    const tag = concatBytes(utf8("blob"), utf8(String(bytes.length)));
+    const taggedHash = concatBytes(await sha384(tag), await sha384(bytes));
+    return sha384(taggedHash);
+  }
+
+  function toHex(bytes) {
+    return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function createSignedIrysDataItem(provider, data, tags) {
+    const owner = new Uint8Array(provider.publicKey.toBytes ? provider.publicKey.toBytes() : provider.publicKey.toBuffer());
+    if (owner.length !== 32) throw new Error("Phantom public key has an invalid length.");
+
+    const anchor = crypto.getRandomValues(new Uint8Array(32));
+    const target = new Uint8Array(0);
+    const rawTags = serializeIrysTags(tags);
+    const rawData = data instanceof Uint8Array ? data : utf8(data);
+
+    // Irys Solana DataItem signature type 4.
+    const signatureType = littleEndianNumber(4, 2);
+    const header = concatBytes(
+      signatureType,
+      new Uint8Array([0]), // signature placeholder
+      owner,
+      new Uint8Array([0]), // no target
+      new Uint8Array([1]), // anchor present
+      anchor,
+      rawTags,
+      rawData
+    );
+
+    const signatureData = await irysDeepHash([
+      utf8("dataitem"),
+      utf8("1"),
+      utf8("4"),
+      owner,
+      target,
+      anchor,
+      rawTags,
+      rawData
+    ]);
+
+    // Irys HexInjectedSolanaSigner signs the ASCII hex representation.
+    const message = utf8(toHex(signatureData));
+    if (typeof provider.signMessage !== "function") {
+      throw new Error("Phantom does not expose signMessage required for Irys storage.");
+    }
+    const signed = await provider.signMessage(message);
+    const signature = new Uint8Array(signed?.signature ?? signed);
+    if (signature.length !== 64) throw new Error("Phantom returned an invalid Irys signature.");
+
+    const binary = concatBytes(
+      signatureType,
+      signature,
+      owner,
+      new Uint8Array([0]),
+      new Uint8Array([1]),
+      anchor,
+      rawTags,
+      rawData
+    );
+
+    return binary;
   }
 
   async function irysRequest(path, options = {}) {
@@ -565,14 +666,9 @@
   }
 
   async function createIrysWebClient(provider) {
-    const {createData, HexInjectedSolanaSigner} = await loadIrysBundles();
-    const wallet = createPhantomWalletAdapter(provider);
-    const signer = new HexInjectedSolanaSigner(wallet);
-    const address = provider.publicKey.toString();
     return {
-      createData,
-      signer,
-      address
+      provider,
+      address: provider.publicKey.toString()
     };
   }
 
@@ -623,10 +719,13 @@
   }
 
   async function uploadToPermanentStorage(irys, provider, data, contentType, label) {
-    const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
+    const bytes = data instanceof Uint8Array ? data : utf8(data);
     const tags = [{name: "Content-Type", value: contentType}];
+    const rawTags = serializeIrysTags(tags);
 
-    const price = await getIrysPrice(bytes.length + 512, tags, irys.address);
+    // Exact ANS-104 DataItem size: header + signature + owner + target/anchor + tags + data.
+    const itemSize = 2 + 64 + 32 + 1 + 1 + 32 + rawTags.length + bytes.length;
+    const price = await getIrysPrice(itemSize, tags, irys.address);
     if (price <= 0n) throw new Error(label + " storage price could not be calculated.");
 
     const currentBalance = await getIrysBalance(irys.address);
@@ -634,11 +733,8 @@
       await fundIrysIfNeeded(provider, price - currentBalance, irys.address);
     }
 
-    const item = irys.createData(bytes, irys.signer, {
-      tags,
-      anchor: crypto.getRandomValues(new Uint8Array(32))
-    });
-    await item.sign(irys.signer);
+    setStatus("STEP 2/4 — Sign " + label.toLowerCase() + " for permanent Arweave storage...", "active");
+    const binary = await createSignedIrysDataItem(provider, bytes, tags);
 
     const response = await fetch("https://node1.irys.xyz/tx/solana", {
       method: "POST",
@@ -646,7 +742,7 @@
         "Content-Type": "application/octet-stream",
         "x-irys-js-sdk-version": "web-direct"
       },
-      body: item.getRaw()
+      body: binary
     });
 
     const text = await response.text();
