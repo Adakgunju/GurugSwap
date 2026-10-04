@@ -1,7 +1,29 @@
 (() => {
   "use strict";
 
-  const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
+  const SOLANA_RPCS = [
+    "https://solana-rpc.publicnode.com",
+    "https://api.mainnet.solana.com",
+    "https://api.mainnet-beta.solana.com"
+  ];
+
+  async function getWorkingRpc() {
+    for (const rpc of SOLANA_RPCS) {
+      try {
+        const response = await fetch(rpc, {
+          method: "POST",
+          headers: {"content-type": "application/json"},
+          body: JSON.stringify({jsonrpc:"2.0",id:1,method:"getHealth",params:[]}),
+          cache: "no-store"
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.result === "ok" || data?.result === "healthy") return rpc;
+        }
+      } catch {}
+    }
+    throw new Error("No Solana RPC endpoint is currently available. Please try again.");
+  }
   const SPL_TOKEN_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const MAX_RECIPIENTS_PER_TX = 6;
 
@@ -311,7 +333,8 @@
       return row;
     });
 
-    const connection = new web3.Connection(SOLANA_RPC, "confirmed");
+    const rpc = await getWorkingRpc();
+    const connection = new web3.Connection(rpc, "confirmed");
     setStatus("Checking token account, decimals and recipient wallets...", "active");
     const {decimals, sourceAta} = await getMintInfo(connection, mint, provider.publicKey);
 
