@@ -251,3 +251,43 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     box-shadow:none!important;
   }
 }
+
+
+/* --- TOKEN ICON HARD SIZE GUARD --- */
+#fromTokenButton img,
+#toTokenButton img,
+#fromTokenButton .token-dynamic-icon,
+#toTokenButton .token-dynamic-icon,
+.token-option img,
+.token-option .token-dynamic-icon{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  min-height:30px!important;
+  max-width:30px!important;
+  max-height:30px!important;
+  flex:0 0 30px!important;
+  object-fit:cover!important;
+  display:block!important;
+  border-radius:50%!important;
+}
+#toTokenButton #toTokenIcon{
+  width:31px!important;
+  height:31px!important;
+  min-width:31px!important;
+  min-height:31px!important;
+  max-width:31px!important;
+  max-height:31px!important;
+  flex:0 0 31px!important;
+}
+.token-option .sol-logo,
+#toTokenButton .sol-logo,
+#fromTokenButton .sol-logo{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  min-height:30px!important;
+  max-width:30px!important;
+  max-height:30px!important;
+  flex:0 0 30px!important;
+}
