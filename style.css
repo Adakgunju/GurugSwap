@@ -2106,3 +2106,26 @@ main{padding-top:90px!important}
 .workspace-nav.active em{
   color:var(--yellow)!important;
 }
+
+
+/* --- TOP BRAND LOGO --- */
+.topbar .brand{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.topbar .brand-logo{
+  width:34px!important;
+  height:34px!important;
+  object-fit:contain!important;
+  display:block!important;
+  flex:0 0 34px!important;
+}
+@media(max-width:520px){
+  .topbar .brand-logo{
+    width:30px!important;
+    height:30px!important;
+    flex-basis:30px!important;
+  }
+  .topbar .brand{gap:8px!important}
+}
