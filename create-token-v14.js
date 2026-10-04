@@ -510,7 +510,7 @@
     }
     const rpc = await getWorkingRpc();
     const bundlr = new WebBundlr(
-      "https://node1.bundlr.network",
+      "https://node1.irys.xyz",
       "solana",
       provider,
       { providerUrl: rpc }
@@ -706,6 +706,9 @@
       "Metadata"
     );
     const metadataUri = metadataUpload.uri;
+    const totalStorageAtomic =
+      BigInt(imageUpload.atomicCost) + BigInt(metadataUpload.atomicCost);
+    updateStorageCost(Number(totalStorageAtomic) / 1e9);
 
     setStatus("STEP 3/4 — Building the token creation transaction...", "active");
 
