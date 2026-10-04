@@ -171,7 +171,7 @@
 
   function decimalToRawExact(value, decimals) {
     const text = String(value || "").trim();
-    if (!/^\\d+(\\.\\d+)?$/.test(text)) throw new Error("Invalid liquidity amount.");
+    if (!/^\d+(\.\d+)?$/.test(text)) throw new Error("Invalid liquidity amount.");
     const [whole, fraction = ""] = text.split(".");
     if (fraction.length > decimals) {
       throw new Error("Amount has more than " + decimals + " decimal places.");
