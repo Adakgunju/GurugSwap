@@ -696,12 +696,12 @@
       contentType: logoFile.type
     });
 
-    const bundlr = await createLegacyWebBundlr(provider);
+    const irys = await createIrysWebClient(provider);
     setStatus("STEP 1/4 — Uploading logo to permanent storage...", "active");
 
     const imageData = new Uint8Array(await logoFile.arrayBuffer());
     const imageUpload = await uploadToPermanentStorage(
-      bundlr,
+      irys,
       imageData,
       logoFile.type,
       "Logo"
@@ -722,7 +722,7 @@
 
     setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
     const metadataUpload = await uploadToPermanentStorage(
-      bundlr,
+      irys,
       JSON.stringify(metadataJson),
       "application/json",
       "Metadata"
