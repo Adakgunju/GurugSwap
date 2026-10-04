@@ -247,15 +247,51 @@
       ASSOCIATED_TOKEN_PROGRAM_ID
     );
     let walletTokenRaw = 0n;
+    let walletTokenUi = "0";
+    let ataExists = false;
+
     try {
-      const balance = await connection.getTokenAccountBalance(ata, "confirmed");
-      walletTokenRaw = BigInt(balance?.value?.amount || "0");
-    } catch (_) {
-      walletTokenRaw = 0n;
+      const ataInfo = await connection.getAccountInfo(ata, "confirmed");
+      ataExists = !!ataInfo;
+      if (ataExists) {
+        const balance = await connection.getTokenAccountBalance(ata, "confirmed");
+        walletTokenRaw = BigInt(balance?.value?.amount || "0");
+        walletTokenUi = balance?.value?.uiAmountString || "0";
+      }
+    } catch (_) {}
+
+    // If the standard ATA is not readable from this public RPC, fall back to
+    // an owner+mint token-account lookup so a valid balance is not rejected
+    // merely because the ATA query is unavailable.
+    if (!ataExists || walletTokenRaw === 0n) {
+      try {
+        const accounts = await connection.getParsedTokenAccountsByOwner(
+          owner,
+          { mint: new Web3.PublicKey(mintAddress) },
+          "confirmed"
+        );
+        for (const item of (accounts?.value || [])) {
+          const amount = BigInt(item?.account?.data?.parsed?.info?.tokenAmount?.amount || "0");
+          if (amount > walletTokenRaw) {
+            walletTokenRaw = amount;
+            walletTokenUi = item?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString || walletTokenUi;
+          }
+        }
+      } catch (_) {}
     }
+
     if (walletTokenRaw < tokenRaw) {
-      throw new Error("Insufficient token balance in your connected wallet, or the token's associated account is not available.");
+      const requestedUi = String(tokenAmount) + " tokens";
+      const availableUi = walletTokenUi + " tokens";
+      const ataNote = ataExists ? "Associated token account found." : "Associated token account was not found for this wallet.";
+      throw new Error(
+        "Token balance check failed: wallet has " + availableUi +
+        ", but pool creation requires " + requestedUi + ". " + ataNote +
+        " Make sure the correct token mint and the wallet that owns the tokens are connected."
+      );
     }
+
+    setStatus("Token balance verified: " + walletTokenUi + " available. Preparing " + tokenAmount + " tokens for the pool…");
 
     const lamports = await connection.getBalance(owner, "confirmed");
     if (BigInt(lamports) < solRaw) {
