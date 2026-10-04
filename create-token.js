@@ -439,15 +439,17 @@
         import(MPL_METADATA_CDN),
         import(MPL_TOOLBOX_CDN),
         import(BUFFER_CDN)
-      ]).then(([umi, defaults, walletAdapters, irys, metadata, toolbox, bufferModule]) => ({
-        umi,
-        defaults,
-        walletAdapters,
-        irys,
-        metadata,
-        toolbox,
-        buffer: bufferModule
-      }));
+      ]).then(([umi, defaults, walletAdapters, irys, metadata, toolbox, bufferModule]) => {
+        if (!globalThis.Buffer && bufferModule?.Buffer) globalThis.Buffer = bufferModule.Buffer;
+        return {
+          umi,
+          defaults,
+          walletAdapters,
+          irys,
+          metadata,
+          toolbox
+        };
+      });
     }
     return metadataModulesPromise;
   }
@@ -573,22 +575,6 @@
     return actualAmount;
   }
 
-  async function uploadIrysFile(uploader, fileBuffer, fileName, contentType, BufferCtor) {
-    if (!BufferCtor) throw new Error("Browser storage support could not be initialized.");
-    const irys = await uploader.irys();
-    const tx = irys.createTransaction(BufferCtor.from(fileBuffer), {
-      tags: [{name: "Content-Type", value: contentType}]
-    });
-    await tx.sign();
-    const response = await irys.uploader.uploadTransaction(tx);
-    const status = Number(response?.status || 0);
-    const id = response?.data?.id;
-    if (status >= 300 || !id) {
-      throw new Error("Irys upload failed" + (status ? " (HTTP " + status + ")" : "") + ".");
-    }
-    return "https://gateway.irys.xyz/" + id;
-  }
-
   async function createToken() {
     const logoInput = document.getElementById("createTokenLogo");
     const logoFile = logoInput?.files?.[0];
@@ -621,7 +607,6 @@
     setStatus("STEP 1/4 — Preparing permanent metadata storage...", "active");
     const {umi, modules} = await createUmiForWallet(provider);
     const {createGenericFile, generateSigner, percentAmount, some} = modules.umi;
-    const BufferCtor = modules.buffer?.Buffer;
     const {createV1, TokenStandard} = modules.metadata;
     const {
       createMint,
@@ -644,12 +629,10 @@
     if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
 
     setStatus("STEP 1/4 — Uploading logo to permanent storage...", "active");
-    let imageUri;
+    let imageUris;
     try {
-      const imagePrice = await uploader.getUploadPrice([imageFile]);
-      await uploader.fund(imagePrice);
-      imageUri = await withTimeout(
-        uploadIrysFile(uploader, imageBuffer, logoFile.name, logoFile.type, BufferCtor),
+      imageUris = await withTimeout(
+        uploader.upload([imageFile]),
         120000,
         "Logo storage timed out after the wallet payment. Please try again."
       );
@@ -659,6 +642,8 @@
         "Logo upload failed after storage payment. " + (error?.message || "Please try again.") + " No token was created."
       );
     }
+    const imageUri = Array.isArray(imageUris) ? imageUris[0] : imageUris?.[0] || imageUris;
+    if (!imageUri) throw new Error("Logo upload completed without a storage URI. No token was created.");
 
     const metadataJson = {
       name,
@@ -684,14 +669,8 @@
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
 
     setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
-    const metadataBuffer = new TextEncoder().encode(JSON.stringify(metadataJson));
-    const metadataFile = createGenericFile(metadataBuffer, "metadata.json", {contentType: "application/json"});
     const metadataUri = await withTimeout(
-      (async () => {
-        const metadataPrice = await uploader.getUploadPrice([metadataFile]);
-        await uploader.fund(metadataPrice);
-        return uploadIrysFile(uploader, metadataBuffer, "metadata.json", "application/json", BufferCtor);
-      })(),
+      uploader.uploadJson(metadataJson),
       120000,
       "Metadata storage timed out. No token was created."
     );
