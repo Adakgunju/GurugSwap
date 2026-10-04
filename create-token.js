@@ -46,6 +46,51 @@
 .create-token-result-links a{color:#ffe500;text-decoration:none;font-size:8px;letter-spacing:.1em}
 .create-token-note{margin-top:13px;color:#66685f;font-size:8px;line-height:1.55}
 @media(max-width:520px){#create-token{padding:30px 18px 14px}.create-token-card{padding:17px;border-radius:18px}.create-token-head{gap:10px}.create-token-title{font-size:21px}.create-token-grid{grid-template-columns:1fr}.create-token-field.full{grid-column:auto}.create-token-network{font-size:7px}.create-token-button{min-height:46px}}
+/* GurugSwap Create Token visual upgrade */
+#create-token{padding:54px 5vw 24px}
+.create-token-card{max-width:1180px;margin:0 auto;padding:30px}
+.create-token-head{margin-bottom:28px}
+.create-token-kicker{font-size:12px}
+.create-token-title{font-size:30px}
+.create-token-copy{font-size:15px}
+.create-token-field label{font-size:14px}
+.create-token-field input{padding:15px 14px;font-size:16px}
+.create-token-field small{font-size:12px}
+.create-token-options{margin-top:24px;padding:19px}
+.create-token-check strong{font-size:15px}
+.create-token-check span{font-size:13px}
+.create-token-button{min-height:54px;font-size:14px}
+.create-token-status{font-size:13px}
+.create-token-shell{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(330px,.78fr);gap:28px;align-items:start}
+.create-token-shell .create-token-card{max-width:none;margin:0}
+.create-token-help{padding:30px;position:sticky;top:24px;border:1px solid rgba(255,229,0,.26);border-radius:24px;background:linear-gradient(145deg,rgba(27,29,17,.97),rgba(10,12,9,.97));box-shadow:0 18px 55px rgba(0,0,0,.34)}
+.create-token-help-kicker{color:#ffe500;font-size:12px;font-weight:900;letter-spacing:.15em}
+.create-token-help h3{margin:9px 0 22px;color:#fff;font-size:26px;line-height:1.12}
+.create-token-help-step{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.065)}
+.create-token-help-num{width:27px;height:27px;flex:0 0 27px;border-radius:50%;background:rgba(255,229,0,.12);border:1px solid rgba(255,229,0,.28);display:flex;align-items:center;justify-content:center;color:#ffe500;font-size:12px;font-weight:900}
+.create-token-help-step strong{display:block;color:#eee;font-size:15px}
+.create-token-help-step span{display:block;margin-top:4px;color:#929388;font-size:13px;line-height:1.5}
+.create-token-help-section{margin-top:25px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+.create-token-help-section h4{margin:0 0 11px;color:#fff;font-size:17px}
+.create-token-help-section p{margin:0 0 13px;color:#929388;font-size:13px;line-height:1.6}
+.create-token-help-tip{padding:13px 14px;border-radius:11px;background:rgba(255,229,0,.055);border:1px solid rgba(255,229,0,.13);color:#b9baae;font-size:12px;line-height:1.55}
+.create-token-logo-wrap{display:grid;grid-template-columns:1fr 118px;gap:14px;align-items:center}
+.create-token-logo-upload{min-height:118px;border:1px dashed rgba(255,229,0,.35);border-radius:14px;background:#10110d;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative}
+.create-token-logo-upload input{display:none}
+.create-token-logo-placeholder{text-align:center;color:#a9aa9f;font-size:14px;line-height:1.5;padding:15px}
+.create-token-logo-placeholder b{display:block;color:#ffe500;font-size:16px;margin-bottom:4px}
+.create-token-logo-preview{width:100%;height:100%;object-fit:cover;display:none}
+.create-token-logo-preview.visible{display:block}
+.create-token-logo-preview.visible + .create-token-logo-placeholder{display:none}
+.create-token-cost{margin-top:22px;padding:19px;border:1px solid rgba(255,229,0,.22);border-radius:15px;background:rgba(255,229,0,.035)}
+.create-token-cost-title{color:#fff;font-size:17px;font-weight:900;margin-bottom:12px}
+.create-token-cost-row{display:flex;justify-content:space-between;gap:18px;color:#aaaBA0;font-size:14px;line-height:1.8}
+.create-token-cost-row strong{color:#fff}
+.create-token-cost-total{margin-top:9px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);font-size:16px;color:#fff}
+.create-token-cost-total strong{color:#ffe500;font-size:19px}
+@media(max-width:900px){.create-token-shell{grid-template-columns:1fr}.create-token-help{position:static}}
+@media(max-width:560px){#create-token{padding:34px 18px 18px}.create-token-card,.create-token-help{padding:21px}.create-token-title{font-size:25px}.create-token-copy{font-size:14px}.create-token-grid{grid-template-columns:1fr}.create-token-field.full{grid-column:auto}.create-token-logo-wrap{grid-template-columns:1fr 100px}.create-token-logo-upload{min-height:100px}}
+
 `;
   
   function addStyle() {
@@ -62,6 +107,7 @@
     if (!swap) return;
     swap.insertAdjacentHTML("beforebegin", `
       <section id="create-token" aria-label="Create a Solana token">
+        <div class="create-token-shell">
         <div class="create-token-card">
           <div class="create-token-head">
             <div>
@@ -94,9 +140,15 @@
               <small>0–9 decimal places.</small>
             </div>
             <div class="create-token-field full">
-              <label for="createTokenLogo">LOGO URL <span style="color:#55564f">(OPTIONAL)</span></label>
-              <input id="createTokenLogo" type="url" placeholder="https://.../token-logo.png" autocomplete="off">
-              <small>The logo/metadata upload will be connected in the next metadata module. This first step creates the real SPL mint and supply.</small>
+              <label>TOKEN LOGO</label>
+              <div class="create-token-logo-wrap">
+                <label class="create-token-logo-upload" for="createTokenLogo">
+                  <input id="createTokenLogo" type="file" accept="image/png,image/jpeg,image/webp">
+                  <img id="createTokenLogoPreview" class="create-token-logo-preview" alt="Token logo preview">
+                  <span class="create-token-logo-placeholder"><b>UPLOAD LOGO</b>PNG, JPG or WEBP</span>
+                </label>
+                <small>Use a square image. Maximum 2 MB. The selected logo is previewed here.</small>
+              </div>
             </div>
           </div>
 
@@ -104,14 +156,28 @@
             <label class="create-token-check">
               <input id="createTokenFixed" type="checkbox" checked>
               <span>
-                <strong>FIX THE TOTAL SUPPLY</strong>
-                <span>After the initial supply is minted, permanently revoke the mint authority. This cannot be undone.</span>
+                <strong>FIX TOTAL SUPPLY</strong>
+                <span>After the initial supply is minted, permanently revoke Mint Authority. No additional tokens can be minted.</span>
+              </span>
+            </label>
+            <label class="create-token-check">
+              <input id="createTokenRevokeFreeze" type="checkbox" checked>
+              <span>
+                <strong>REVOKE FREEZE AUTHORITY</strong>
+                <span>Prevents a freeze authority from freezing token accounts later. Recommended for public liquidity pools.</span>
               </span>
             </label>
             <div class="create-token-warning"><b>Important:</b> this creates a real token on Solana mainnet and costs SOL for rent and transaction fees. Review everything before approving in Phantom.</div>
           </div>
 
-          <button id="createTokenButton" class="create-token-button" type="button">CREATE SPL TOKEN</button>
+          <div class="create-token-cost">
+            <div class="create-token-cost-title">CREATION COST</div>
+            <div class="create-token-cost-row"><span>Solana network &amp; rent</span><strong id="createTokenNetworkCost">Calculating…</strong></div>
+            <div class="create-token-cost-row"><span>GurugSwap fee</span><strong>0 SOL</strong></div>
+            <div class="create-token-cost-row create-token-cost-total"><span>Estimated total</span><strong id="createTokenTotalCost">Calculating…</strong></div>
+            <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The final network amount is calculated before you sign.</div>
+          </div>
+          <button id="createTokenButton" class="create-token-button" type="button">CREATE TOKEN</button>
           <div id="createTokenStatus" class="create-token-status">Connect your Phantom wallet, enter the token details, then create the token.</div>
 
           <div id="createTokenResult" class="create-token-result" hidden>
@@ -126,7 +192,21 @@
             </div>
           </div>
 
-          <div class="create-token-note">This first release uses the standard SPL Token Program for broad ecosystem compatibility. Token name, symbol and logo will become on-chain metadata in the next CREATE TOKEN upgrade.</div>
+          <div class="create-token-note">Token name, symbol and logo will be connected to Solana token metadata in the next metadata module. GurugSwap does not custody your wallet or private key.</div>
+        </div>
+        <aside class="create-token-help">
+          <div class="create-token-help-kicker">HOW IT WORKS</div>
+          <h3>How to create a Solana token</h3>
+          <div class="create-token-help-step"><div class="create-token-help-num">1</div><div><strong>Connect your wallet</strong><span>Connect Phantom. Your wallet stays under your control.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">2</div><div><strong>Enter token details</strong><span>Choose the name, symbol, supply and decimals.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">3</div><div><strong>Upload your logo</strong><span>Upload PNG, JPG or WEBP and check the preview before creating.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">4</div><div><strong>Choose supply control</strong><span>Fixed Supply and Revoke Freeze Authority are enabled by default.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">5</div><div><strong>Review the cost</strong><span>See the estimated Solana network and rent cost before signing. GurugSwap currently charges 0 SOL.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">6</div><div><strong>Approve in Phantom</strong><span>Your wallet signs the on-chain transaction.</span></div></div>
+          <div class="create-token-help-section"><h4>What is Fixed Total Supply?</h4><p>Revoking Mint Authority after the initial mint means no additional tokens can be minted through that authority.</p></div>
+          <div class="create-token-help-section"><h4>What is Freeze Authority?</h4><p>A freeze authority can freeze token accounts. Revoking it leaves no freeze authority on the mint.</p><div class="create-token-help-tip">Recommended for public liquidity pools and transparent token launches.</div></div>
+          <div class="create-token-help-section"><h4>What happens after creation?</h4><p>Your wallet receives the initial supply and GurugSwap shows the new mint address with direct Solscan links.</p></div>
+        </aside>
         </div>
       </section>
     `);
@@ -184,13 +264,61 @@
     });
   }
 
+  function updateCostDisplay(lamports) {
+    const sol = Number(lamports || 0) / 1e9;
+    const formatted = sol < 0.000001 ? "<0.000001 SOL" : sol.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
+    const networkEl = document.getElementById("createTokenNetworkCost");
+    const totalEl = document.getElementById("createTokenTotalCost");
+    if (networkEl) networkEl.textContent = formatted;
+    if (totalEl) totalEl.textContent = formatted;
+  }
+
+  async function refreshCreationCost() {
+    try {
+      if (!window.solanaWeb3) return;
+      const spl = await loadSplToken();
+      const connection = new window.solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+      const rent = await connection.getMinimumBalanceForRentExemption(spl.MINT_SIZE);
+      updateCostDisplay(rent + 5000);
+    } catch {
+      const networkEl = document.getElementById("createTokenNetworkCost");
+      const totalEl = document.getElementById("createTokenTotalCost");
+      if (networkEl) networkEl.textContent = "Calculated at signing";
+      if (totalEl) totalEl.textContent = "Calculated at signing";
+    }
+  }
+
   async function createToken() {
+    const logoInput = document.getElementById("createTokenLogo");
+    const logoPreview = document.getElementById("createTokenLogoPreview");
+    if (logoInput && logoPreview) {
+      logoInput.addEventListener("change", () => {
+        const file = logoInput.files?.[0];
+        if (!file) return;
+        if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+          logoInput.value = "";
+          setStatus("Please choose a PNG, JPG or WEBP image.", "error");
+          return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+          logoInput.value = "";
+          setStatus("Logo image must be 2 MB or smaller.", "error");
+          return;
+        }
+        logoPreview.src = URL.createObjectURL(file);
+        logoPreview.classList.add("visible");
+      });
+    }
+
+    refreshCreationCost();
+
     const button = document.getElementById("createTokenButton");
     const name = String(document.getElementById("createTokenName")?.value || "").trim();
     const symbol = normalizeSymbol(document.getElementById("createTokenSymbol")?.value);
     const supplyText = document.getElementById("createTokenSupply")?.value;
     const decimals = Number(document.getElementById("createTokenDecimals")?.value);
     const fixedSupply = !!document.getElementById("createTokenFixed")?.checked;
+    const revokeFreeze = !!document.getElementById("createTokenRevokeFreeze")?.checked;
 
     if (!name) throw new Error("Enter a token name.");
     if (name.length > 32) throw new Error("Token name must be 32 characters or fewer.");
@@ -245,7 +373,7 @@
         mintKeypair.publicKey,
         decimals,
         owner,
-        null,
+        revokeFreeze ? null : owner,
         spl.TOKEN_PROGRAM_ID
       ),
       spl.createAssociatedTokenAccountInstruction(
@@ -282,6 +410,12 @@
 
     const latest = await connection.getLatestBlockhash("confirmed");
     tx.recentBlockhash = latest.blockhash;
+    try {
+      const feeInfo = await connection.getFeeForMessage(tx.compileMessage(), "confirmed");
+      updateCostDisplay(rentLamports + Number(feeInfo?.value || 5000));
+    } catch {
+      updateCostDisplay(rentLamports + 5000);
+    }
     tx.feePayer = owner;
     tx.partialSign(mintKeypair);
 
