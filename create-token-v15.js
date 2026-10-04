@@ -514,9 +514,25 @@
 
   let irysWebUploaderPromise = null;
 
+  function ensureBrowserPolyfills() {
+    if (globalThis.Buffer == null && globalThis.buffer?.Buffer) {
+      globalThis.Buffer = globalThis.buffer.Buffer;
+    }
+    if (typeof window !== "undefined" && window.Buffer == null && globalThis.Buffer) {
+      window.Buffer = globalThis.Buffer;
+    }
+    if (globalThis.process == null) {
+      globalThis.process = { env: {} };
+    } else if (globalThis.process.env == null) {
+      globalThis.process.env = {};
+    }
+    if (globalThis.global == null) globalThis.global = globalThis;
+  }
+
   async function createIrysWebClient(provider) {
+    ensureBrowserPolyfills();
     if (!irysWebUploaderPromise) {
-      irysWebUploaderPromise = import("https://esm.sh/@irys/sdk@0.2.11?bundle&target=es2020")
+      irysWebUploaderPromise = import("https://esm.sh/@irys/sdk@0.2.11?bundle&target=es2020&deps=buffer@6.0.3")
         .then(module => module?.WebIrys || module?.default?.WebIrys || module?.default)
         .then(WebIrys => {
           if (typeof WebIrys !== "function") {
