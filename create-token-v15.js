@@ -512,7 +512,7 @@
     return {umi, modules};
   }
 
-  let irysWebUploaderPromise = null;
+  let irysBundlesPromise = null;
 
   function ensureBrowserPolyfills() {
     if (globalThis.Buffer == null && globalThis.buffer?.Buffer) {
@@ -529,87 +529,140 @@
     if (globalThis.global == null) globalThis.global = globalThis;
   }
 
-  async function createIrysWebClient(provider) {
-    if (!irysWebUploaderPromise) {
-      const browserDeps =
-        "bundle&target=es2020" +
-        "&alias=stream:stream-browserify@3.0.0" +
-        "&alias=buffer:buffer@6.0.3" +
-        "&alias=events:events@3.3.0";
-      irysWebUploaderPromise = Promise.all([
-        import("https://esm.sh/@irys/web-upload@0.0.15?" + browserDeps),
-        import("https://esm.sh/@irys/web-upload-solana@0.1.8?" + browserDeps)
-      ]).then(([webUpload, solanaUpload]) => {
-        const WebUploader = webUpload?.WebUploader || webUpload?.default;
-        const WebSolana = solanaUpload?.WebSolana || solanaUpload?.default;
-        if (typeof WebUploader !== "function" || typeof WebSolana !== "function") {
-          throw new Error("Irys browser uploader modules loaded without WebUploader/WebSolana.");
-        }
-        return {WebUploader, WebSolana};
-      });
+  async function loadIrysBundles() {
+    if (!irysBundlesPromise) {
+      ensureBrowserPolyfills();
+      irysBundlesPromise = import("https://esm.sh/@irys/bundles@0.0.5/web?bundle&target=es2020")
+        .then(modules => {
+          const createData = modules?.createData;
+          const HexInjectedSolanaSigner =
+            modules?.HexInjectedSolanaSigner || modules?.default?.HexInjectedSolanaSigner;
+          if (typeof createData !== "function" || typeof HexInjectedSolanaSigner !== "function") {
+            throw new Error("Irys browser bundle loaded without the Solana DataItem signer.");
+          }
+          return {createData, HexInjectedSolanaSigner};
+        });
     }
-
-    const {WebUploader, WebSolana} = await irysWebUploaderPromise;
-    const wallet = createPhantomWalletAdapter(provider);
-    const rpc = await getWorkingRpc();
-
-    const irys = await withTimeout(
-      WebUploader(WebSolana)
-        .withProvider(wallet)
-        .withRpc(rpc)
-        .bundlerUrl("https://node1.irys.xyz")
-        .build(),
-      60000,
-      "Irys storage connection timed out. Please try again."
-    );
-
-    if (!irys || typeof irys.upload !== "function") {
-      throw new Error("Irys browser uploader initialized without an upload method.");
-    }
-
-    return irys;
+    return irysBundlesPromise;
   }
-  async function uploadToPermanentStorage(irys, data, contentType, label) {
-    const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
-    const price = await irys.getPrice(bytes.length);
-    const priceAtomic = price?.toString ? price.toString() : String(price);
-    if (!priceAtomic || priceAtomic === "0") {
-      throw new Error(label + " storage price could not be calculated.");
-    }
 
-    const currentBalance = await irys.getLoadedBalance();
-    if (currentBalance.lt(price)) {
-      const funding = await withTimeout(
-        irys.fund(price.minus(currentBalance)),
-        120000,
-        label + " storage payment timed out after wallet approval."
-      );
-      if (!funding) throw new Error(label + " storage funding failed.");
-
-      // WebIrys returns a funding transaction that must be submitted
-      // through its funder before the balance becomes spendable.
-      if (irys.funder && typeof irys.funder.submitFundTransaction === "function" && funding.id) {
-        await withTimeout(
-          irys.funder.submitFundTransaction(funding.id),
-          120000,
-          label + " storage funding confirmation timed out."
-        );
+  async function irysRequest(path, options = {}) {
+    const response = await fetch("https://node1.irys.xyz" + path, {
+      ...options,
+      headers: {
+        "x-irys-js-sdk-version": "web-direct",
+        ...(options.headers || {})
       }
+    });
+    const text = await response.text();
+    let data = text;
+    try { data = text ? JSON.parse(text) : null; } catch {}
+    if (!response.ok) {
+      const message = typeof data === "string" ? data : (data?.message || data?.error || response.statusText);
+      throw new Error("Irys request failed: " + response.status + " " + message);
     }
+    return data;
+  }
 
-    const receipt = await withTimeout(
-      irys.upload(bytes, {
-        tags: [{name: "Content-Type", value: contentType}]
-      }),
-      180000,
-      label + " storage upload timed out."
+  async function createIrysWebClient(provider) {
+    const {createData, HexInjectedSolanaSigner} = await loadIrysBundles();
+    const wallet = createPhantomWalletAdapter(provider);
+    const signer = new HexInjectedSolanaSigner(wallet);
+    const address = provider.publicKey.toString();
+    return {
+      createData,
+      signer,
+      address
+    };
+  }
+
+  async function getIrysPrice(byteLength, tags, address) {
+    const query = new URLSearchParams();
+    query.set("address", address);
+    for (const tag of (tags || [])) {
+      query.append("tags", tag.name + "|" + tag.value);
+    }
+    return BigInt(String(await irysRequest("/price/solana/" + byteLength + "?" + query.toString())));
+  }
+
+  async function getIrysBalance(address) {
+    const data = await irysRequest("/account/balance/solana?address=" + encodeURIComponent(address));
+    return BigInt(String(data?.balance ?? "0"));
+  }
+
+  async function fundIrysIfNeeded(provider, amount, address) {
+    if (amount <= 0n) return;
+    const bundlerInfo = await irysRequest("/info");
+    const destination = bundlerInfo?.addresses?.solana;
+    if (!destination) throw new Error("Irys did not return a Solana funding address.");
+
+    const rpc = await getWorkingRpc();
+    const connection = new window.solanaWeb3.Connection(rpc, "confirmed");
+    const latest = await connection.getLatestBlockhash("confirmed");
+    const transaction = new window.solanaWeb3.Transaction({
+      recentBlockhash: latest.blockhash,
+      feePayer: new window.solanaWeb3.PublicKey(address)
+    }).add(
+      window.solanaWeb3.SystemProgram.transfer({
+        fromPubkey: new window.solanaWeb3.PublicKey(address),
+        toPubkey: new window.solanaWeb3.PublicKey(destination),
+        lamports: Number(amount)
+      })
     );
 
-    const id = receipt?.id;
+    setStatus("STEP 1/4 — Approve the Irys storage funding transaction in Phantom...", "active");
+    const signed = await provider.signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signed.serialize(), {skipPreflight:false});
+    await waitForConfirmation(connection, signature);
+
+    await irysRequest("/account/balance/solana", {
+      method: "POST",
+      headers: {"content-type":"application/json"},
+      body: JSON.stringify({tx_id: signature})
+    });
+  }
+
+  async function uploadToPermanentStorage(irys, provider, data, contentType, label) {
+    const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
+    const tags = [{name: "Content-Type", value: contentType}];
+
+    const price = await getIrysPrice(bytes.length + 512, tags, irys.address);
+    if (price <= 0n) throw new Error(label + " storage price could not be calculated.");
+
+    const currentBalance = await getIrysBalance(irys.address);
+    if (currentBalance < price) {
+      await fundIrysIfNeeded(provider, price - currentBalance, irys.address);
+    }
+
+    const item = irys.createData(bytes, irys.signer, {
+      tags,
+      anchor: crypto.getRandomValues(new Uint8Array(32))
+    });
+    await item.sign(irys.signer);
+
+    const response = await fetch("https://node1.irys.xyz/tx/solana", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "x-irys-js-sdk-version": "web-direct"
+      },
+      body: item.getRaw()
+    });
+
+    const text = await response.text();
+    let result = text;
+    try { result = text ? JSON.parse(text) : null; } catch {}
+
+    if (!response.ok) {
+      const message = typeof result === "string" ? result : (result?.message || result?.error || response.statusText);
+      throw new Error(label + " upload failed: " + response.status + " " + message);
+    }
+
+    const id = result?.id;
     if (!id) throw new Error(label + " upload completed without a storage ID.");
     return {
       uri: "https://arweave.net/" + id,
-      atomicCost: priceAtomic
+      atomicCost: price.toString()
     };
   }
 
@@ -735,6 +788,7 @@
     const imageData = new Uint8Array(await logoFile.arrayBuffer());
     const imageUpload = await uploadToPermanentStorage(
       irys,
+      provider,
       imageData,
       logoFile.type,
       "Logo"
@@ -756,6 +810,7 @@
     setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
     const metadataUpload = await uploadToPermanentStorage(
       irys,
+      provider,
       JSON.stringify(metadataJson),
       "application/json",
       "Metadata"
