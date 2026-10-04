@@ -1441,3 +1441,49 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     line-height:1.04!important;
   }
 }
+
+
+/* === 07 / ABOUT GURUG === */
+.workspace-main>.about .about-inner{
+  align-items:start!important;
+}
+.workspace-main>.about .about-kicker{
+  color:#ffe500!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.18em!important;
+  margin:0 0 14px!important;
+}
+.workspace-main>.about .big-type{
+  font-family:'Space Grotesk',sans-serif!important;
+  font-size:48px!important;
+  line-height:.98!important;
+  letter-spacing:-.035em!important;
+  font-weight:700!important;
+  font-stretch:normal!important;
+  transform:none!important;
+  text-transform:none!important;
+}
+.workspace-main>.about .big-type span{
+  color:#ffe500!important;
+}
+.workspace-main>.about .about-copy{
+  font-size:14px!important;
+  line-height:1.65!important;
+}
+.workspace-main>.about .about-copy p{
+  margin:0 0 18px!important;
+}
+.workspace-main>.about .about-meta{
+  font-size:8px!important;
+}
+@media(max-width:850px){
+  .workspace-main>.about .big-type{
+    font-size:40px!important;
+  }
+}
+@media(max-width:520px){
+  .workspace-main>.about .big-type{
+    font-size:34px!important;
+  }
+}
