@@ -10,7 +10,7 @@
   const MAX_RECIPIENTS_PER_TX = 5;
 
   let splPromise = null;
-  let rows = [{ address: "", amount: "" }];
+  let recipientAddresses = [];
 
   function getProvider() {
     if (typeof getPhantomProvider === "function") return getPhantomProvider();
@@ -59,57 +59,29 @@
     return String(document.getElementById("multiAirdropMint")?.value || "").trim();
   }
 
-  function renderRows() {
-    const host = document.getElementById("multiAirdropRows");
+  function getAirdropAmount() {
+    return String(document.getElementById("multiAirdropAmount")?.value || "").trim();
+  }
+
+  function renderRecipients() {
+    const host = document.getElementById("multiAirdropAddresses");
     if (!host) return;
-
-    host.innerHTML = rows.map((row, index) => `
-      <div class="multi-airdrop-row" data-index="${index}">
-        <div class="multi-airdrop-row-num">${String(index + 1).padStart(2, "0")}</div>
-        <input class="multi-airdrop-address" type="text" placeholder="Recipient wallet address" value="${escapeHtml(row.address)}" autocomplete="off" spellcheck="false">
-        <input class="multi-airdrop-amount" type="text" inputmode="decimal" placeholder="Amount" value="${escapeHtml(row.amount)}" autocomplete="off">
-        <button class="multi-airdrop-remove" type="button" aria-label="Remove recipient">×</button>
-      </div>
-    `).join("");
-
-    host.querySelectorAll(".multi-airdrop-row").forEach((el, index) => {
-      const address = el.querySelector(".multi-airdrop-address");
-      const amount = el.querySelector(".multi-airdrop-amount");
-      const remove = el.querySelector(".multi-airdrop-remove");
-
-      address.addEventListener("input", () => {
-        rows[index].address = address.value.trim();
-        updateSummary();
-      });
-      amount.addEventListener("input", () => {
-        rows[index].amount = amount.value.trim();
-        updateSummary();
-      });
-      remove.addEventListener("click", () => {
-        if (rows.length === 1) {
-          rows[0] = { address: "", amount: "" };
-        } else {
-          rows.splice(index, 1);
-        }
-        renderRows();
-      });
-    });
-
+    host.value = recipientAddresses.join("\n");
     updateSummary();
   }
 
-  function updateSummary(txCount = null) {
-    const count = rows.filter(row => row.address.trim() || row.amount.trim()).length || rows.length;
-    const total = rows.reduce((sum, row) => {
-      const value = Number(String(row.amount).replace(/,/g, ""));
-      return Number.isFinite(value) && value > 0 ? sum + value : sum;
-    }, 0);
+  function updateSummary(txCount = null, decimals = null) {
+    const count = recipientAddresses.filter(address => address.trim()).length;
+    const amount = Number(getAirdropAmount().replace(/,/g, ""));
+    const total = Number.isFinite(amount) && amount > 0 ? amount * count : 0;
 
     const countEl = document.getElementById("multiAirdropCount");
     const totalEl = document.getElementById("multiAirdropTotal");
     const txEl = document.getElementById("multiAirdropTxCount");
     if (countEl) countEl.textContent = String(count);
-    if (totalEl) totalEl.textContent = Number.isFinite(total) ? total.toLocaleString("en-US", { maximumFractionDigits: 9 }) : "—";
+    if (totalEl) totalEl.textContent = count && Number.isFinite(total)
+      ? total.toLocaleString("en-US", { maximumFractionDigits: decimals == null ? 9 : decimals })
+      : "0";
     if (txEl) txEl.textContent = txCount == null ? "—" : String(txCount);
   }
 
@@ -160,25 +132,21 @@
     return { decimals, tokenProgram, sourceAta, rawBalance };
   }
 
-  function validateRows(web3) {
-    if (!rows.length) throw new Error("Add at least one recipient.");
+  function validateRows(web3, amount) {
+    const addresses = recipientAddresses.map(address => String(address || "").trim()).filter(Boolean);
+    if (!addresses.length) throw new Error("Paste at least one recipient wallet address.");
 
     const seen = new Set();
-    return rows.map((row, index) => {
-      const address = String(row.address || "").trim();
-      const amount = String(row.amount || "").trim();
-      if (!address) throw new Error(`Recipient ${index + 1}: enter a wallet address.`);
-      if (!amount) throw new Error(`Recipient ${index + 1}: enter an amount.`);
-
+    return addresses.map((address, index) => {
       let publicKey;
       try {
         publicKey = new web3.PublicKey(address);
       } catch {
-        throw new Error(`Recipient ${index + 1}: invalid Solana wallet address.`);
+        throw new Error("Recipient " + (index + 1) + ": invalid Solana wallet address.");
       }
 
       const key = publicKey.toBase58();
-      if (seen.has(key)) throw new Error(`Recipient ${index + 1}: duplicate wallet address.`);
+      if (seen.has(key)) throw new Error("Duplicate wallet address: " + key);
       seen.add(key);
 
       return { index, address: key, publicKey, amount };
@@ -279,6 +247,9 @@
     const mintText = getMintText();
     if (!mintText) throw new Error("Enter the token mint address.");
 
+    const amountText = getAirdropAmount();
+    if (!amountText) throw new Error("Enter the token amount to send to each wallet.");
+
     let mint;
     try {
       mint = new web3.PublicKey(mintText);
@@ -286,37 +257,35 @@
       throw new Error("Enter a valid Solana token mint address.");
     }
 
-    const validated = validateRows(web3);
     const rpc = await getWorkingRpc();
     const connection = new web3.Connection(rpc, "confirmed");
     const spl = await loadSpl();
 
     setStatus("Checking token, balance and recipient wallets...", "active");
     const mintInfo = await readMint(connection, mint, provider.publicKey, spl);
+    const amountRaw = parseAmount(amountText, mintInfo.decimals);
 
-    const preparedRows = validated.map(item => ({
-      ...item,
-      rawAmount: parseAmount(item.amount, mintInfo.decimals)
-    }));
+    if (amountRaw <= 0n) throw new Error("Token amount must be greater than zero.");
 
-    const totalRaw = preparedRows.reduce((sum, item) => sum + item.rawAmount, 0n);
-    if (totalRaw <= 0n) throw new Error("Total airdrop amount must be greater than zero.");
+    const validated = validateRows(web3, amountRaw);
+    const totalRaw = amountRaw * BigInt(validated.length);
+
     if (totalRaw > mintInfo.rawBalance) {
       throw new Error("Your token balance is lower than the total airdrop amount.");
     }
 
     const batches = [];
-    for (let i = 0; i < preparedRows.length; i += MAX_RECIPIENTS_PER_TX) {
-      batches.push(preparedRows.slice(i, i + MAX_RECIPIENTS_PER_TX));
+    for (let i = 0; i < validated.length; i += MAX_RECIPIENTS_PER_TX) {
+      batches.push(validated.slice(i, i + MAX_RECIPIENTS_PER_TX));
     }
 
-    updateSummary(batches.length);
-    setStatus(`Ready: ${preparedRows.length} recipient(s) in ${batches.length} transaction(s).`, "active");
+    updateSummary(batches.length, mintInfo.decimals);
+    setStatus(`Ready: ${validated.length} recipient(s) × ${amountText} tokens in ${batches.length} transaction(s).`, "active");
 
-    const results = [];
+    const ataRent = await connection.getMinimumBalanceForRentExemption(165);
     let estimatedLamports = 0;
     let estimatedNewAtas = 0;
-    const ataRent = await connection.getMinimumBalanceForRentExemption(165);
+
     for (const batch of batches) {
       const preview = await buildBatch(
         connection,
@@ -331,6 +300,7 @@
       estimatedNewAtas += preview.newAtaCount;
       estimatedLamports += await estimateFee(connection, preview.tx);
     }
+
     estimatedLamports += estimatedNewAtas * ataRent;
 
     const solBalance = await connection.getBalance(provider.publicKey, "confirmed");
@@ -345,13 +315,13 @@
       );
     }
 
+    const results = [];
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       setStatus(`Preparing batch ${i + 1} of ${batches.length}...`, "active");
 
-      let built;
       try {
-        built = await buildBatch(
+        const built = await buildBatch(
           connection,
           provider.publicKey,
           mint,
@@ -392,41 +362,21 @@
       }
     }
 
-    setStatus(`MULTI AIRDROP COMPLETE — ${preparedRows.length} recipient(s) confirmed on Solana.`, "success");
+    setStatus(`MULTI AIRDROP COMPLETE — ${validated.length} recipient(s) confirmed on Solana.`, "success");
     return results;
   }
 
-  function parseCsv(text) {
-    const lines = String(text || "")
-      .split(/\r?\n/)
-      .map(line => line.trim())
+  function loadPastedAddresses(text) {
+    const addresses = String(text || "")
+      .split(/[,\\s]+/)
+      .map(value => value.trim())
       .filter(Boolean);
 
-    if (!lines.length) throw new Error("The CSV file is empty.");
+    if (!addresses.length) throw new Error("Paste at least one wallet address.");
 
-    const parsed = [];
-    for (let i = 0; i < lines.length; i++) {
-      const parts = lines[i].split(",").map(v => v.trim().replace(/^"(.*)"$/, "$1"));
-      if (parts.length < 2) {
-        if (i === 0 && /wallet|address/i.test(lines[i])) continue;
-        throw new Error(`CSV line ${i + 1}: expected wallet,address or address,amount.`);
-      }
-
-      const first = parts[0];
-      const second = parts[1];
-      if (i === 0 && /wallet|address/i.test(first) && /amount/i.test(second)) continue;
-
-      parsed.push({ address: first, amount: second });
-    }
-    if (!parsed.length) throw new Error("No recipient rows were found in the CSV.");
-    return parsed;
-  }
-
-  function loadCsv(text) {
-    const imported = parseCsv(text);
-    rows = imported;
-    renderRows();
-    setStatus(`Loaded ${imported.length} recipient(s) from CSV. Review before sending.`, "active");
+    recipientAddresses = addresses;
+    renderRecipients();
+    setStatus(`Loaded ${addresses.length} wallet address(es). Enter the common token amount, then send.`, "active");
   }
 
   function addStyles() {
@@ -436,21 +386,20 @@
     style.textContent = `
       .multi-airdrop-shell{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(330px,.78fr);gap:28px;align-items:start}
       .multi-airdrop-card,.multi-airdrop-help{background:rgba(27,29,25,.96);border:1px solid rgba(255,255,255,.16);border-radius:18px;box-shadow:0 22px 65px rgba(0,0,0,.42);box-sizing:border-box}
-      .multi-airdrop-card{padding:28px}
-      .multi-airdrop-help{padding:28px}
+      .multi-airdrop-card{padding:28px}.multi-airdrop-help{padding:28px}
       .multi-airdrop-label{display:block;color:#f7f7f2;font-size:13px;font-weight:800;letter-spacing:.12em;margin-bottom:9px}
       .multi-airdrop-input{width:100%;box-sizing:border-box;min-height:52px;padding:14px;background:#0f100e;border:1px solid #3a3b36;border-radius:10px;color:#fff;outline:0}
       .multi-airdrop-input:focus{border-color:#77786f}
       .multi-airdrop-controls{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
       .multi-airdrop-secondary{background:#20221e;color:#ffe500;border:1px solid #494a44;border-radius:9px;padding:10px 13px;font-weight:800;font-size:10px;letter-spacing:.08em;cursor:pointer}
-      .multi-airdrop-file{display:none}
-      .multi-airdrop-recipient-head{display:flex;justify-content:space-between;align-items:center;margin:24px 0 10px}
-      .multi-airdrop-add{background:transparent;color:#ffe500;border:1px solid #555;border-radius:9px;padding:9px 12px;font-size:10px;font-weight:800;letter-spacing:.08em;cursor:pointer}
-      .multi-airdrop-row{display:grid;grid-template-columns:34px minmax(0,1fr) 150px 38px;gap:8px;margin-bottom:8px;align-items:center}
-      .multi-airdrop-row-num{color:#777871;font-size:10px;font-weight:800;text-align:center}
-      .multi-airdrop-row input{width:100%;box-sizing:border-box;min-height:50px;padding:13px 12px;background:#0f100e;border:1px solid #3a3b36;border-radius:9px;color:#fff;outline:0}
-      .multi-airdrop-row input:focus{border-color:#77786f}
-      .multi-airdrop-remove{min-height:50px;background:#20221e;color:#bbb;border:1px solid #444;border-radius:9px;cursor:pointer;font-size:18px}
+      .multi-airdrop-addresses{width:100%;min-height:330px;box-sizing:border-box;resize:vertical;padding:15px;background:#0f100e;border:1px solid #3a3b36;border-radius:10px;color:#fff;outline:0;font:500 13px/1.65 monospace}
+      .multi-airdrop-addresses:focus{border-color:#77786f}
+      .multi-airdrop-addresses::placeholder{color:#777871}
+      .multi-airdrop-amount-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end;margin-top:18px}
+      .multi-airdrop-amount-wrap{min-width:0}
+      .multi-airdrop-amount{width:100%;box-sizing:border-box;min-height:52px;padding:14px;background:#0f100e;border:1px solid #3a3b36;border-radius:10px;color:#fff;outline:0}
+      .multi-airdrop-amount:focus{border-color:#77786f}
+      .multi-airdrop-hint{color:#777871;font-size:10px;line-height:1.5;margin-top:7px}
       .multi-airdrop-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:17px}
       .multi-airdrop-stat{padding:13px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:#1b1d19}
       .multi-airdrop-stat span{display:block;color:#8f9087;font-size:9px;letter-spacing:.12em;margin-bottom:5px}
@@ -467,8 +416,8 @@
       .multi-airdrop-result p{margin:9px 0 0;color:#ffb4b4;font-size:10px}
       .multi-airdrop-help h3{margin:0 0 20px;color:#fff;font-size:26px}.multi-airdrop-help-step{display:grid;grid-template-columns:30px 1fr;gap:11px;padding:13px 0;border-top:1px solid rgba(255,255,255,.08)}.multi-airdrop-help-num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,229,0,.3);color:#ffe500;font-size:10px;font-weight:800}.multi-airdrop-help-step strong{display:block;color:#f5f5ef;font-size:12px;margin-bottom:4px}.multi-airdrop-help-step span{display:block;color:#a5a69e;font-size:10px;line-height:1.55}
       @media(max-width:900px){.multi-airdrop-shell{grid-template-columns:1fr}.multi-airdrop-card,.multi-airdrop-help{padding:22px}}
-      @media(max-width:600px){.multi-airdrop-row{grid-template-columns:26px minmax(0,1fr) 100px 34px}.multi-airdrop-row input{font-size:13px}.multi-airdrop-summary{grid-template-columns:1fr 1fr}.multi-airdrop-card,.multi-airdrop-help{padding:18px}}
-      @media(max-width:430px){.multi-airdrop-row{grid-template-columns:1fr}.multi-airdrop-row-num{text-align:left}.multi-airdrop-remove{width:100%}.multi-airdrop-summary{grid-template-columns:1fr}}
+      @media(max-width:600px){.multi-airdrop-summary{grid-template-columns:1fr 1fr}.multi-airdrop-card,.multi-airdrop-help{padding:18px}.multi-airdrop-addresses{min-height:260px}.multi-airdrop-amount-row{grid-template-columns:1fr}}
+      @media(max-width:430px){.multi-airdrop-summary{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);
   }
@@ -486,65 +435,63 @@
 
           <div class="multi-airdrop-controls">
             <button id="multiAirdropUseCreated" class="multi-airdrop-secondary" type="button" hidden>USE NEW TOKEN</button>
-            <label class="multi-airdrop-secondary" for="multiAirdropCsv">IMPORT CSV</label>
-            <input id="multiAirdropCsv" class="multi-airdrop-file" type="file" accept=".csv,text/csv">
-            <button id="multiAirdropClear" class="multi-airdrop-secondary" type="button">CLEAR RECIPIENTS</button>
+            <button id="multiAirdropClear" class="multi-airdrop-secondary" type="button">CLEAR ADDRESSES</button>
           </div>
 
-          <div class="multi-airdrop-recipient-head">
-            <span class="multi-airdrop-label" style="margin:0">RECIPIENTS</span>
-            <button id="multiAirdropAdd" class="multi-airdrop-add" type="button">+ ADD RECIPIENT</button>
+          <label class="multi-airdrop-label" for="multiAirdropAddresses" style="margin-top:24px">RECIPIENT WALLET ADDRESSES</label>
+          <textarea id="multiAirdropAddresses" class="multi-airdrop-addresses" placeholder="Paste wallet addresses here — one address per line.\n\nYou can paste hundreds or thousands of addresses at once." spellcheck="false"></textarea>
+          <div class="multi-airdrop-hint">One wallet address per line. Commas and spaces are also accepted. The same amount will be sent to every wallet.</div>
+
+          <div class="multi-airdrop-amount-row">
+            <div class="multi-airdrop-amount-wrap">
+              <label class="multi-airdrop-label" for="multiAirdropAmount">AMOUNT PER WALLET</label>
+              <input id="multiAirdropAmount" class="multi-airdrop-amount" type="text" inputmode="decimal" placeholder="e.g. 1000" autocomplete="off">
+              <div class="multi-airdrop-hint">Enter the token amount once. Every pasted wallet receives this exact amount.</div>
+            </div>
           </div>
-          <div id="multiAirdropRows"></div>
 
           <div class="multi-airdrop-summary">
-            <div class="multi-airdrop-stat"><span>RECIPIENTS</span><strong id="multiAirdropCount">1</strong></div>
+            <div class="multi-airdrop-stat"><span>RECIPIENTS</span><strong id="multiAirdropCount">0</strong></div>
             <div class="multi-airdrop-stat"><span>TOTAL TOKENS</span><strong id="multiAirdropTotal">0</strong></div>
             <div class="multi-airdrop-stat"><span>TRANSACTIONS</span><strong id="multiAirdropTxCount">—</strong></div>
           </div>
           <div class="multi-airdrop-stat" style="margin-top:8px"><span>NETWORK COST</span><strong id="multiAirdropCost">CALCULATED AT SIGNING</strong></div>
 
           <button id="multiAirdropSend" class="multi-airdrop-action" type="button">SEND MULTI AIRDROP</button>
-          <div id="multiAirdropStatus" class="multi-airdrop-status">Connect Phantom, enter a token mint and add the recipient wallets.</div>
+          <div id="multiAirdropStatus" class="multi-airdrop-status">Paste your token mint, wallet addresses and one amount per wallet.</div>
           <div id="multiAirdropResults" class="multi-airdrop-results"></div>
         </div>
 
         <aside class="multi-airdrop-help">
           <h3>HOW IT WORKS</h3>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">1</div><div><strong>Select your token</strong><span>Paste the SPL Token or Token-2022 mint address you want to distribute.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">2</div><div><strong>Add recipients</strong><span>Enter a Solana wallet address and the exact token amount for each recipient.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">3</div><div><strong>Import or review</strong><span>Add rows manually or import a CSV with wallet address and amount columns.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">4</div><div><strong>Approve in Phantom</strong><span>GurugSwap splits large airdrops into practical Solana transactions. You approve each batch in your wallet.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">5</div><div><strong>Track every batch</strong><span>Each confirmed batch gets a direct Solscan transaction link and recipient status.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">2</div><div><strong>Paste wallet addresses</strong><span>Paste hundreds or thousands of Solana wallet addresses at once. One address per line is easiest.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">3</div><div><strong>Set one amount</strong><span>Enter the token amount once. Every wallet receives the same amount.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">4</div><div><strong>Approve batches in Phantom</strong><span>GurugSwap automatically splits the list into practical Solana transactions and asks Phantom to approve each batch.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">5</div><div><strong>Track every batch</strong><span>Each confirmed batch gets a direct Solscan transaction link.</span></div></div>
         </aside>
       </div>
     `;
 
-    renderRows();
+    renderRecipients();
 
-    document.getElementById("multiAirdropAdd")?.addEventListener("click", () => {
-      rows.push({ address: "", amount: "" });
-      renderRows();
+    document.getElementById("multiAirdropAddresses")?.addEventListener("input", event => {
+      recipientAddresses = event.target.value.split(/[,\\s]+/).map(v => v.trim()).filter(Boolean);
+      updateSummary();
     });
+
+    document.getElementById("multiAirdropAmount")?.addEventListener("input", () => updateSummary());
 
     document.getElementById("multiAirdropClear")?.addEventListener("click", () => {
-      rows = [{ address: "", amount: "" }];
+      recipientAddresses = [];
+      const input = document.getElementById("multiAirdropAddresses");
+      if (input) input.value = "";
+      const amount = document.getElementById("multiAirdropAmount");
+      if (amount) amount.value = "";
       document.getElementById("multiAirdropResults").innerHTML = "";
       document.getElementById("multiAirdropCost").textContent = "CALCULATED AT SIGNING";
-      setStatus("Recipient list cleared.");
-      renderRows();
-    });
-
-    document.getElementById("multiAirdropCsv")?.addEventListener("change", async event => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      try {
-        loadCsv(await file.text());
-      } catch (error) {
-        setStatus(error?.message || "CSV import failed.", "error");
-      } finally {
-        event.target.value = "";
-      }
+      setStatus("Wallet address list cleared.");
+      updateSummary();
     });
 
     document.getElementById("multiAirdropSend")?.addEventListener("click", async () => {
