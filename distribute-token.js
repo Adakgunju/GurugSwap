@@ -128,8 +128,9 @@
       </div>
     `;
 
-    const insertBefore = swapIntro || swap;
-    insertBefore.parentNode.insertBefore(section, insertBefore);
+    const create = document.getElementById("create-token");
+    const anchor = create || swapIntro || swap;
+    anchor.parentNode.insertBefore(section, anchor.nextSibling);
   }
 
   function setStatus(message, state = "") {
