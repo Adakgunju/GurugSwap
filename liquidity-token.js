@@ -163,10 +163,11 @@
         </aside>
       </div>
     `;
-    const swapIntro = document.querySelector(".swap-intro");
+    const distribute = document.getElementById("distributeTokens");
+    const create = document.getElementById("create-token");
     const swap = document.getElementById("swap");
-    const anchor = swapIntro || swap;
-    if (anchor?.parentNode) anchor.parentNode.insertBefore(section, anchor);
+    const anchor = distribute || create || swap;
+    if (anchor?.parentNode) anchor.parentNode.insertBefore(section, anchor.nextSibling);
     else document.querySelector("main")?.appendChild(section);
   }
 
