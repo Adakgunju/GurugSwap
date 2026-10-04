@@ -1551,3 +1551,39 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     box-sizing:border-box!important;
   }
 }
+
+
+/* === FINAL SECTION RHYTHM + SINGLE-LINE 02/04 TITLES === */
+@media(min-width:851px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>#swap,
+  .workspace-main>#token-info,
+  .workspace-main>#multi-airdrop,
+  .workspace-main>#links,
+  .workspace-main>#about{
+    margin-bottom:52px!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-title,
+  .workspace-main>#swap .swap-intro-inner h2{
+    white-space:nowrap!important;
+    font-size:46px!important;
+    line-height:1!important;
+    letter-spacing:-.045em!important;
+  }
+}
+
+@media(max-width:850px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>#swap,
+  .workspace-main>#token-info,
+  .workspace-main>#multi-airdrop,
+  .workspace-main>#links,
+  .workspace-main>#about{
+    margin-bottom:40px!important;
+  }
+}
