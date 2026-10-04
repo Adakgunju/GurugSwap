@@ -1075,3 +1075,201 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     justify-content:flex-start!important;
   }
 }
+
+
+/* === FINAL CLEAN 01–05 PLATFORM LAYOUT === */
+@media(min-width:851px){
+  .workspace-main{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:0!important;
+  }
+
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>#swap,
+  .workspace-main>#multi-airdrop{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 36px!important;
+    padding:34px 0 0!important;
+    border:0!important;
+    box-sizing:border-box!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  /* Common heading: kicker → title → description → boxes */
+  .workspace-main>#create-token .create-token-head,
+  .workspace-main>#distributeTokens .distribute-wrap,
+  .workspace-main>#liquidity .liquidity-heading,
+  .workspace-main>#swap .swap-intro-inner,
+  .workspace-main>#multi-airdrop .platform-placeholder-head{
+    display:block!important;
+    width:100%!important;
+    max-width:none!important;
+    margin:0 0 28px!important;
+    padding:0!important;
+    text-align:left!important;
+    box-sizing:border-box!important;
+  }
+
+  .workspace-main>#create-token .create-token-kicker,
+  .workspace-main>#distributeTokens .distribute-kicker,
+  .workspace-main>#liquidity .liquidity-kicker,
+  .workspace-main>#swap .swap-intro-kicker,
+  .workspace-main>#multi-airdrop .platform-section-kicker{
+    display:block!important;
+    margin:0 0 12px!important;
+    text-align:left!important;
+  }
+
+  .workspace-main>#create-token .create-token-title,
+  .workspace-main>#distributeTokens .distribute-title,
+  .workspace-main>#liquidity .liquidity-title,
+  .workspace-main>#swap h2,
+  .workspace-main>#multi-airdrop h2{
+    display:block!important;
+    margin:0 0 14px!important;
+    text-align:left!important;
+  }
+
+  .workspace-main>#create-token .create-token-copy,
+  .workspace-main>#distributeTokens .distribute-lead,
+  .workspace-main>#liquidity .liquidity-sub,
+  .workspace-main>#swap .swap-intro-inner p,
+  .workspace-main>#multi-airdrop .platform-placeholder-head p{
+    display:block!important;
+    margin:0!important;
+    max-width:760px!important;
+    text-align:left!important;
+  }
+
+  /* Function boxes stay below the heading and preserve their internal columns. */
+  .workspace-main>#create-token .create-token-shell{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.05fr) minmax(330px,.78fr)!important;
+    gap:28px!important;
+  }
+  .workspace-main>#create-token .create-token-head{
+    grid-column:1 / -1!important;
+    grid-row:1!important;
+  }
+  .workspace-main>#create-token .create-token-card{
+    grid-column:1!important;
+    grid-row:2!important;
+  }
+  .workspace-main>#create-token .create-token-help{
+    grid-column:2!important;
+    grid-row:2!important;
+  }
+
+  .workspace-main>#distributeTokens .distribute-wrap{
+    margin-bottom:28px!important;
+  }
+  .workspace-main>#distributeTokens .distribute-grid{
+    margin-top:0!important;
+  }
+
+  .workspace-main>#liquidity .liquidity-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;
+    gap:24px!important;
+    row-gap:0!important;
+  }
+  .workspace-main>#liquidity .liquidity-heading{
+    grid-column:1 / -1!important;
+    grid-row:1!important;
+  }
+  .workspace-main>#liquidity .liquidity-card{
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+  }
+  .workspace-main>#liquidity .liquidity-help{
+    grid-column:2!important;
+    grid-row:2!important;
+    width:100%!important;
+  }
+
+  .workspace-main>#swap{
+    margin-bottom:36px!important;
+  }
+  .workspace-main>#swap .swap-intro-inner{
+    margin-bottom:28px!important;
+  }
+  .workspace-main>#swap .swap-layout{
+    margin-top:0!important;
+    justify-content:flex-start!important;
+  }
+
+  .workspace-main>#multi-airdrop .platform-placeholder-card{
+    width:100%!important;
+    min-height:170px!important;
+    padding:28px!important;
+    box-sizing:border-box!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    border-radius:18px!important;
+    background:rgba(12,12,12,.88)!important;
+    display:flex!important;
+    align-items:center!important;
+    text-align:left!important;
+  }
+  .workspace-main>#multi-airdrop .platform-placeholder-label{
+    display:block!important;
+    color:#ffe500!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    letter-spacing:.16em!important;
+    margin-bottom:12px!important;
+  }
+  .workspace-main>#multi-airdrop .platform-placeholder-card strong{
+    display:block!important;
+    color:#fff!important;
+    font-family:'Syne',sans-serif!important;
+    font-size:34px!important;
+    letter-spacing:-.04em!important;
+    margin-bottom:10px!important;
+  }
+  .workspace-main>#multi-airdrop .platform-placeholder-card p{
+    margin:0!important;
+    color:#999!important;
+    font-size:14px!important;
+  }
+}
+
+@media(max-width:850px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>#swap,
+  .workspace-main>#multi-airdrop{
+    margin:0 0 28px!important;
+    padding:28px 0 0!important;
+  }
+  .workspace-main>#create-token .create-token-head,
+  .workspace-main>#distributeTokens .distribute-wrap,
+  .workspace-main>#liquidity .liquidity-heading,
+  .workspace-main>#swap .swap-intro-inner,
+  .workspace-main>#multi-airdrop .platform-placeholder-head{
+    margin:0 0 22px!important;
+    text-align:left!important;
+  }
+  .workspace-main>#swap .swap-layout{
+    margin-top:0!important;
+    justify-content:flex-start!important;
+  }
+  .workspace-main>#multi-airdrop .platform-placeholder-card{
+    padding:22px!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    border-radius:16px!important;
+    background:rgba(12,12,12,.88)!important;
+  }
+  .workspace-main>#multi-airdrop .platform-placeholder-card strong{
+    display:block!important;
+    font-family:'Syne',sans-serif!important;
+    font-size:30px!important;
+    margin:8px 0!important;
+  }
+}
