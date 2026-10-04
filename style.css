@@ -1349,3 +1349,33 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-bottom:28px!important;
   }
 }
+
+
+/* === SECTION TITLES: NORMAL, UPRIGHT TYPE ===
+   Do not use the wide Syne display face for platform section titles. */
+.create-token-title,
+.distribute-title,
+.liquidity-title,
+.swap-intro h2,
+.links-heading h2,
+.platform-placeholder-head h2{
+  font-family:'Space Grotesk',sans-serif!important;
+  font-weight:700!important;
+  font-style:normal!important;
+  font-stretch:normal!important;
+  letter-spacing:-.035em!important;
+  line-height:1.0!important;
+  transform:none!important;
+  text-transform:none!important;
+}
+@media(max-width:850px){
+  .create-token-title,
+  .distribute-title,
+  .liquidity-title,
+  .swap-intro h2,
+  .links-heading h2,
+  .platform-placeholder-head h2{
+    letter-spacing:-.03em!important;
+    line-height:1.02!important;
+  }
+}
