@@ -1622,3 +1622,32 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
 .section-title-accent{
   color:#ffe500!important;
 }
+
+
+/* === PLATFORM SECTION DESCRIPTIONS: MATCH 01 === */
+.workspace-main>#create-token .create-token-copy,
+.workspace-main>#distributeTokens .distribute-lead,
+.workspace-main>#liquidity .liquidity-sub,
+.workspace-main>#swap .swap-intro-inner p,
+.workspace-main>#multi-airdrop .platform-placeholder-head p,
+.workspace-main>#links .links-heading p{
+  color:#c9c9c4!important;
+  font-size:16px!important;
+  line-height:1.6!important;
+  font-weight:400!important;
+  max-width:760px!important;
+  opacity:1!important;
+}
+
+@media(max-width:850px){
+  .workspace-main>#create-token .create-token-copy,
+  .workspace-main>#distributeTokens .distribute-lead,
+  .workspace-main>#liquidity .liquidity-sub,
+  .workspace-main>#swap .swap-intro-inner p,
+  .workspace-main>#multi-airdrop .platform-placeholder-head p,
+  .workspace-main>#links .links-heading p{
+    color:#c9c9c4!important;
+    font-size:16px!important;
+    line-height:1.6!important;
+  }
+}
