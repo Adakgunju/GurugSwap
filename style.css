@@ -1786,3 +1786,24 @@ footer{
 .topbar,.platform-header,.workspace-shell,footer{position:relative!important;z-index:2!important}
 @media(max-width:850px){.gurug-rain i{width:22px!important;height:22px!important;opacity:.30!important}}
 @media(prefers-reduced-motion:reduce){.gurug-rain i{animation-name:gurugLogoFall!important}}
+
+/* === GURUG SNOW FINAL: transform-based motion === */
+@keyframes gurugSnowFallFinal{
+  0%{transform:translate3d(0,-120px,0) scale(.72);opacity:0}
+  8%{opacity:.42}
+  50%{transform:translate3d(18px,55vh,0) scale(.72);opacity:.42}
+  92%{opacity:.42}
+  100%{transform:translate3d(-12px,115vh,0) scale(.72);opacity:0}
+}
+.gurug-rain i{
+  top:0!important;
+  animation-name:gurugSnowFallFinal!important;
+  animation-duration:20s!important;
+  animation-delay:0s!important;
+  animation-iteration-count:infinite!important;
+  animation-timing-function:linear!important;
+  animation-fill-mode:both!important;
+}
+.gurug-rain i:nth-child(2n){animation-duration:25s!important;animation-delay:-8s!important}
+.gurug-rain i:nth-child(3n){animation-duration:18s!important;animation-delay:-13s!important}
+.gurug-rain i:nth-child(5n){animation-duration:28s!important;animation-delay:-19s!important}
