@@ -1487,3 +1487,67 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     font-size:34px!important;
   }
 }
+
+
+/* === DESKTOP WORKSPACE ALIGNMENT: 80px RHYTHM === */
+@media(min-width:851px){
+  .workspace-shell{
+    grid-template-columns:230px minmax(0,1180px)!important;
+    gap:80px!important;
+    margin-left:22px!important;
+    margin-right:22px!important;
+    align-items:start!important;
+  }
+
+  .workspace-main{
+    width:100%!important;
+    max-width:1180px!important;
+    margin:0!important;
+    padding-top:80px!important;
+    min-width:0!important;
+  }
+
+  /* Every section starts from the same left edge. */
+  .workspace-main>section,
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>#swap,
+  .workspace-main>#token-info,
+  .workspace-main>#multi-airdrop,
+  .workspace-main>#links,
+  .workspace-main>#about{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* The 80px top rhythm is owned by workspace-main, not each section. */
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>.swap-intro,
+  .workspace-main>#swap,
+  .workspace-main>#token-info,
+  .workspace-main>#multi-airdrop,
+  .workspace-main>#links,
+  .workspace-main>#about{
+    padding-top:0!important;
+  }
+
+  .workspace-main .create-token-shell,
+  .workspace-main .distribute-wrap,
+  .workspace-main .liquidity-heading,
+  .workspace-main .liquidity-grid,
+  .workspace-main .swap-intro-inner,
+  .workspace-main .links-heading,
+  .workspace-main .about-inner{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+}
