@@ -161,6 +161,7 @@
     tx.feePayer = owner;
 
     const prepared = [];
+    let newAtaCount = 0;
 
     for (const item of batch) {
       const destinationAta = await spl.getAssociatedTokenAddress(
