@@ -2144,3 +2144,26 @@ body{
 .workspace-main #liquidity{
   background:rgba(19,21,16,.94)!important;
 }
+
+
+/* --- REMOVE OUTER WORKSPACE BOXES --- */
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about,
+.workspace-main #liquidity{
+  margin:0 0 14px!important;
+  padding:0!important;
+  border:none!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+@media(max-width:850px){
+  .workspace-main>.swap-section,
+  .workspace-main>.links-section,
+  .workspace-main>.about,
+  .workspace-main #liquidity{
+    padding:0!important;
+    margin-bottom:12px!important;
+  }
+}
