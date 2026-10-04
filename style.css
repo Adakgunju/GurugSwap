@@ -2167,3 +2167,37 @@ body{
     margin-bottom:12px!important;
   }
 }
+
+
+/* --- UNIFIED CONTENT WIDTH / NO REDUNDANT FRAMING --- */
+.workspace-main{
+  width:100%!important;
+  min-width:0!important;
+}
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about,
+.workspace-main>.token-info-section,
+.workspace-main #liquidity{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.workspace-main .swap-card,
+.workspace-main .token-info-card,
+.workspace-main #liquidity.gurug-liquidity,
+.workspace-main .links-section,
+.workspace-main .about{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.workspace-main .swap-section,
+.workspace-main .links-section,
+.workspace-main .about,
+.workspace-main #liquidity{
+  border:none!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
