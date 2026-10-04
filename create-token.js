@@ -34,6 +34,7 @@
   const UMI_IRYS_CDN = "https://esm.sh/@metaplex-foundation/umi-uploader-irys@1.6.0/web?bundle";
   const MPL_METADATA_CDN = "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.4.0?bundle";
   const MPL_TOOLBOX_CDN = "https://esm.sh/@metaplex-foundation/mpl-toolbox@0.11.4?bundle";
+  const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
   const STYLE_ID = "gurug-create-token-style";
   const SECTION_ID = "create-token";
 
@@ -436,15 +437,19 @@
         import(UMI_WALLET_CDN),
         import(UMI_IRYS_CDN),
         import(MPL_METADATA_CDN),
-        import(MPL_TOOLBOX_CDN)
-      ]).then(([umi, defaults, walletAdapters, irys, metadata, toolbox]) => ({
-        umi,
-        defaults,
-        walletAdapters,
-        irys,
-        metadata,
-        toolbox
-      }));
+        import(MPL_TOOLBOX_CDN),
+        import(BUFFER_CDN)
+      ]).then(([umi, defaults, walletAdapters, irys, metadata, toolbox, bufferModule]) => {
+        if (!globalThis.Buffer && bufferModule?.Buffer) globalThis.Buffer = bufferModule.Buffer;
+        return {
+          umi,
+          defaults,
+          walletAdapters,
+          irys,
+          metadata,
+          toolbox
+        };
+      });
     }
     return metadataModulesPromise;
   }
@@ -570,21 +575,6 @@
     return actualAmount;
   }
 
-  async function uploadToIrys(uploader, buffer, fileName, contentType) {
-    const irys = await uploader.irys();
-    const transaction = irys.createTransaction(buffer, {
-      tags: [{name: "Content-Type", value: contentType}]
-    });
-    await transaction.sign();
-    const response = await irys.uploader.uploadTransaction(transaction);
-    const status = Number(response?.status || 0);
-    const id = response?.data?.id;
-    if (status >= 300 || !id) {
-      throw new Error("Irys upload failed" + (status ? " (HTTP " + status + ")" : "") + ".");
-    }
-    return "https://gateway.irys.xyz/" + id;
-  }
-
   async function createToken() {
     const logoInput = document.getElementById("createTokenLogo");
     const logoFile = logoInput?.files?.[0];
@@ -638,11 +628,11 @@
     const imagePriceSol = solAmountToNumber(imagePrice);
     if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
 
-    setStatus("STEP 1/4 — Approve storage payment in Phantom...", "active");
-    let imageUri;
+    setStatus("STEP 1/4 — Uploading logo to permanent storage...", "active");
+    let imageUris;
     try {
-      imageUri = await withTimeout(
-        uploadToIrys(uploader, imageBuffer, logoFile.name, logoFile.type),
+      imageUris = await withTimeout(
+        uploader.upload([imageFile]),
         120000,
         "Logo storage timed out after the wallet payment. Please try again."
       );
@@ -652,6 +642,8 @@
         "Logo upload failed after storage payment. " + (error?.message || "Please try again.") + " No token was created."
       );
     }
+    const imageUri = Array.isArray(imageUris) ? imageUris[0] : imageUris?.[0] || imageUris;
+    if (!imageUri) throw new Error("Logo upload completed without a storage URI. No token was created.");
 
     const metadataJson = {
       name,
@@ -677,13 +669,12 @@
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
 
     setStatus("STEP 2/4 — Uploading token metadata JSON...", "active");
-    const metadataBuffer = new TextEncoder().encode(JSON.stringify(metadataJson));
     const metadataUri = await withTimeout(
-      uploadToIrys(uploader, metadataBuffer, "metadata.json", "application/json"),
+      uploader.uploadJson(metadataJson),
       120000,
       "Metadata storage timed out. No token was created."
     );
-    if (!metadataUri) throw new Error("Metadata upload failed: Irys returned no storage URI.");
+    if (!metadataUri) throw new Error("Metadata upload failed: no storage URI was returned.");
 
     setStatus("STEP 3/4 — Building the token creation transaction...", "active");
 
