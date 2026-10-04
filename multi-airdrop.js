@@ -366,6 +366,85 @@
     return results;
   }
 
+  let costEstimateTimer = null;
+  let costEstimateRequest = 0;
+
+  async function updateEstimatedCost() {
+    const requestId = ++costEstimateRequest;
+    const costEl = document.getElementById("multiAirdropCost");
+    const mintText = getMintText();
+    const amountText = getAirdropAmount();
+    const provider = getProvider();
+
+    if (!costEl) return;
+    if (!mintText || !amountText || !recipientAddresses.length || !provider?.publicKey) {
+      costEl.textContent = "ENTER MINT, AMOUNT & WALLETS";
+      return;
+    }
+
+    try {
+      const web3 = window.solanaWeb3;
+      if (!web3) return;
+      const mint = new web3.PublicKey(mintText);
+      const amount = amountText.replace(/,/g, "");
+      if (!/^\d+(\.\d+)?$/.test(amount) || Number(amount) <= 0) {
+        costEl.textContent = "ENTER A VALID AMOUNT";
+        return;
+      }
+
+      costEl.textContent = "CALCULATING...";
+      const rpc = await getWorkingRpc();
+      const connection = new web3.Connection(rpc, "confirmed");
+      const spl = await loadSpl();
+      const mintInfo = await readMint(connection, mint, provider.publicKey, spl);
+      const amountRaw = parseAmount(amountText, mintInfo.decimals);
+      const addresses = recipientAddresses.map(v => v.trim()).filter(Boolean);
+      const validated = addresses.map((address, index) => ({
+        index,
+        address,
+        publicKey: new web3.PublicKey(address),
+        amount: amountText,
+        rawAmount: amountRaw
+      }));
+
+      const batches = [];
+      for (let i = 0; i < validated.length; i += MAX_RECIPIENTS_PER_TX) {
+        batches.push(validated.slice(i, i + MAX_RECIPIENTS_PER_TX));
+      }
+
+      let lamports = 0;
+      let newAtas = 0;
+      for (const batch of batches) {
+        const built = await buildBatch(
+          connection,
+          provider.publicKey,
+          mint,
+          batch,
+          mintInfo.decimals,
+          mintInfo.tokenProgram,
+          mintInfo.sourceAta,
+          spl
+        );
+        newAtas += built.newAtaCount;
+        lamports += await estimateFee(connection, built.tx);
+      }
+
+      const ataRent = await connection.getMinimumBalanceForRentExemption(165);
+      lamports += newAtas * ataRent;
+
+      if (requestId !== costEstimateRequest) return;
+      costEl.textContent = (lamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL est.";
+    } catch (error) {
+      if (requestId !== costEstimateRequest) return;
+      costEl.textContent = "ESTIMATE AVAILABLE AT SEND";
+    }
+  }
+
+  function scheduleCostEstimate() {
+    clearTimeout(costEstimateTimer);
+    costEstimateTimer = setTimeout(updateEstimatedCost, 500);
+  }
+
   function loadPastedAddresses(text) {
     const addresses = String(text || "")
       .split(/[,\\s]+/)
@@ -476,11 +555,16 @@
     renderRecipients();
 
     document.getElementById("multiAirdropAddresses")?.addEventListener("input", event => {
-      recipientAddresses = event.target.value.split(/[,\\s]+/).map(v => v.trim()).filter(Boolean);
+      recipientAddresses = event.target.value.split(/[,\s]+/).map(v => v.trim()).filter(Boolean);
       updateSummary();
+      scheduleCostEstimate();
     });
 
-    document.getElementById("multiAirdropAmount")?.addEventListener("input", () => updateSummary());
+    document.getElementById("multiAirdropMint")?.addEventListener("input", () => scheduleCostEstimate());
+    document.getElementById("multiAirdropAmount")?.addEventListener("input", () => {
+      updateSummary();
+      scheduleCostEstimate();
+    });
 
     document.getElementById("multiAirdropClear")?.addEventListener("click", () => {
       recipientAddresses = [];
@@ -492,6 +576,7 @@
       document.getElementById("multiAirdropCost").textContent = "CALCULATED AT SIGNING";
       setStatus("Wallet address list cleared.");
       updateSummary();
+      scheduleCostEstimate();
     });
 
     document.getElementById("multiAirdropSend")?.addEventListener("click", async () => {
