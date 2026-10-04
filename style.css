@@ -1866,3 +1866,15 @@ body:before{opacity:.028!important}
   .token-info-identity strong{font-size:16px}
   .token-info-swap{min-height:36px;padding:0 14px}
 }
+
+/* Swap section introduction */
+.swap-intro{padding:78px 8vw 18px;border-top:1px solid var(--line);position:relative}
+.swap-intro-inner{max-width:760px;margin:0 auto;text-align:center}
+.swap-intro-kicker{color:#ffe500;font-size:12px;font-weight:900;letter-spacing:.18em;margin-bottom:12px}
+.swap-intro h2{margin:0;color:#f7f7f2;font-size:32px;line-height:1.1;letter-spacing:-.025em}
+.swap-intro p{max-width:620px;margin:13px auto 0;color:#aaaBA0;font-size:15px;line-height:1.65}
+@media(max-width:560px){
+  .swap-intro{padding:54px 20px 10px}
+  .swap-intro h2{font-size:25px}
+  .swap-intro p{font-size:14px;line-height:1.55}
+}
