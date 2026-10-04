@@ -289,7 +289,7 @@
         <div class="create-token-shell">
           <div class="create-token-head">
             <div class="create-token-kicker">01 / TOKEN CREATION</div>
-            <h2 class="create-token-title">Create your SPL token.</h2>
+            <h2 class="create-token-title">Create your <span class="section-title-accent">SPL token.</span></h2>
             <p class="create-token-copy">Create a new standard SPL Token mint directly from GurugSwap. Your wallet signs the transaction — GurugSwap never receives your private key.</p>
             <span class="create-token-network">SOLANA MAINNET</span>
           </div>
