@@ -164,7 +164,7 @@
 
         const SDK_URL = "https://ga.jspm.io/npm:@raydium-io/raydium-sdk-v2@0.2.73-alpha/lib/index.mjs";
         const BN_URL = "https://ga.jspm.io/npm:bn.js@5.2.2/lib/index.js";
-        const [{ default: RaydiumModule }, { default: BN }] = await Promise.all([
+        const [sdk, { default: BN }] = await Promise.all([
           import(SDK_URL),
           import(BN_URL)
         ]);
