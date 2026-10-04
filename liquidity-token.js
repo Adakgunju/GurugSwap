@@ -116,8 +116,8 @@
     `;
     const swap = document.getElementById("swap");
     const swapIntro = document.querySelector(".swap-intro");
-    const before = swapIntro || swap;
-    if (before?.parentNode) before.parentNode.insertBefore(section, before);
+    const before = swap?.nextSibling || null;
+    if (swap?.parentNode) swap.parentNode.insertBefore(section, before);
     else document.querySelector("main")?.appendChild(section);
   }
 
