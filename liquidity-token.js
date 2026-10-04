@@ -230,16 +230,24 @@
     const solRaw = decimalToRawExact(solAmount, 9);
     if (tokenRaw <= 0n || solRaw <= 0n) throw new Error("Liquidity amounts must be greater than zero.");
 
-    const tokenBalance = await connection.getTokenAccountsByOwner(owner, {
-      mint: new Web3.PublicKey(mintAddress)
-    });
+    // Do not use getTokenAccountsByOwner here. Public RPC endpoints may
+    // block indexed/token-account queries. Derive the associated token
+    // account directly and query it with getTokenAccountBalance instead.
+    const TOKEN_PROGRAM_ID = new Web3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+    const ASSOCIATED_TOKEN_PROGRAM_ID = new Web3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+    const [ata] = Web3.PublicKey.findProgramAddressSync(
+      [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), new Web3.PublicKey(mintAddress).toBuffer()],
+      ASSOCIATED_TOKEN_PROGRAM_ID
+    );
     let walletTokenRaw = 0n;
-    for (const item of tokenBalance.value || []) {
-      const amount = item?.account?.data?.parsed?.info?.tokenAmount?.amount;
-      if (amount) walletTokenRaw += BigInt(amount);
+    try {
+      const balance = await connection.getTokenAccountBalance(ata, "confirmed");
+      walletTokenRaw = BigInt(balance?.value?.amount || "0");
+    } catch (_) {
+      walletTokenRaw = 0n;
     }
     if (walletTokenRaw < tokenRaw) {
-      throw new Error("Insufficient token balance in your connected wallet.");
+      throw new Error("Insufficient token balance in your connected wallet, or the token's associated account is not available.");
     }
 
     const lamports = await connection.getBalance(owner, "confirmed");
