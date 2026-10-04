@@ -534,7 +534,7 @@
       const browserDeps =
         "bundle&target=es2020" +
         "&deps=@irys/bundles@0.0.5,@irys/upload-core@0.0.10,stream-browserify@3.0.0,events@3.3.0,buffer@6.0.3" +
-        "&alias=stream:stream-browserify";
+        "&alias=stream:stream-browserify@3.0.0,buffer:buffer@6.0.3,events:events@3.3.0";
       irysWebUploaderPromise = Promise.all([
         import("https://esm.sh/@irys/web-upload@0.0.15?" + browserDeps),
         import("https://esm.sh/@irys/web-upload-solana@0.1.8?" + browserDeps)
