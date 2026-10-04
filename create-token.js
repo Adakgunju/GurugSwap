@@ -233,7 +233,7 @@
             <div class="create-token-cost-row"><span>Metadata storage (Irys)</span><strong id="createTokenStorageCost">Calculated when uploaded</strong></div>
             <div class="create-token-cost-row"><span>GurugSwap fee</span><strong>0 SOL</strong></div>
             <div class="create-token-cost-row create-token-cost-total"><span>Estimated total</span><strong id="createTokenTotalCost">Calculating…</strong></div>
-            <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The estimated Solana cost is shown before you sign.</div>
+            <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The estimate includes the base Solana account/network cost plus permanent metadata storage. Final network fees and metadata-account cost are finalized when you sign.</div>
           </div>
           <button id="createTokenButton" class="create-token-button" type="button">CREATE TOKEN</button>
           <div id="createTokenStatus" class="create-token-status">Connect your Phantom wallet, enter the token details, then create the token.</div>
