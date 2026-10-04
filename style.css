@@ -1970,3 +1970,40 @@ body{background:#151714!important}
   background:#11120f!important;
   border-color:#66675f!important;
 }
+
+/* === GURUG NETWORK: CENTERED CARDS + YELLOW FEATURE CARDS === */
+.workspace-main>#links .link-card,
+.workspace-main>#links .universe-feature{
+  text-align:center!important;
+  align-items:center!important;
+}
+.workspace-main>#links .link-card strong,
+.workspace-main>#links .universe-feature strong{
+  width:100%!important;
+  text-align:center!important;
+}
+.workspace-main>#links .link-card span,
+.workspace-main>#links .universe-feature span,
+.workspace-main>#links .universe-feature p{
+  width:100%!important;
+  text-align:center!important;
+}
+.workspace-main>#links .link-card em,
+.workspace-main>#links .universe-feature em{
+  align-self:center!important;
+  position:absolute!important;
+  right:22px!important;
+  bottom:20px!important;
+}
+.workspace-main>#links .universe-feature{
+  background:#ffe500!important;
+  color:#090909!important;
+  border-color:#ffe500!important;
+  box-shadow:0 18px 50px rgba(255,229,0,.10)!important;
+}
+.workspace-main>#links .universe-feature strong,
+.workspace-main>#links .universe-feature span,
+.workspace-main>#links .universe-feature p,
+.workspace-main>#links .universe-feature em{
+  color:#090909!important;
+}
