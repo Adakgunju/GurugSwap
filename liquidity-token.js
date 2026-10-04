@@ -237,66 +237,12 @@
     const tokenAmountBN = new BN(tokenRaw.toString());
     const solAmountBN = new BN(solRaw.toString());
 
-    // Do not use getTokenAccountsByOwner here. Public RPC endpoints may
-    // block indexed/token-account queries. Derive the associated token
-    // account directly and query it with getTokenAccountBalance instead.
-    const TOKEN_PROGRAM_ID = new Web3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-    const ASSOCIATED_TOKEN_PROGRAM_ID = new Web3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
-    const [ata] = Web3.PublicKey.findProgramAddressSync(
-      [owner.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), new Web3.PublicKey(mintAddress).toBuffer()],
-      ASSOCIATED_TOKEN_PROGRAM_ID
-    );
-    let walletTokenRaw = 0n;
-    let walletTokenUi = "0";
-    let ataExists = false;
-
-    try {
-      const ataInfo = await connection.getAccountInfo(ata, "confirmed");
-      ataExists = !!ataInfo;
-      if (ataExists) {
-        const balance = await connection.getTokenAccountBalance(ata, "confirmed");
-        walletTokenRaw = BigInt(balance?.value?.amount || "0");
-        walletTokenUi = balance?.value?.uiAmountString || "0";
-      }
-    } catch (_) {}
-
-    // If the standard ATA is not readable from this public RPC, fall back to
-    // an owner+mint token-account lookup so a valid balance is not rejected
-    // merely because the ATA query is unavailable.
-    if (!ataExists || walletTokenRaw === 0n) {
-      try {
-        const accounts = await connection.getParsedTokenAccountsByOwner(
-          owner,
-          { mint: new Web3.PublicKey(mintAddress) },
-          "confirmed"
-        );
-        for (const item of (accounts?.value || [])) {
-          const amount = BigInt(item?.account?.data?.parsed?.info?.tokenAmount?.amount || "0");
-          if (amount > walletTokenRaw) {
-            walletTokenRaw = amount;
-            walletTokenUi = item?.account?.data?.parsed?.info?.tokenAmount?.uiAmountString || walletTokenUi;
-          }
-        }
-      } catch (_) {}
-    }
-
-    if (walletTokenRaw < tokenRaw) {
-      const requestedUi = String(tokenAmount) + " tokens";
-      const availableUi = walletTokenUi + " tokens";
-      const ataNote = ataExists ? "Associated token account found." : "Associated token account was not found for this wallet.";
-      throw new Error(
-        "Token balance check failed: wallet has " + availableUi +
-        ", but pool creation requires " + requestedUi + ". " + ataNote +
-        " Make sure the correct token mint and the wallet that owns the tokens are connected."
-      );
-    }
-
-    setStatus("Token balance verified: " + walletTokenUi + " available. Preparing " + tokenAmount + " tokens for the pool…");
-
-    const lamports = await connection.getBalance(owner, "confirmed");
-    if (BigInt(lamports) < solRaw) {
-      throw new Error("Insufficient SOL balance for the initial liquidity and pool creation costs.");
-    }
+    // Let Raydium SDK resolve the wallet token account. The SDK can create/use
+    // the associated token account as part of the pool-creation transaction.
+    // A manual public-RPC balance precheck is intentionally avoided because
+    // some public RPCs restrict indexed token-account queries even when the
+    // wallet definitely owns the tokens.
+    setStatus("Token amount accepted: " + tokenAmount + ". Preparing wallet token account…");
 
     setStatus("Loading Raydium CPMM configuration…");
     const raydium = await sdk.Raydium.load({
@@ -304,7 +250,7 @@
       connection,
       cluster: "mainnet",
       disableFeatureCheck: true,
-      disableLoadToken: true,
+      disableLoadToken: false,
       blockhashCommitment: "confirmed",
       signAllTransactions: async (transactions) => {
         if (typeof provider.signAllTransactions === "function") {
@@ -358,7 +304,7 @@
       mintB: mintBInfo,
       mintAAmount: tokenAmountBN,
       mintBAmount: solAmountBN,
-      startTime: new BN(0),
+      startTime: new BN(Math.floor(Date.now() / 1000)),
       feeConfig,
       associatedOnly: true,
       ownerInfo: {
