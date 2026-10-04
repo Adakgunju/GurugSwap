@@ -1882,3 +1882,18 @@ main{padding-top:82px!important}
   backdrop-filter:blur(2px)!important;
   -webkit-backdrop-filter:blur(2px)!important;
 }
+
+/* === FUNCTION CARDS: UNIFIED TRANSLUCENT BACKGROUND === */
+.workspace-main>#create-token .create-token-card,
+.workspace-main>#create-token .create-token-help,
+.workspace-main>#distributeTokens .distribute-card,
+.workspace-main>#distributeTokens .distribute-help,
+.workspace-main>#liquidity .liquidity-card,
+.workspace-main>#liquidity .liquidity-help,
+.workspace-main>#swap .swap-card,
+.workspace-main>#token-info .token-info-card,
+.workspace-main>#multi-airdrop .platform-placeholder-card{
+  background:rgba(14,16,11,.72)!important;
+  backdrop-filter:blur(2px)!important;
+  -webkit-backdrop-filter:blur(2px)!important;
+}
