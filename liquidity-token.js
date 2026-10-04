@@ -68,29 +68,13 @@
           </div>
 
           <div class="liq-pair">
-            <div>
-              <label class="liq-label" for="liqTokenAmount">TOKEN AMOUNT</label>
-              <input id="liqTokenAmount" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="0">
-            </div>
-            <div>
-              <label class="liq-label" for="liqSolAmount">SOL AMOUNT</label>
-              <input id="liqSolAmount" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="0">
-            </div>
+            <div><label class="liq-label" for="liqTokenAmount">TOKEN AMOUNT</label><input id="liqTokenAmount" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="0"></div>
+            <div><label class="liq-label" for="liqSolAmount">SOL AMOUNT</label><input id="liqSolAmount" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="0"></div>
           </div>
 
           <div class="liq-row">
-            <div>
-              <label class="liq-label" for="liqPrice">INITIAL PRICE (SOL)</label>
-              <input id="liqPrice" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="Calculated from deposits">
-            </div>
-            <div>
-              <label class="liq-label" for="liqFee">FEE TIER</label>
-              <select id="liqFee" class="liq-input">
-                <option value="0.25">0.25%</option>
-                <option value="0.01">0.01%</option>
-                <option value="1">1.00%</option>
-              </select>
-            </div>
+            <div><label class="liq-label" for="liqPrice">INITIAL PRICE (SOL)</label><input id="liqPrice" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="Calculated from deposits"></div>
+            <div><label class="liq-label" for="liqFee">FEE TIER</label><select id="liqFee" class="liq-input"><option value="0.25">0.25%</option><option value="0.01">0.01%</option><option value="1">1.00%</option></select></div>
           </div>
 
           <div class="liq-summary">
@@ -114,17 +98,14 @@
         </aside>
       </div>
     `;
+    const tokenInfo = document.getElementById("token-info");
     const swap = document.getElementById("swap");
-    const swapIntro = document.querySelector(".swap-intro");
-    const before = swap?.nextSibling || null;
-    if (swap?.parentNode) swap.parentNode.insertBefore(section, before);
+    const anchor = tokenInfo || swap;
+    if (anchor?.parentNode) anchor.parentNode.insertBefore(section, anchor.nextSibling);
     else document.querySelector("main")?.appendChild(section);
   }
 
-  function setStatus(message) {
-    const el = document.getElementById("liqStatus");
-    if (el) el.textContent = message;
-  }
+  function setStatus(message) { const el = document.getElementById("liqStatus"); if (el) el.textContent = message; }
 
   function updatePrice() {
     const token = Number(document.getElementById("liqTokenAmount")?.value);
@@ -132,12 +113,8 @@
     const price = token > 0 && sol > 0 ? sol / token : 0;
     const input = document.getElementById("liqPrice");
     const summary = document.getElementById("liqSummaryPrice");
-    if (price > 0) {
-      input.value = String(price);
-      summary.textContent = price < 0.000001 ? price.toExponential(6) + " SOL" : price.toFixed(9).replace(/0+$/,"").replace(/\.$/,"") + " SOL";
-    } else {
-      summary.textContent = "—";
-    }
+    if (price > 0) { input.value = String(price); summary.textContent = price < 0.000001 ? price.toExponential(6) + " SOL" : price.toFixed(9).replace(/0+$/,"").replace(/\.$/,"") + " SOL"; }
+    else summary.textContent = "—";
   }
 
   async function checkExistingPool() {
@@ -147,17 +124,12 @@
     if (!mint) { el.textContent = "ENTER MINT"; return; }
     el.textContent = "CHECKING…";
     try {
-      const url = RAYDIUM_API + "/pools/info/list-v2?mint1=" + encodeURIComponent(mint) +
-        "&mint2=" + encodeURIComponent(SOL_MINT) +
-        "&poolType=standard&page=1&pageSize=10";
+      const url = RAYDIUM_API + "/pools/info/list-v2?mint1=" + encodeURIComponent(mint) + "&mint2=" + encodeURIComponent(SOL_MINT) + "&poolType=standard&page=1&pageSize=10";
       const res = await fetch(url, { cache: "no-store" });
       const json = await res.json();
-      const count = Array.isArray(json?.data?.data) ? json.data.data.length :
-        Array.isArray(json?.data) ? json.data.length : 0;
+      const count = Array.isArray(json?.data?.data) ? json.data.data.length : Array.isArray(json?.data) ? json.data.length : 0;
       el.textContent = count > 0 ? count + " POOL(S) FOUND" : "NONE FOUND";
-    } catch (_) {
-      el.textContent = "CHECK UNAVAILABLE";
-    }
+    } catch (_) { el.textContent = "CHECK UNAVAILABLE"; }
   }
 
   function bind() {
@@ -167,7 +139,6 @@
     [tokenAmount, solAmount].forEach(el => el?.addEventListener("input", updatePrice));
     mint?.addEventListener("change", checkExistingPool);
     mint?.addEventListener("blur", checkExistingPool);
-
     document.getElementById("liqCreateButton")?.addEventListener("click", async () => {
       const p = provider();
       if (!p) { setStatus("Connect Phantom first."); return; }
@@ -180,24 +151,16 @@
       if (!Number.isFinite(solAmountValue) || solAmountValue <= 0) { setStatus("Enter a SOL amount greater than zero."); return; }
       updatePrice();
       setStatus("Pool creation transaction wiring is being prepared. Your wallet will sign the final Raydium transaction.");
-      // The Raydium SDK transaction builder is intentionally not invoked until the browser bundle
-      // is wired in. This prevents an incomplete SDK transaction from touching user funds.
     });
   }
 
   function init() {
-    injectStyles();
-    createSection();
-    bind();
+    injectStyles(); createSection(); bind();
     window.addEventListener("gurug:token-created", event => {
       const mint = event?.detail?.mint || event?.detail?.mintAddress || "";
-      if (mint) {
-        const input = document.getElementById("liqMint");
-        if (input) { input.value = mint; checkExistingPool(); }
-      }
+      if (mint) { const input = document.getElementById("liqMint"); if (input) { input.value = mint; checkExistingPool(); } }
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
