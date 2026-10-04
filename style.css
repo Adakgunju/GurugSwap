@@ -529,3 +529,72 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     letter-spacing:.18em!important;
   }
 }
+
+
+/* --- ALL SECTION HEADERS LIVE OUTSIDE FUNCTION CARDS --- */
+.create-token-shell,
+.distribute-wrap,
+#liquidity.gurug-liquidity,
+.swap-intro-inner{
+  width:100%!important;
+  max-width:1180px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+
+.create-token-head,
+.distribute-wrap > .distribute-kicker,
+.distribute-wrap > .distribute-title,
+.distribute-wrap > .distribute-lead,
+.liquidity-heading,
+.swap-intro-inner{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+.create-token-head{
+  margin:0 0 28px!important;
+  padding:0!important;
+}
+
+.create-token-card,
+.distribute-card,
+.distribute-help,
+.liquidity-card,
+.liquidity-help,
+.swap-card{
+  margin-top:0!important;
+}
+
+.liquidity-heading{
+  margin:0 0 28px!important;
+  padding:0!important;
+}
+
+.liquidity-heading .liquidity-kicker,
+.liquidity-heading .liquidity-title,
+.liquidity-heading .liquidity-sub{
+  margin-left:0!important;
+}
+
+.create-token-copy,
+.distribute-lead,
+.liquidity-sub{
+  max-width:760px!important;
+  color:#c9c9c4!important;
+  font-size:16px!important;
+  line-height:1.6!important;
+}
+
+@media(max-width:850px){
+  .create-token-head,
+  .liquidity-heading{
+    margin-bottom:22px!important;
+  }
+  .create-token-copy,
+  .distribute-lead,
+  .liquidity-sub{
+    font-size:14px!important;
+  }
+}
