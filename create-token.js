@@ -1,9 +1,17 @@
-/* GURUGSWAP — CREATE TOKEN v1
- * Isolated from the existing Swap engine.
- * Creates a standard SPL Token mint on Solana mainnet using the connected wallet.
+/* GURUGSWAP — CREATE TOKEN v2
+ * Creates a standard SPL Token + Metaplex Token Metadata on Solana mainnet.
+ * Logo + metadata are uploaded to permanent Arweave storage through Irys.
+ * The connected wallet signs all Solana/storage transactions; GurugSwap never
+ * receives or stores the user's private key.
  */
 (() => {
-  const SPL_TOKEN_CDN = "https://unpkg.com/@solana/spl-token@0.4.15/lib/index.iife.min.js";
+  const SOLANA_RPC = "https://api.mainnet-beta.solana.com";
+  const UMI_CDN = "https://esm.sh/@metaplex-foundation/umi@1.6.0?bundle";
+  const UMI_DEFAULTS_CDN = "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@1.6.0?bundle";
+  const UMI_WALLET_CDN = "https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.6.0?bundle";
+  const UMI_IRYS_CDN = "https://esm.sh/@metaplex-foundation/umi-uploader-irys@1.6.0/web?bundle";
+  const MPL_METADATA_CDN = "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.4.0?bundle";
+  const MPL_TOOLBOX_CDN = "https://esm.sh/@metaplex-foundation/mpl-toolbox@0.11.4?bundle";
   const STYLE_ID = "gurug-create-token-style";
   const SECTION_ID = "create-token";
 
@@ -222,6 +230,7 @@
           <div class="create-token-cost">
             <div class="create-token-cost-title">CREATION COST</div>
             <div class="create-token-cost-row"><span>Solana account &amp; network cost</span><strong id="createTokenNetworkCost">Calculating…</strong></div>
+            <div class="create-token-cost-row"><span>Metadata storage (Irys)</span><strong id="createTokenStorageCost">Calculated when uploaded</strong></div>
             <div class="create-token-cost-row"><span>GurugSwap fee</span><strong>0 SOL</strong></div>
             <div class="create-token-cost-row create-token-cost-total"><span>Estimated total</span><strong id="createTokenTotalCost">Calculating…</strong></div>
             <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The estimated Solana cost is shown before you sign.</div>
@@ -238,10 +247,11 @@
             <div class="create-token-result-links">
               <a id="createTokenSolscan" href="#" target="_blank" rel="noopener noreferrer">VIEW SOLSCAN ↗</a>
               <a id="createTokenAccount" href="#" target="_blank" rel="noopener noreferrer">VIEW TOKEN ACCOUNT ↗</a>
+              <a id="createTokenMetadata" href="#" target="_blank" rel="noopener noreferrer" hidden>VIEW METADATA ↗</a>
             </div>
           </div>
 
-          <div class="create-token-note">Token name, symbol and logo will be connected to Solana token metadata in the next metadata module. GurugSwap does not custody your wallet or private key.</div>
+          <div class="create-token-note">Your logo and token metadata are stored on permanent Arweave storage through Irys and connected to the mint with Metaplex Token Metadata. GurugSwap does not custody your wallet or private key.</div>
         </div>
         <aside class="create-token-help">
           <div class="create-token-help-kicker">HOW IT WORKS</div>
@@ -250,8 +260,8 @@
           <div class="create-token-help-step"><div class="create-token-help-num">2</div><div><strong>Enter token details</strong><span>Choose the name, symbol, supply and decimals.</span></div></div>
           <div class="create-token-help-step"><div class="create-token-help-num">3</div><div><strong>Upload your logo</strong><span>Upload PNG, JPG or WEBP and check the preview before creating.</span></div></div>
           <div class="create-token-help-step"><div class="create-token-help-num">4</div><div><strong>Choose supply control</strong><span>Fixed Supply and Revoke Freeze Authority are enabled by default.</span></div></div>
-          <div class="create-token-help-step"><div class="create-token-help-num">5</div><div><strong>Review the cost</strong><span>See the estimated Solana account and network cost before signing. GurugSwap currently charges 0 SOL.</span></div></div>
-          <div class="create-token-help-step"><div class="create-token-help-num">6</div><div><strong>Approve in Phantom</strong><span>Your wallet signs the on-chain transaction.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">5</div><div><strong>Upload metadata</strong><span>Your logo and metadata JSON are stored permanently through Irys. Storage cost is paid by your wallet.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">6</div><div><strong>Approve in Phantom</strong><span>Your wallet signs the token creation and metadata transaction.</span></div></div>
           <div class="create-token-help-section"><h4>What is Fixed Total Supply?</h4><p>Revoking Mint Authority after the initial mint means no additional tokens can be minted through that authority.</p></div>
           <div class="create-token-help-section"><h4>What is Freeze Authority?</h4><p>A freeze authority can freeze token accounts. Revoking it leaves no freeze authority on the mint.</p><div class="create-token-help-tip">Recommended for public liquidity pools and transparent token launches.</div></div>
           <div class="create-token-help-section"><h4>What happens after creation?</h4><p>Your wallet receives the initial supply and GurugSwap shows the new mint address with direct Solscan links.</p></div>
@@ -294,6 +304,148 @@
     return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
   }
 
+  function formatSol(lamports) {
+    const value = Number(lamports || 0) / 1e9;
+    if (!Number.isFinite(value)) return "Calculated at signing";
+    if (value < 0.000001) return "<0.000001 SOL";
+    return value.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
+  }
+
+  function solAmountToNumber(amount) {
+    const basisPoints = amount?.basisPoints;
+    if (basisPoints === undefined || basisPoints === null) return NaN;
+    try {
+      return Number(basisPoints) / 1e9;
+    } catch {
+      return NaN;
+    }
+  }
+
+  function updateStorageCost(sol) {
+    const el = document.getElementById("createTokenStorageCost");
+    if (!el) return;
+    if (!Number.isFinite(sol)) {
+      el.textContent = "Calculated when uploaded";
+      return;
+    }
+    el.textContent = sol < 0.000001
+      ? "<0.000001 SOL"
+      : sol.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
+  }
+
+  function updateNetworkCost(lamports) {
+    const networkEl = document.getElementById("createTokenNetworkCost");
+    const totalEl = document.getElementById("createTokenTotalCost");
+    const formatted = formatSol(lamports);
+    if (networkEl) networkEl.textContent = formatted;
+    if (totalEl) totalEl.textContent = formatted;
+  }
+
+  function bindLogoPreview() {
+    const logoInput = document.getElementById("createTokenLogo");
+    const logoPreview = document.getElementById("createTokenLogoPreview");
+    if (!logoInput || !logoPreview || logoInput.dataset.bound) return;
+    logoInput.dataset.bound = "1";
+
+    logoInput.addEventListener("change", () => {
+      const file = logoInput.files?.[0];
+      if (!file) {
+        logoPreview.removeAttribute("src");
+        logoPreview.classList.remove("visible");
+        updateStorageCost(NaN);
+        return;
+      }
+      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+        logoInput.value = "";
+        logoPreview.removeAttribute("src");
+        logoPreview.classList.remove("visible");
+        setStatus("Please choose a PNG, JPG or WEBP image.", "error");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        logoInput.value = "";
+        logoPreview.removeAttribute("src");
+        logoPreview.classList.remove("visible");
+        setStatus("Logo image must be 2 MB or smaller.", "error");
+        return;
+      }
+      if (logoPreview.dataset.objectUrl) URL.revokeObjectURL(logoPreview.dataset.objectUrl);
+      const objectUrl = URL.createObjectURL(file);
+      logoPreview.dataset.objectUrl = objectUrl;
+      logoPreview.src = objectUrl;
+      logoPreview.classList.add("visible");
+      setStatus("Logo selected. Connect Phantom and create when ready.", "active");
+      updateStorageCost(NaN);
+    });
+  }
+
+  let metadataModulesPromise = null;
+
+  async function loadMetadataModules() {
+    if (!metadataModulesPromise) {
+      metadataModulesPromise = Promise.all([
+        import(UMI_CDN),
+        import(UMI_DEFAULTS_CDN),
+        import(UMI_WALLET_CDN),
+        import(UMI_IRYS_CDN),
+        import(MPL_METADATA_CDN),
+        import(MPL_TOOLBOX_CDN)
+      ]).then(([umi, defaults, walletAdapters, irys, metadata, toolbox]) => ({
+        umi,
+        defaults,
+        walletAdapters,
+        irys,
+        metadata,
+        toolbox
+      }));
+    }
+    return metadataModulesPromise;
+  }
+
+  function createPhantomWalletAdapter(provider) {
+    return {
+      publicKey: provider.publicKey,
+      signTransaction: async transaction => provider.signTransaction(transaction),
+      signAllTransactions: async transactions => {
+        if (typeof provider.signAllTransactions === "function") {
+          return provider.signAllTransactions(transactions);
+        }
+        const signed = [];
+        for (const transaction of transactions) {
+          signed.push(await provider.signTransaction(transaction));
+        }
+        return signed;
+      },
+      signMessage: async message => {
+        if (typeof provider.signMessage !== "function") {
+          throw new Error("This wallet does not support message signing required for storage upload.");
+        }
+        return provider.signMessage(message);
+      }
+    };
+  }
+
+  async function createUmiForWallet(provider) {
+    const modules = await loadMetadataModules();
+    const { createUmi } = modules.defaults;
+    const { walletAdapterIdentity } = modules.walletAdapters;
+    const { mplTokenMetadata } = modules.metadata;
+    const { mplToolbox } = modules.toolbox;
+    const { irysUploader } = modules.irys;
+
+    const wallet = createPhantomWalletAdapter(provider);
+    const umi = createUmi(SOLANA_RPC)
+      .use(walletAdapterIdentity(wallet))
+      .use(mplTokenMetadata())
+      .use(mplToolbox())
+      .use(irysUploader({
+        payer: undefined,
+        priceMultiplier: 1.1
+      }));
+
+    return {umi, modules};
+  }
+
   async function waitForConfirmation(connection, signature) {
     for (let i = 0; i < 40; i++) {
       const result = await connection.getSignatureStatuses([signature], {searchTransactionHistory:true});
@@ -305,41 +457,22 @@
     throw new Error("Transaction was sent, but confirmation timed out. Check Solscan.");
   }
 
-  async function loadSplToken() {
-    const existing = window.splToken || window.SPLToken || window.SplToken;
-    if (existing) return existing;
-    return await new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = SPL_TOKEN_CDN;
-      script.onload = () => {
-        const lib = window.splToken || window.SPLToken || window.SplToken;
-        if (lib) resolve(lib);
-        else reject(new Error("SPL Token library loaded, but no browser API was exposed."));
-      };
-      script.onerror = () => reject(new Error("Could not load the SPL Token library."));
-      document.head.appendChild(script);
-    });
-  }
-
-  const TOKEN_ACCOUNT_SIZE = 165;
-
-  function updateCostDisplay(lamports) {
-    const sol = Number(lamports || 0) / 1e9;
-    const formatted = sol < 0.000001 ? "<0.000001 SOL" : sol.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
-    const networkEl = document.getElementById("createTokenNetworkCost");
-    const totalEl = document.getElementById("createTokenTotalCost");
-    if (networkEl) networkEl.textContent = formatted;
-    if (totalEl) totalEl.textContent = formatted;
-  }
-
   async function refreshCreationCost() {
     try {
       if (!window.solanaWeb3) return;
-      const spl = await loadSplToken();
-      const connection = new window.solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-      const mintRent = await connection.getMinimumBalanceForRentExemption(spl.MINT_SIZE);
-      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
-      updateCostDisplay(mintRent + tokenAccountRent + 5000);
+      const connection = new window.solanaWeb3.Connection(SOLANA_RPC, "confirmed");
+      const mintRent = await connection.getMinimumBalanceForRentExemption(82);
+      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(165);
+      const recentFee = await connection.getFeeForMessage(
+        new window.solanaWeb3.TransactionMessage({
+          payerKey: new window.solanaWeb3.PublicKey("11111111111111111111111111111111"),
+          recentBlockhash: (await connection.getLatestBlockhash("confirmed")).blockhash,
+          instructions: []
+        }).compileToV0Message(),
+        "confirmed"
+      ).catch(() => null);
+
+      updateNetworkCost(mintRent + tokenAccountRent + Number(recentFee?.value || 5000));
     } catch {
       const networkEl = document.getElementById("createTokenNetworkCost");
       const totalEl = document.getElementById("createTokenTotalCost");
@@ -350,29 +483,7 @@
 
   async function createToken() {
     const logoInput = document.getElementById("createTokenLogo");
-    const logoPreview = document.getElementById("createTokenLogoPreview");
-    if (logoInput && logoPreview) {
-      logoInput.addEventListener("change", () => {
-        const file = logoInput.files?.[0];
-        if (!file) return;
-        if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
-          logoInput.value = "";
-          setStatus("Please choose a PNG, JPG or WEBP image.", "error");
-          return;
-        }
-        if (file.size > 2 * 1024 * 1024) {
-          logoInput.value = "";
-          setStatus("Logo image must be 2 MB or smaller.", "error");
-          return;
-        }
-        logoPreview.src = URL.createObjectURL(file);
-        logoPreview.classList.add("visible");
-      });
-    }
-
-    refreshCreationCost();
-
-    const button = document.getElementById("createTokenButton");
+    const logoFile = logoInput?.files?.[0];
     const name = String(document.getElementById("createTokenName")?.value || "").trim();
     const symbol = normalizeSymbol(document.getElementById("createTokenSymbol")?.value);
     const supplyText = document.getElementById("createTokenSupply")?.value;
@@ -386,6 +497,10 @@
     if (!Number.isInteger(decimals) || decimals < 0 || decimals > 9) throw new Error("Decimals must be between 0 and 9.");
     const amount = parseSupply(supplyText, decimals);
 
+    if (!logoFile) throw new Error("Upload a token logo before creating the token.");
+    if (!/^image\/(png|jpeg|webp)$/.test(logoFile.type)) throw new Error("Please choose a PNG, JPG or WEBP image.");
+    if (logoFile.size > 2 * 1024 * 1024) throw new Error("Logo image must be 2 MB or smaller.");
+
     const provider = typeof getPhantomProvider === "function" ? getPhantomProvider() : null;
     if (!provider?.publicKey) {
       setStatus("Connect Phantom first.", "error");
@@ -394,122 +509,152 @@
     }
 
     if (!window.solanaWeb3) throw new Error("Solana Web3 library is not available.");
-    const spl = await loadSplToken();
-    const required = [
-      "MINT_SIZE","TOKEN_PROGRAM_ID","ASSOCIATED_TOKEN_PROGRAM_ID",
-      "createInitializeMintInstruction","createAssociatedTokenAccountInstruction",
-      "getAssociatedTokenAddressSync","createMintToCheckedInstruction",
-      "createSetAuthorityInstruction","AuthorityType"
-    ];
-    const missing = required.filter(key => spl[key] === undefined);
-    if (missing.length) throw new Error("SPL Token library is missing: " + missing.join(", "));
 
-    const web3 = window.solanaWeb3;
-    const owner = provider.publicKey;
-    const connection = new web3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-    const mintKeypair = web3.Keypair.generate();
+    setStatus("Preparing permanent metadata storage...", "active");
+    const {umi, modules} = await createUmiForWallet(provider);
+    const {createGenericFile, generateSigner, percentAmount, some} = modules.umi;
+    const {createV1, TokenStandard} = modules.metadata;
+    const {
+      createMint,
+      createTokenIfMissing,
+      findAssociatedTokenPda,
+      mintTokensTo,
+      setAuthority,
+      AuthorityType
+    } = modules.toolbox;
 
-    setStatus("Preparing the mint transaction...", "active");
+    const mint = generateSigner(umi);
+    const imageBuffer = new Uint8Array(await logoFile.arrayBuffer());
+    const imageFile = createGenericFile(imageBuffer, logoFile.name, {
+      contentType: logoFile.type
+    });
 
-    const rentLamports = await connection.getMinimumBalanceForRentExemption(spl.MINT_SIZE);
-    const ata = spl.getAssociatedTokenAddressSync(
-      mintKeypair.publicKey,
-      owner,
-      false,
-      spl.TOKEN_PROGRAM_ID,
-      spl.ASSOCIATED_TOKEN_PROGRAM_ID
+    const uploader = umi.uploader;
+    const imagePrice = await uploader.getUploadPrice([imageFile]).catch(() => null);
+    const imagePriceSol = solAmountToNumber(imagePrice);
+    if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
+
+    setStatus("Uploading token logo to permanent storage...", "active");
+    const [imageUri] = await uploader.upload([imageFile]);
+    if (!imageUri) throw new Error("Logo upload failed.");
+
+    const metadataJson = {
+      name,
+      symbol,
+      description: name + " — created on GurugSwap",
+      image: imageUri,
+      properties: {
+        files: [{uri: imageUri, type: logoFile.type}],
+        category: "image"
+      }
+    };
+
+    const metadataFile = createGenericFile(
+      new TextEncoder().encode(JSON.stringify(metadataJson)),
+      "metadata.json",
+      {contentType: "application/json"}
     );
 
-    const tx = new web3.Transaction();
-    tx.add(
-      web3.SystemProgram.createAccount({
-        fromPubkey: owner,
-        newAccountPubkey: mintKeypair.publicKey,
-        lamports: rentLamports,
-        space: spl.MINT_SIZE,
-        programId: spl.TOKEN_PROGRAM_ID
-      }),
-      spl.createInitializeMintInstruction(
-        mintKeypair.publicKey,
-        decimals,
-        owner,
-        revokeFreeze ? null : owner,
-        spl.TOKEN_PROGRAM_ID
-      ),
-      spl.createAssociatedTokenAccountInstruction(
-        owner,
-        ata,
-        owner,
-        mintKeypair.publicKey,
-        spl.TOKEN_PROGRAM_ID,
-        spl.ASSOCIATED_TOKEN_PROGRAM_ID
-      ),
-      spl.createMintToCheckedInstruction(
-        mintKeypair.publicKey,
-        ata,
-        owner,
-        amount,
-        decimals,
-        [],
-        spl.TOKEN_PROGRAM_ID
-      )
-    );
+    const metadataPrice = await uploader.getUploadPrice([metadataFile]).catch(() => null);
+    const metadataPriceSol = solAmountToNumber(metadataPrice);
+    const storageSol = (Number.isFinite(imagePriceSol) ? imagePriceSol : 0) +
+      (Number.isFinite(metadataPriceSol) ? metadataPriceSol : 0);
+    updateStorageCost(storageSol > 0 ? storageSol : NaN);
 
-    if (fixedSupply) {
-      tx.add(
-        spl.createSetAuthorityInstruction(
-          mintKeypair.publicKey,
-          owner,
-          spl.AuthorityType.MintTokens,
-          null,
-          [],
-          spl.TOKEN_PROGRAM_ID
+    setStatus("Uploading token metadata JSON...", "active");
+    const metadataUri = await uploader.uploadJson(metadataJson);
+    if (!metadataUri) throw new Error("Metadata upload failed.");
+
+    setStatus("Building the token creation transaction...", "active");
+
+    const tokenBuilder = createMint(umi, {
+      mint,
+      decimals,
+      mintAuthority: umi.identity.publicKey,
+      freezeAuthority: revokeFreeze ? null : umi.identity.publicKey
+    })
+      .add(createV1(umi, {
+        mint,
+        authority: umi.identity,
+        payer: umi.payer,
+        updateAuthority: umi.identity.publicKey,
+        name,
+        symbol,
+        uri: metadataUri,
+        sellerFeeBasisPoints: percentAmount(0),
+        tokenStandard: TokenStandard.Fungible,
+        decimals: some(decimals),
+        isMutable: true
+      }))
+      .add(
+        createTokenIfMissing(umi, {
+          mint: mint.publicKey,
+          owner: umi.identity.publicKey
+        }).add(
+          mintTokensTo(umi, {
+            mint: mint.publicKey,
+            token: findAssociatedTokenPda(umi, {
+              mint: mint.publicKey,
+              owner: umi.identity.publicKey
+            }),
+            amount
+          })
         )
       );
-    }
 
-    const latest = await connection.getLatestBlockhash("confirmed");
-    tx.recentBlockhash = latest.blockhash;
-    try {
-      const feeInfo = await connection.getFeeForMessage(tx.compileMessage(), "confirmed");
-      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
-      updateCostDisplay(rentLamports + tokenAccountRent + Number(feeInfo?.value || 5000));
-    } catch {
-      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
-      updateCostDisplay(rentLamports + tokenAccountRent + 5000);
-    }
-    tx.feePayer = owner;
-    tx.partialSign(mintKeypair);
+    const finalBuilder = fixedSupply
+      ? tokenBuilder.add(
+          setAuthority(umi, {
+            authorityType: AuthorityType.MintTokens,
+            newAuthority: null,
+            owned: mint.publicKey,
+            owner: umi.identity.publicKey
+          })
+        )
+      : tokenBuilder;
 
-    setStatus("Review the transaction in Phantom and approve it...", "active");
-    const signed = await provider.signAndSendTransaction(tx);
-    const signature = signed?.signature;
-    if (!signature) throw new Error("Phantom did not return a transaction signature.");
+    setStatus("Review the token, metadata and storage transactions in Phantom and approve...", "active");
+    const result = await finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}});
 
-    setStatus("Transaction sent. Waiting for Solana confirmation...", "active");
-    await waitForConfirmation(connection, signature);
+    const mintAddress = mint.publicKey.toString();
+    const signature = result?.signature
+      ? (typeof result.signature === "string" ? result.signature : modules.umi.base58?.serialize?.(result.signature))
+      : "";
 
-    const mintAddress = mintKeypair.publicKey.toBase58();
+    const ata = findAssociatedTokenPda(umi, {
+      mint: mint.publicKey,
+      owner: umi.identity.publicKey
+    });
+    const ataAddress = ata[0]?.toString ? ata[0].toString() : String(ata);
+
     const solscan = "https://solscan.io/token/" + mintAddress;
-    const account = "https://solscan.io/account/" + ata.toBase58();
+    const account = "https://solscan.io/account/" + ataAddress;
 
-    const result = document.getElementById("createTokenResult");
-    const address = document.getElementById("createTokenMintAddress");
+    const resultEl = document.getElementById("createTokenResult");
+    const addressEl = document.getElementById("createTokenMintAddress");
     const solscanEl = document.getElementById("createTokenSolscan");
     const accountEl = document.getElementById("createTokenAccount");
-    if (address) address.textContent = mintAddress;
+    const metadataEl = document.getElementById("createTokenMetadata");
+
+    if (addressEl) addressEl.textContent = mintAddress;
     if (solscanEl) solscanEl.href = solscan;
     if (accountEl) accountEl.href = account;
-    if (result) result.hidden = false;
+    if (metadataEl) {
+      metadataEl.href = metadataUri;
+      metadataEl.hidden = false;
+    }
+    if (resultEl) resultEl.hidden = false;
 
-    setStatus("TOKEN CREATED SUCCESSFULLY — your new SPL token is on Solana.", "success");
-    button.disabled = false;
-    return {mintAddress, ata, signature};
+    updateStorageCost(storageSol > 0 ? storageSol : NaN);
+    setStatus("TOKEN CREATED SUCCESSFULLY — token, metadata and logo are live on Solana.", "success");
+    return {mintAddress, metadataUri, signature};
   }
 
   function bind() {
     addStyle();
     addSection();
+    bindLogoPreview();
+    refreshCreationCost();
 
     const button = document.getElementById("createTokenButton");
     if (!button || button.dataset.bound) return;
