@@ -28,10 +28,10 @@
     }
     throw new Error("No Solana RPC endpoint is currently available. Please try again.");
   }
-  const UMI_CDN = "https://esm.sh/@metaplex-foundation/umi@1.6.0?bundle";
-  const UMI_DEFAULTS_CDN = "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@1.6.0?bundle";
-  const UMI_WALLET_CDN = "https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.6.0?bundle";
-  const UMI_IRYS_CDN = "https://esm.sh/@metaplex-foundation/umi-uploader-irys@1.6.0/web?bundle";
+  const UMI_CDN = "https://esm.sh/@metaplex-foundation/umi@1.5.1?bundle";
+  const UMI_DEFAULTS_CDN = "https://esm.sh/@metaplex-foundation/umi-bundle-defaults@1.5.1?bundle";
+  const UMI_WALLET_CDN = "https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.5.1?bundle";
+  const UMI_IRYS_CDN = "https://esm.sh/@metaplex-foundation/umi-uploader-irys@1.5.0/web?bundle";
   const MPL_METADATA_CDN = "https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.4.0?bundle";
   const MPL_TOOLBOX_CDN = "https://esm.sh/@metaplex-foundation/mpl-toolbox@0.11.4?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
