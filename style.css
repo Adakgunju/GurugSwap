@@ -1932,3 +1932,21 @@ body{background:#151714!important}
   border-color:rgba(255,255,255,.16)!important;
   box-shadow:0 22px 65px rgba(0,0,0,.42)!important;
 }
+
+/* === GURUG NETWORK CARDS: MATCH FUNCTION CARD TONE === */
+.workspace-main>#links .link-card,
+.workspace-main>#links .universe-feature{
+  background:rgba(27,29,25,.96)!important;
+  color:var(--white)!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  box-shadow:0 22px 65px rgba(0,0,0,.42)!important;
+  backdrop-filter:blur(3px)!important;
+  -webkit-backdrop-filter:blur(3px)!important;
+}
+.workspace-main>#links .link-card strong,
+.workspace-main>#links .universe-feature strong{color:var(--white)!important}
+.workspace-main>#links .link-card span,
+.workspace-main>#links .universe-feature span,
+.workspace-main>#links .universe-feature p{color:#c9c9c4!important}
+.workspace-main>#links .link-card em,
+.workspace-main>#links .universe-feature em{color:var(--yellow)!important}
