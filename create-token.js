@@ -264,6 +264,8 @@
     });
   }
 
+  const TOKEN_ACCOUNT_SIZE = 165;
+
   function updateCostDisplay(lamports) {
     const sol = Number(lamports || 0) / 1e9;
     const formatted = sol < 0.000001 ? "<0.000001 SOL" : sol.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
@@ -278,8 +280,9 @@
       if (!window.solanaWeb3) return;
       const spl = await loadSplToken();
       const connection = new window.solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-      const rent = await connection.getMinimumBalanceForRentExemption(spl.MINT_SIZE);
-      updateCostDisplay(rent + 5000);
+      const mintRent = await connection.getMinimumBalanceForRentExemption(spl.MINT_SIZE);
+      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
+      updateCostDisplay(mintRent + tokenAccountRent + 5000);
     } catch {
       const networkEl = document.getElementById("createTokenNetworkCost");
       const totalEl = document.getElementById("createTokenTotalCost");
@@ -412,9 +415,11 @@
     tx.recentBlockhash = latest.blockhash;
     try {
       const feeInfo = await connection.getFeeForMessage(tx.compileMessage(), "confirmed");
-      updateCostDisplay(rentLamports + Number(feeInfo?.value || 5000));
+      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
+      updateCostDisplay(rentLamports + tokenAccountRent + Number(feeInfo?.value || 5000));
     } catch {
-      updateCostDisplay(rentLamports + 5000);
+      const tokenAccountRent = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
+      updateCostDisplay(rentLamports + tokenAccountRent + 5000);
     }
     tx.feePayer = owner;
     tx.partialSign(mintKeypair);
