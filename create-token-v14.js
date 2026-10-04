@@ -498,93 +498,81 @@
     return {umi, modules};
   }
 
-  function resolveBundlrConstructor() {
-    const directCandidates = [
-      globalThis.WebBundlr,
-      globalThis.Bundlr,
-      globalThis.BundlrClient,
-      globalThis.bundlr?.WebBundlr,
-      globalThis.Bundlr?.WebBundlr,
-      globalThis.Bundlr?.default,
-      globalThis.bundlr?.default
-    ];
+  let irysWebUploaderPromise = null;
 
-    for (const candidate of directCandidates) {
-      if (typeof candidate === "function") return candidate;
-    }
-
-    // Some IIFE builds expose a namespace object rather than WebBundlr
-    // directly. Search the browser globals without downloading another SDK.
-    for (const key of Object.keys(globalThis)) {
-      if (!/bundlr/i.test(key)) continue;
-      const value = globalThis[key];
-      if (typeof value === "function") return value;
-      if (value && typeof value === "object") {
-        for (const prop of ["WebBundlr", "Bundlr", "default", "Client"]) {
-          if (typeof value[prop] === "function") return value[prop];
+  async function createIrysWebClient(provider) {
+    if (!irysWebUploaderPromise) {
+      irysWebUploaderPromise = Promise.all([
+        import("https://esm.sh/@irys/web-upload@0.0.15?bundle&target=es2020"),
+        import("https://esm.sh/@irys/web-upload-solana@0.1.8?bundle&target=es2020")
+      ]).then(([webUpload, solanaUpload]) => {
+        const WebUploader = webUpload?.WebUploader || webUpload?.default;
+        const WebSolana = solanaUpload?.WebSolana || solanaUpload?.default;
+        if (typeof WebUploader !== "function" || typeof WebSolana !== "function") {
+          throw new Error("Irys browser uploader modules loaded without WebUploader/WebSolana.");
         }
-      }
+        return {WebUploader, WebSolana};
+      });
     }
 
-    return null;
-  }
-
-  async function createLegacyWebBundlr(provider) {
-    const BundlrConstructor = resolveBundlrConstructor();
-
-    if (typeof BundlrConstructor !== "function") {
-      const available = Object.keys(globalThis)
-        .filter(key => /bundlr/i.test(key))
-        .slice(0, 20);
-      throw new Error(
-        "Irys storage client is not available." +
-        (available.length ? " Detected browser globals: " + available.join(", ") : " The Bundlr browser bundle did not expose a usable WebBundlr constructor.")
-      );
-    }
-
+    const {WebUploader, WebSolana} = await irysWebUploaderPromise;
+    const wallet = createPhantomWalletAdapter(provider);
     const rpc = await getWorkingRpc();
-    const bundlr = new BundlrConstructor(
-      "https://node1.irys.xyz",
-      "solana",
-      provider,
-      { providerUrl: rpc }
-    );
-    await withTimeout(
-      bundlr.ready(),
+
+    const irys = await withTimeout(
+      WebUploader(WebSolana)
+        .withProvider(wallet)
+        .withRpc(rpc)
+        .bundlerUrl("https://node1.irys.xyz")
+        .build(),
       60000,
       "Irys storage connection timed out. Please try again."
     );
-    return bundlr;
+
+    if (!irys || typeof irys.upload !== "function") {
+      throw new Error("Irys browser uploader initialized without an upload method.");
+    }
+
+    return irys;
   }
 
-  async function uploadToPermanentStorage(bundlr, data, contentType, label) {
+  async function uploadToPermanentStorage(irys, data, contentType, label) {
     const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
-    const price = await bundlr.getPrice(bytes.length);
+    const price = await irys.getPrice(bytes.length);
     const priceAtomic = price?.toString ? price.toString() : String(price);
     if (!priceAtomic || priceAtomic === "0") {
       throw new Error(label + " storage price could not be calculated.");
     }
 
-    const currentBalance = await bundlr.getLoadedBalance();
+    const currentBalance = await irys.getLoadedBalance();
     if (currentBalance.lt(price)) {
       const funding = await withTimeout(
-        bundlr.fund(price.minus(currentBalance)),
+        irys.fund(price.minus(currentBalance)),
         120000,
         label + " storage payment timed out after wallet approval."
       );
       if (!funding) throw new Error(label + " storage funding failed.");
+
+      // WebIrys returns a funding transaction that must be submitted
+      // through its funder before the balance becomes spendable.
+      if (irys.funder && typeof irys.funder.submitFundTransaction === "function" && funding.id) {
+        await withTimeout(
+          irys.funder.submitFundTransaction(funding.id),
+          120000,
+          label + " storage funding confirmation timed out."
+        );
+      }
     }
 
-    const tx = bundlr.createTransaction(bytes, {
-      tags: [{name: "Content-Type", value: contentType}]
-    });
-    await withTimeout(tx.sign(), 120000, label + " storage signing timed out.");
     const receipt = await withTimeout(
-      tx.upload(),
+      irys.upload(bytes, {
+        tags: [{name: "Content-Type", value: contentType}]
+      }),
       180000,
       label + " storage upload timed out."
     );
-    const id = receipt?.id || tx?.id;
+
+    const id = receipt?.id;
     if (!id) throw new Error(label + " upload completed without a storage ID.");
     return {
       uri: "https://arweave.net/" + id,
