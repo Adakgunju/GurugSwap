@@ -1875,3 +1875,10 @@ main{padding-top:82px!important}
 .gurug-rain i:nth-child(22){left:97vw!important}
 .gurug-rain i:nth-child(23){left:24vw!important}
 .gurug-rain i:nth-child(24){left:67vw!important}
+
+/* === PLATFORM HEADER: LET GURUG SNOW SHOW THROUGH === */
+.platform-header.hero{
+  background:linear-gradient(110deg,rgba(20,22,14,.58),rgba(10,11,9,.52))!important;
+  backdrop-filter:blur(2px)!important;
+  -webkit-backdrop-filter:blur(2px)!important;
+}
