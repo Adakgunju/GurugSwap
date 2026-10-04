@@ -2129,3 +2129,18 @@ main{padding-top:90px!important}
   }
   .topbar .brand{gap:8px!important}
 }
+
+
+/* --- BRIGHTER OVERALL BACKGROUND --- */
+body{
+  background:#11130f!important;
+}
+.workspace-sidebar{
+  background:rgba(19,21,16,.97)!important;
+}
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about,
+.workspace-main #liquidity{
+  background:rgba(19,21,16,.94)!important;
+}
