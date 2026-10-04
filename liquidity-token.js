@@ -107,6 +107,15 @@
 
   function setStatus(message) { const el = document.getElementById("liqStatus"); if (el) el.textContent = message; }
 
+  function decimalToRaw(value, decimals) {
+    const text = String(value);
+    if (!/^\\d+(\\.\\d+)?$/.test(text)) throw new Error("Invalid amount.");
+    const [whole, fraction = ""] = text.split(".");
+    if (fraction.length > decimals) throw new Error("Amount has too many decimal places.");
+    return BigInt(whole) * (10n ** BigInt(decimals)) +
+      BigInt((fraction + "0".repeat(decimals)).slice(0, decimals) || "0");
+  }
+
   function updatePrice() {
     const token = Number(document.getElementById("liqTokenAmount")?.value);
     const sol = Number(document.getElementById("liqSolAmount")?.value);
@@ -150,7 +159,150 @@
       if (!Number.isFinite(tokenAmountValue) || tokenAmountValue <= 0) { setStatus("Enter a token amount greater than zero."); return; }
       if (!Number.isFinite(solAmountValue) || solAmountValue <= 0) { setStatus("Enter a SOL amount greater than zero."); return; }
       updatePrice();
-      setStatus("Pool creation transaction wiring is being prepared. Your wallet will sign the final Raydium transaction.");
+      try {
+        setStatus("STEP 1/5 — Loading Raydium CPMM configuration…");
+
+        const SDK_URL = "https://ga.jspm.io/npm:@raydium-io/raydium-sdk-v2@0.2.73-alpha/lib/index.mjs";
+        const BN_URL = "https://ga.jspm.io/npm:bn.js@5.2.2/lib/index.js";
+        const [{ default: RaydiumModule }, { default: BN }] = await Promise.all([
+          import(SDK_URL),
+          import(BN_URL)
+        ]);
+
+        const sdk = RaydiumModule || {};
+        const PublicKey = window.solanaWeb3?.PublicKey;
+        const Connection = window.solanaWeb3?.Connection;
+        if (!PublicKey || !Connection) throw new Error("Solana Web3 library is not available.");
+
+        const connection = new Connection("https://solana-rpc.publicnode.com", "confirmed");
+        const owner = new PublicKey(p.publicKey.toString());
+
+        setStatus("STEP 2/5 — Checking token, balances and fee tier…");
+
+        const mintPubkey = new PublicKey(mintValue);
+        const mintAccount = await connection.getParsedAccountInfo(mintPubkey, "confirmed");
+        const parsedMint = mintAccount?.value?.data?.parsed?.info;
+        const mintOwner = mintAccount?.value?.owner?.toBase58?.();
+
+        if (!parsedMint || !parsedMint.decimals) throw new Error("This address is not a valid SPL token mint.");
+        if (mintOwner && mintOwner !== "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") {
+          throw new Error("Only standard SPL Token mints are supported for this pool.");
+        }
+
+        const tokenDecimals = Number(parsedMint.decimals);
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(owner, { mint: mintPubkey }, "confirmed");
+        const tokenBalance = tokenAccounts.value.reduce((sum, item) => {
+          const amount = item?.account?.data?.parsed?.info?.tokenAmount?.amount || "0";
+          return sum + BigInt(amount);
+        }, 0n);
+
+        const tokenRaw = decimalToRaw(tokenAmountValue, tokenDecimals);
+        const solRaw = decimalToRaw(solAmountValue, 9);
+        if (tokenRaw <= 0n || solRaw <= 0n) throw new Error("Liquidity amounts must be greater than zero.");
+        if (tokenRaw > tokenBalance) throw new Error("Insufficient token balance for this liquidity amount.");
+
+        const solBalance = await connection.getBalance(owner, "confirmed");
+        const minimumSol = solRaw + 250000000n;
+        if (BigInt(solBalance) < minimumSol) {
+          throw new Error("Not enough SOL. Keep additional SOL available for pool creation and network costs.");
+        }
+
+        const feeConfigsResponse = await fetch("https://api-v3.raydium.io/main/cpmm-config", { cache: "no-store" });
+        const feeJson = await feeConfigsResponse.json();
+        const feeRate = Math.round(Number(document.getElementById("liqFee")?.value || "0.25") * 10000);
+        const feeConfig = (feeJson?.data || []).find(item =>
+          Number(item?.tradeFeeRate) === feeRate && item?.showWithUI !== false
+        );
+        if (!feeConfig) throw new Error("Raydium fee configuration for the selected tier is unavailable.");
+
+        setStatus("STEP 3/5 — Building the Raydium CPMM transaction…");
+
+        if (!sdk.Raydium || !sdk.TxVersion || !sdk.CREATE_CPMM_POOL_PROGRAM || !sdk.CREATE_CPMM_POOL_FEE_ACC) {
+          throw new Error("Raydium SDK browser module could not be loaded.");
+        }
+
+        const walletAdapter = {
+          publicKey: owner,
+          signTransaction: async tx => {
+            if (typeof p.signTransaction !== "function") throw new Error("Wallet does not support transaction signing.");
+            return p.signTransaction(tx);
+          },
+          signAllTransactions: async txs => {
+            if (typeof p.signAllTransactions === "function") return p.signAllTransactions(txs);
+            if (typeof p.signTransaction !== "function") throw new Error("Wallet does not support transaction signing.");
+            const signed = [];
+            for (const tx of txs) signed.push(await p.signTransaction(tx));
+            return signed;
+          }
+        };
+
+        const raydium = await sdk.Raydium.load({
+          connection,
+          owner,
+          cluster: "mainnet",
+          signAllTransactions: walletAdapter.signAllTransactions,
+          disableFeatureCheck: true,
+          disableLoadToken: true,
+          blockhashCommitment: "confirmed"
+        });
+
+        const mintA = {
+          address: mintValue,
+          programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          decimals: tokenDecimals
+        };
+        const mintB = {
+          address: SOL_MINT,
+          programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          decimals: 9
+        };
+
+        const { execute, extInfo } = await raydium.cpmm.createPool({
+          programId: sdk.CREATE_CPMM_POOL_PROGRAM,
+          poolFeeAccount: sdk.CREATE_CPMM_POOL_FEE_ACC,
+          mintA,
+          mintB,
+          mintAAmount: new BN(tokenRaw.toString()),
+          mintBAmount: new BN(solRaw.toString()),
+          startTime: new BN(0),
+          feeConfig,
+          associatedOnly: true,
+          ownerInfo: { useSOLBalance: true, feePayer: owner },
+          txVersion: sdk.TxVersion.V0,
+          computeBudgetConfig: { units: 600000, microLamports: 50000 }
+        });
+
+        const poolId = extInfo?.address?.poolId?.toString?.() || extInfo?.address?.pool?.toString?.() || "";
+
+        setStatus("STEP 4/5 — Phantom approval required. Review the Raydium pool transaction carefully…");
+
+        const result = await execute({ sendAndConfirm: true });
+        const txId = result?.txId || result?.signature || result;
+
+        setStatus("STEP 5/5 — Pool created. Verifying on Solana…");
+
+        if (!txId) throw new Error("Raydium returned no transaction signature.");
+        const txLink = "https://solscan.io/tx/" + encodeURIComponent(txId);
+        const poolLink = poolId ? "https://solscan.io/account/" + encodeURIComponent(poolId) : "";
+
+        const statusEl = document.getElementById("liqStatus");
+        if (statusEl) {
+          statusEl.innerHTML =
+            "POOL CREATED ✓ " +
+            (poolId ? '<br><a class="liq-link" href="' + poolLink + '" target="_blank" rel="noopener noreferrer">POOL ' + poolId + ' ↗</a>' : "") +
+            '<br><a class="liq-link" href="' + txLink + '" target="_blank" rel="noopener noreferrer">VIEW TRANSACTION ↗</a>';
+        }
+        const existing = document.getElementById("liqExisting");
+        if (existing) existing.textContent = "POOL CREATED";
+      } catch (error) {
+        const raw = String(error?.message || error || "");
+        const lower = raw.toLowerCase();
+        if (lower.includes("user rejected") || lower.includes("user denied") || lower.includes("rejected the request") || lower.includes("cancelled") || lower.includes("canceled")) {
+          setStatus("Transaction cancelled by user. No pool was created.");
+        } else {
+          setStatus("Pool creation failed: " + raw.slice(0, 260));
+        }
+      }
     });
   }
 
