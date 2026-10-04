@@ -1950,3 +1950,23 @@ body{background:#151714!important}
 .workspace-main>#links .universe-feature p{color:#c9c9c4!important}
 .workspace-main>#links .link-card em,
 .workspace-main>#links .universe-feature em{color:var(--yellow)!important}
+
+/* === DISTRIBUTION INPUTS: MATCH DARK INPUT SYSTEM === */
+.workspace-main>#distributeTokens .distribute-input,
+.workspace-main>#distributeTokens .distribute-row input,
+.workspace-main>#distributeTokens input,
+.workspace-main>#distributeTokens textarea,
+.workspace-main>#distributeTokens select{
+  background:#0f100e!important;
+  border-color:#3a3b36!important;
+  color:#f7f7f2!important;
+}
+.workspace-main>#distributeTokens .distribute-input::placeholder,
+.workspace-main>#distributeTokens .distribute-row input::placeholder{
+  color:#777871!important;
+}
+.workspace-main>#distributeTokens .distribute-input:focus,
+.workspace-main>#distributeTokens .distribute-row input:focus{
+  background:#11120f!important;
+  border-color:#66675f!important;
+}
