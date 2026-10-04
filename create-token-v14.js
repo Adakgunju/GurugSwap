@@ -499,11 +499,26 @@
   }
 
   async function createLegacyWebBundlr(provider) {
-    if (typeof WebBundlr !== "function") {
-      throw new Error("Irys storage client is not available. Please refresh the page and try again.");
+    // The legacy browser bundle can expose the constructor under different
+    // global names depending on the bundle build. Resolve it at runtime.
+    const BundlrConstructor =
+      globalThis.WebBundlr ||
+      globalThis.Bundlr ||
+      globalThis.BundlrClient ||
+      null;
+
+    if (typeof BundlrConstructor !== "function") {
+      const available = Object.keys(globalThis)
+        .filter(key => /bundlr/i.test(key))
+        .slice(0, 12);
+      throw new Error(
+        "Irys storage client failed to load." +
+        (available.length ? " Detected: " + available.join(", ") : " Please refresh the page and try again.")
+      );
     }
+
     const rpc = await getWorkingRpc();
-    const bundlr = new WebBundlr(
+    const bundlr = new BundlrConstructor(
       "https://node1.irys.xyz",
       "solana",
       provider,
