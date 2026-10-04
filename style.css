@@ -2079,3 +2079,30 @@ main{padding-top:90px!important}
 @media(max-width:520px){
   main{padding-top:76px!important}
 }
+
+
+/* --- SIDEBAR NAV READABILITY --- */
+.workspace-nav{
+  color:#d8d8cf!important;
+}
+.workspace-nav b{
+  font-size:13px!important;
+  font-weight:800!important;
+  letter-spacing:.12em!important;
+}
+.workspace-nav span{
+  font-size:10px!important;
+  color:#8f8f87!important;
+}
+.workspace-nav em{
+  font-size:14px!important;
+  color:#8f8f87!important;
+}
+.workspace-nav:hover,
+.workspace-nav.active{
+  color:var(--yellow)!important;
+}
+.workspace-nav.active span,
+.workspace-nav.active em{
+  color:var(--yellow)!important;
+}
