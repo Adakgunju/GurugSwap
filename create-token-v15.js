@@ -530,46 +530,44 @@
   }
 
   async function createIrysWebClient(provider) {
-    ensureBrowserPolyfills();
     if (!irysWebUploaderPromise) {
-      irysWebUploaderPromise = import("https://esm.sh/@irys/sdk@0.2.11?bundle&target=es2020&deps=buffer@6.0.3")
-        .then(module => module?.WebIrys || module?.default?.WebIrys || module?.default)
-        .then(WebIrys => {
-          if (typeof WebIrys !== "function") {
-            throw new Error("Irys browser SDK loaded without WebIrys.");
-          }
-          return WebIrys;
-        });
+      const browserDeps =
+        "bundle&target=es2020" +
+        "&deps=@irys/bundles@0.0.5,@irys/upload-core@0.0.10,stream-browserify@3.0.0,events@3.3.0,buffer@6.0.3" +
+        "&alias=stream:stream-browserify";
+      irysWebUploaderPromise = Promise.all([
+        import("https://esm.sh/@irys/web-upload@0.0.15?" + browserDeps),
+        import("https://esm.sh/@irys/web-upload-solana@0.1.8?" + browserDeps)
+      ]).then(([webUpload, solanaUpload]) => {
+        const WebUploader = webUpload?.WebUploader || webUpload?.default;
+        const WebSolana = solanaUpload?.WebSolana || solanaUpload?.default;
+        if (typeof WebUploader !== "function" || typeof WebSolana !== "function") {
+          throw new Error("Irys browser uploader modules loaded without WebUploader/WebSolana.");
+        }
+        return {WebUploader, WebSolana};
+      });
     }
 
-    const WebIrys = await irysWebUploaderPromise;
+    const {WebUploader, WebSolana} = await irysWebUploaderPromise;
     const wallet = createPhantomWalletAdapter(provider);
     const rpc = await getWorkingRpc();
 
     const irys = await withTimeout(
-      new WebIrys({
-        url: "https://node1.irys.xyz",
-        token: "solana",
-        wallet: { provider: wallet },
-        config: { providerUrl: rpc }
-      }),
-      60000,
-      "Irys storage client initialization timed out. Please try again."
-    );
-
-    await withTimeout(
-      irys.ready(),
+      WebUploader(WebSolana)
+        .withProvider(wallet)
+        .withRpc(rpc)
+        .bundlerUrl("https://node1.irys.xyz")
+        .build(),
       60000,
       "Irys storage connection timed out. Please try again."
     );
 
     if (!irys || typeof irys.upload !== "function") {
-      throw new Error("Irys browser SDK initialized without an upload method.");
+      throw new Error("Irys browser uploader initialized without an upload method.");
     }
 
     return irys;
   }
-
   async function uploadToPermanentStorage(irys, data, contentType, label) {
     const bytes = data instanceof Uint8Array ? data : new TextEncoder().encode(String(data));
     const price = await irys.getPrice(bytes.length);
