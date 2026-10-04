@@ -469,6 +469,13 @@
         }
         const result = await provider.signMessage(message);
         return result?.signature || result;
+      },
+      sendTransaction: async (transaction, connection, options = {}) => {
+        if (typeof provider.sendTransaction !== "function") {
+          throw new Error("This wallet does not support transaction sending required for Irys storage.");
+        }
+        const result = await provider.sendTransaction(transaction, connection, options);
+        return result?.signature || result;
       }
     };
   }
@@ -585,8 +592,9 @@
     if (Number.isFinite(imagePriceSol)) updateStorageCost(imagePriceSol);
 
     setStatus("Uploading token logo to permanent storage...", "active");
-    const [imageUri] = await uploader.upload([imageFile]);
-    if (!imageUri) throw new Error("Logo upload failed.");
+    const imageUris = await uploader.upload([imageFile]);
+    const imageUri = imageUris?.[0];
+    if (!imageUri) throw new Error("Logo upload failed: Irys returned no storage URI.");
 
     const metadataJson = {
       name,
@@ -613,7 +621,7 @@
 
     setStatus("Uploading token metadata JSON...", "active");
     const metadataUri = await uploader.uploadJson(metadataJson);
-    if (!metadataUri) throw new Error("Metadata upload failed.");
+    if (!metadataUri) throw new Error("Metadata upload failed: Irys returned no storage URI.");
 
     setStatus("Building the token creation transaction...", "active");
 
