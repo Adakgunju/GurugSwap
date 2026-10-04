@@ -263,7 +263,75 @@
       }
     });
 
-    setStatus("Loading live Raydium CPMM fee configuration…");
+    // Public RPC providers may reject Raydium SDK's indexed
+    // getTokenAccountsByOwner request. We already know the user's ATA,
+    // so seed the SDK account cache from a direct getAccountInfo call.
+    // This avoids indexed RPC entirely while still letting Raydium build
+    // the normal CPMM transaction.
+    setStatus("Preparing your token account for Raydium…");
+    const tokenAtaInfo = await connection.getAccountInfo(
+      new Web3.PublicKey(
+        Web3.PublicKey.findProgramAddressSync(
+          [
+            owner.toBuffer(),
+            new Web3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").toBuffer(),
+            new Web3.PublicKey(mintAddress).toBuffer()
+          ],
+          new Web3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+        )[0]
+      ),
+      "confirmed"
+    );
+
+    if (!tokenAtaInfo) {
+      throw new Error("Your token's associated token account was not found. Please make sure this wallet owns the tokens and reconnect Phantom.");
+    }
+
+    // Raydium only needs mint + amount from tokenAccountRawInfos for CPMM
+    // account selection. Decode those fields directly from the SPL account.
+    const tokenAta = Web3.PublicKey.findProgramAddressSync(
+      [
+        owner.toBuffer(),
+        new Web3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").toBuffer(),
+        new Web3.PublicKey(mintAddress).toBuffer()
+      ],
+      new Web3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+    )[0];
+    const ataBytes = new Uint8Array(tokenAtaInfo.data);
+    const ataMint = new Web3.PublicKey(ataBytes.slice(0, 32));
+    const ataOwner = new Web3.PublicKey(ataBytes.slice(32, 64));
+    const ataAmount = new BN(ataBytes.slice(64, 72), "le");
+
+    raydium.account.updateTokenAccount({
+      tokenAccounts: [{
+        publicKey: tokenAta,
+        mint: ataMint,
+        amount: ataAmount,
+        isAssociated: true,
+        isNative: false,
+        programId: new Web3.PublicKey(mintA.programId)
+      }],
+      tokenAccountRawInfos: [{
+        pubkey: tokenAta,
+        programId: new Web3.PublicKey(mintA.programId),
+        accountInfo: {
+          mint: ataMint,
+          owner: ataOwner,
+          amount: ataAmount,
+          delegateOption: 0,
+          delegate: Web3.PublicKey.default,
+          state: 1,
+          isNativeOption: 0,
+          isNative: new BN(0),
+          delegatedAmount: new BN(0),
+          closeAuthorityOption: 0,
+          closeAuthority: Web3.PublicKey.default
+        }
+      }]
+    });
+
+    setStatus("Token account verified. Loading Raydium CPMM configuration…");
+
     const feeConfigs = await raydium.api.getCpmmConfigs();
     if (!Array.isArray(feeConfigs) || !feeConfigs.length) {
       throw new Error("Raydium returned no CPMM fee configurations.");
