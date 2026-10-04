@@ -598,3 +598,44 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     font-size:14px!important;
   }
 }
+
+
+/* --- SECTION TITLE SIZE TUNE --- */
+.create-token-title,
+.distribute-title,
+.liquidity-title,
+.swap-intro h2,
+.links-heading h2{
+  font-size:48px!important;
+  line-height:.92!important;
+  letter-spacing:-.055em!important;
+  margin:14px 0 14px!important;
+}
+.create-token-copy,
+.distribute-lead,
+.liquidity-sub,
+.swap-intro p,
+.links-heading p{
+  margin-top:14px!important;
+}
+@media(max-width:850px){
+  .create-token-title,
+  .distribute-title,
+  .liquidity-title,
+  .swap-intro h2,
+  .links-heading h2{
+    font-size:36px!important;
+    line-height:.95!important;
+    margin:12px 0 12px!important;
+  }
+}
+@media(max-width:520px){
+  .create-token-title,
+  .distribute-title,
+  .liquidity-title,
+  .swap-intro h2,
+  .links-heading h2{
+    font-size:31px!important;
+    line-height:1!important;
+  }
+}
