@@ -388,14 +388,6 @@
         </div>
       </section>
 
-      <section class="swap-intro" aria-label="GurugSwap trading">
-        <div class="swap-intro-inner">
-          <div class="swap-intro-kicker">04 / TOKEN SWAP</div>
-          <h2>TRADE TOKENS ON SOLANA.</h2>
-          <p>Swap SOL, GURUG and supported Solana tokens with a simple, transparent trading interface.</p>
-        </div>
-        </div>
-      </section>
     `);
   }
 
