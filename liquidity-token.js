@@ -119,7 +119,7 @@
       <div class="liquidity-grid">
         <div class="liquidity-heading">
           <div class="liquidity-kicker">03 / LIQUIDITY POOL</div>
-          <h2 class="liquidity-title">Create a Raydium pool.</h2>
+          <h2 class="liquidity-title">Create a <span class="section-title-accent">Raydium</span> pool.</h2>
           <p class="liquidity-sub">Seed your new Solana token with SOL and create a permissionless CPMM pool.</p>
         </div>
         <div class="liquidity-card">
