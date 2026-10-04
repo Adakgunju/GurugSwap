@@ -1651,3 +1651,20 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     line-height:1.6!important;
   }
 }
+
+
+/* === FOOTER VISIBILITY === */
+footer{
+  color:#d8d8d8!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  letter-spacing:.14em!important;
+}
+@media(max-width:520px){
+  footer{
+    color:#d8d8d8!important;
+    font-size:10px!important;
+    font-weight:600!important;
+    letter-spacing:.12em!important;
+  }
+}
