@@ -700,3 +700,34 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     grid-row:3!important;
   }
 }
+
+
+/* --- SECTION HEADERS: LEFT ALIGNMENT --- */
+.create-token-head,
+.create-token-head>div,
+.distribute-wrap,
+.distribute-wrap>.distribute-kicker,
+.distribute-wrap>.distribute-title,
+.distribute-wrap>.distribute-lead,
+.liquidity-heading,
+.swap-intro-inner,
+.links-heading{
+  text-align:left!important;
+}
+.create-token-title,
+.distribute-title,
+.liquidity-title,
+.swap-intro h2,
+.links-heading h2,
+.create-token-kicker,
+.distribute-kicker,
+.liquidity-kicker,
+.swap-intro-kicker,
+.platform-section-kicker,
+.create-token-copy,
+.distribute-lead,
+.liquidity-sub,
+.swap-intro p,
+.links-heading p{
+  text-align:left!important;
+}
