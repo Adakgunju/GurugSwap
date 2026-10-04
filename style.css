@@ -334,3 +334,9 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
 .swap-card #toTokenButton > .sol-logo{
   flex:0 0 30px!important;
 }
+
+
+/* --- PLATFORM HEADER: SINGLE WALLET CONNECT --- */
+.platform-header .hero-wallet{
+  display:none!important;
+}
