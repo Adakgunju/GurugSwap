@@ -437,7 +437,7 @@
         import(MPL_METADATA_CDN),
         import(MPL_TOOLBOX_CDN),
         import(BUFFER_CDN)
-      ]).then(([umi, defaults, walletAdapters, irys, metadata, toolbox, bufferModule]) => {
+      ]).then(([umi, defaults, walletAdapters, metadata, toolbox, bufferModule]) => {
         if (!globalThis.Buffer && bufferModule?.Buffer) globalThis.Buffer = bufferModule.Buffer;
         return {
           umi,
@@ -488,18 +488,12 @@
     const { walletAdapterIdentity } = modules.walletAdapters;
     const { mplTokenMetadata } = modules.metadata;
     const { mplToolbox } = modules.toolbox;
-    const { irysUploader } = modules.irys;
-
     const wallet = createPhantomWalletAdapter(provider);
     const rpc = await getWorkingRpc();
     const umi = createUmi(rpc)
       .use(walletAdapterIdentity(wallet))
       .use(mplTokenMetadata())
-      .use(mplToolbox())
-      .use(irysUploader({
-        payer: undefined,
-        priceMultiplier: 1.1
-      }));
+      .use(mplToolbox());
 
     return {umi, modules};
   }
