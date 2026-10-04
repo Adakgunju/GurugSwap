@@ -304,6 +304,26 @@
     return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
   }
 
+  let estimatedNetworkSol = NaN;
+  let estimatedStorageSol = NaN;
+
+  function updateEstimatedTotal() {
+    const totalEl = document.getElementById("createTokenTotalCost");
+    if (!totalEl) return;
+    if (Number.isFinite(estimatedNetworkSol) && Number.isFinite(estimatedStorageSol)) {
+      const total = estimatedNetworkSol + estimatedStorageSol;
+      totalEl.textContent = total < 0.000001
+        ? "<0.000001 SOL"
+        : total.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
+      return;
+    }
+    if (Number.isFinite(estimatedNetworkSol)) {
+      totalEl.textContent = formatSol(estimatedNetworkSol * 1e9);
+      return;
+    }
+    totalEl.textContent = "Calculated at signing";
+  }
+
   function formatSol(lamports) {
     const value = Number(lamports || 0) / 1e9;
     if (!Number.isFinite(value)) return "Calculated at signing";
@@ -325,20 +345,25 @@
     const el = document.getElementById("createTokenStorageCost");
     if (!el) return;
     if (!Number.isFinite(sol)) {
+      estimatedStorageSol = NaN;
       el.textContent = "Calculated when uploaded";
+      updateEstimatedTotal();
       return;
     }
+    estimatedStorageSol = sol;
     el.textContent = sol < 0.000001
       ? "<0.000001 SOL"
       : sol.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") + " SOL";
+    updateEstimatedTotal();
   }
 
   function updateNetworkCost(lamports) {
     const networkEl = document.getElementById("createTokenNetworkCost");
     const totalEl = document.getElementById("createTokenTotalCost");
+    estimatedNetworkSol = Number(lamports || 0) / 1e9;
     const formatted = formatSol(lamports);
     if (networkEl) networkEl.textContent = formatted;
-    if (totalEl) totalEl.textContent = formatted;
+    updateEstimatedTotal();
   }
 
   function bindLogoPreview() {
