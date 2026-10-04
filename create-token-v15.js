@@ -728,11 +728,12 @@
 
   async function uploadToPermanentStorage(irys, provider, data, contentType, label) {
     const bytes = data instanceof Uint8Array ? data : utf8(data);
-    const tags = [{name: "Content-Type", value: contentType}];
-    const rawTags = serializeIrysTags(tags);
+    // Upload without custom Irys tags. This keeps the ANS-104 DataItem minimal and avoids
+    // browser-side tag encoding differences; Arweave/Irys still stores the payload permanently.
+    const tags = [];
 
     // Exact ANS-104 DataItem size: header + signature + owner + target/anchor + tags + data.
-    const itemSize = 2 + 64 + 32 + 1 + 1 + 32 + rawTags.length + bytes.length;
+    const itemSize = 2 + 64 + 32 + 1 + 1 + 32 + 16 + bytes.length;
     const price = await getIrysPrice(itemSize, tags, irys.address);
     if (price <= 0n) throw new Error(label + " storage price could not be calculated.");
 
