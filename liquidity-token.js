@@ -141,6 +141,191 @@
     } catch (_) { el.textContent = "CHECK UNAVAILABLE"; }
   }
 
+
+  let raydiumSdkPromise = null;
+
+  function formatError(err) {
+    const raw = err?.message || String(err || "Unknown error");
+    if (/User rejected|User denied|rejected the request|Transaction cancelled/i.test(raw)) {
+      return "Transaction cancelled in Phantom.";
+    }
+    if (/block height exceeded|blockhash not found|expired/i.test(raw)) {
+      return "Transaction expired. Please try again with a fresh transaction.";
+    }
+    return raw.length > 220 ? raw.slice(0, 217) + "…" : raw;
+  }
+
+  function getRpcConnection() {
+    const Web3 = window.solanaWeb3;
+    if (!Web3?.Connection) throw new Error("Solana web3 library is not available.");
+    return new Web3.Connection("https://solana-rpc.publicnode.com", "confirmed");
+  }
+
+  async function loadRaydiumSdk() {
+    if (!raydiumSdkPromise) {
+      setStatus("Loading Raydium CPMM engine…");
+      raydiumSdkPromise = import("https://esm.sh/@raydium-io/raydium-sdk-v2@0.2.73-alpha?bundle");
+    }
+    return raydiumSdkPromise;
+  }
+
+  function decimalToRawExact(value, decimals) {
+    const text = String(value || "").trim();
+    if (!/^\\d+(\\.\\d+)?$/.test(text)) throw new Error("Invalid liquidity amount.");
+    const [whole, fraction = ""] = text.split(".");
+    if (fraction.length > decimals) {
+      throw new Error("Amount has more than " + decimals + " decimal places.");
+    }
+    const padded = (fraction + "0".repeat(decimals)).slice(0, decimals);
+    return BigInt(whole) * (10n ** BigInt(decimals)) + BigInt(padded || "0");
+  }
+
+  async function getMintInfo(connection, address) {
+    const Web3 = window.solanaWeb3;
+    const pubkey = new Web3.PublicKey(address);
+    const account = await connection.getParsedAccountInfo(pubkey, "confirmed");
+    const parsed = account?.value?.data?.parsed;
+    const info = parsed?.info;
+    if (!info || parsed?.type !== "mint") throw new Error("The token mint could not be read from Solana.");
+    return {
+      address,
+      decimals: Number(info.decimals),
+      programId: account.value.owner.toBase58()
+    };
+  }
+
+  async function createCpmmPool({ provider, mintAddress, tokenAmount, solAmount, feeTier }) {
+    const Web3 = window.solanaWeb3;
+    if (!Web3?.PublicKey) throw new Error("Solana web3 library is not available.");
+
+    const sdk = await loadRaydiumSdk();
+    if (!sdk?.Raydium || !sdk?.TxVersion) throw new Error("Raydium browser SDK failed to load.");
+
+    const owner = new Web3.PublicKey(provider.publicKey.toString());
+    const connection = getRpcConnection();
+
+    setStatus("Reading token mint and wallet balances…");
+    const mintA = await getMintInfo(connection, mintAddress);
+    const mintB = {
+      address: SOL_MINT,
+      decimals: 9,
+      programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+    };
+
+    const tokenRaw = decimalToRawExact(tokenAmount, mintA.decimals);
+    const solRaw = decimalToRawExact(solAmount, 9);
+    if (tokenRaw <= 0n || solRaw <= 0n) throw new Error("Liquidity amounts must be greater than zero.");
+
+    const tokenBalance = await connection.getTokenAccountsByOwner(owner, {
+      mint: new Web3.PublicKey(mintAddress)
+    });
+    let walletTokenRaw = 0n;
+    for (const item of tokenBalance.value || []) {
+      const amount = item?.account?.data?.parsed?.info?.tokenAmount?.amount;
+      if (amount) walletTokenRaw += BigInt(amount);
+    }
+    if (walletTokenRaw < tokenRaw) {
+      throw new Error("Insufficient token balance in your connected wallet.");
+    }
+
+    const lamports = await connection.getBalance(owner, "confirmed");
+    if (BigInt(lamports) < solRaw) {
+      throw new Error("Insufficient SOL balance for the initial liquidity and pool creation costs.");
+    }
+
+    setStatus("Loading Raydium CPMM configuration…");
+    const raydium = await sdk.Raydium.load({
+      owner,
+      connection,
+      cluster: "mainnet",
+      disableFeatureCheck: true,
+      disableLoadToken: true,
+      blockhashCommitment: "confirmed",
+      signAllTransactions: async (transactions) => {
+        if (typeof provider.signAllTransactions === "function") {
+          return provider.signAllTransactions(transactions);
+        }
+        if (typeof provider.signTransaction === "function" && transactions.length === 1) {
+          return [await provider.signTransaction(transactions[0])];
+        }
+        throw new Error("This wallet does not support transaction signing.");
+      }
+    });
+
+    const feeResponse = await fetch(RAYDIUM_API + "/main/cpmm-config", { cache: "no-store" });
+    if (!feeResponse.ok) throw new Error("Unable to load Raydium CPMM fee configuration.");
+    const feeJson = await feeResponse.json();
+    const feeConfigs = Array.isArray(feeJson?.data) ? feeJson.data.filter(x => x?.showWithUI !== false) : [];
+    const targetRate = Math.round(feeTier * 10000);
+    let feeConfig = feeConfigs.find(x => Number(x.tradeFeeRate) === targetRate);
+    if (!feeConfig) {
+      const allConfigs = Array.isArray(feeJson?.data) ? feeJson.data : [];
+      feeConfig = allConfigs.find(x => Number(x.tradeFeeRate) === targetRate);
+    }
+    if (!feeConfig) throw new Error("Selected fee tier is not available in Raydium's current CPMM configuration.");
+
+    const programId = sdk.CREATE_CPMM_POOL_PROGRAM;
+    const poolFeeAccount = sdk.CREATE_CPMM_POOL_FEE_ACC;
+    if (!programId || !poolFeeAccount) throw new Error("Raydium CPMM program configuration is unavailable.");
+
+    const txVersion = sdk.TxVersion.V0;
+    const mintAInfo = {
+      address: mintA.address,
+      decimals: mintA.decimals,
+      programId: mintA.programId
+    };
+    const mintBInfo = {
+      address: mintB.address,
+      decimals: mintB.decimals,
+      programId: mintB.programId
+    };
+
+    setStatus("Building the CPMM pool transaction…");
+    const { execute, extInfo } = await raydium.cpmm.createPool({
+      programId,
+      poolFeeAccount,
+      mintA: mintAInfo,
+      mintB: mintBInfo,
+      mintAAmount: tokenRaw,
+      mintBAmount: solRaw,
+      startTime: 0n,
+      feeConfig,
+      associatedOnly: true,
+      ownerInfo: {
+        useSOLBalance: true,
+        feePayer: owner
+      },
+      txVersion
+    });
+
+    setStatus("Approve the pool creation transaction in Phantom…");
+    const result = await execute({ sendAndConfirm: true });
+    const txId = result?.txId;
+    const poolId = extInfo?.address?.poolId?.toString?.() || extInfo?.address?.poolState?.toString?.() || "";
+
+    if (poolId) {
+      setStatus("CPMM pool created. Pool ID: " + poolId);
+    } else {
+      setStatus("CPMM pool created successfully.");
+    }
+
+    const status = document.getElementById("liqStatus");
+    if (status && txId) {
+      const txLink = document.createElement("a");
+      txLink.className = "liq-link";
+      txLink.href = "https://solscan.io/tx/" + txId;
+      txLink.target = "_blank";
+      txLink.rel = "noopener noreferrer";
+      txLink.textContent = "VIEW TRANSACTION ↗";
+      status.appendChild(document.createTextNode(" "));
+      status.appendChild(txLink);
+    }
+    if (poolId) {
+      const existing = document.getElementById("liqExisting");
+      if (existing) existing.textContent = "POOL CREATED";
+    }
+  }
+
   function bind() {
     const mint = document.getElementById("liqMint");
     const tokenAmount = document.getElementById("liqTokenAmount");
@@ -159,7 +344,18 @@
       if (!Number.isFinite(tokenAmountValue) || tokenAmountValue <= 0) { setStatus("Enter a token amount greater than zero."); return; }
       if (!Number.isFinite(solAmountValue) || solAmountValue <= 0) { setStatus("Enter a SOL amount greater than zero."); return; }
       updatePrice();
-      setStatus("Liquidity module loaded. Pool creation wiring will be enabled after browser SDK validation.");
+      try {
+        await createCpmmPool({
+          provider: p,
+          mintAddress: mintValue,
+          tokenAmount: String(tokenAmount?.value || ""),
+          solAmount: String(solAmount?.value || ""),
+          feeTier: Number(document.getElementById("liqFee")?.value || 0.25)
+        });
+      } catch (err) {
+        console.error("CPMM pool creation failed:", err);
+        setStatus(formatError(err));
+      }
     });
   }
 
