@@ -473,11 +473,25 @@
         return result?.signature || result;
       },
       sendTransaction: async (transaction, connection, options = {}) => {
-        if (typeof provider.sendTransaction !== "function") {
-          throw new Error("This wallet does not support transaction sending required for Irys storage.");
+        // Phantom's legacy provider may expose signAndSendTransaction rather
+        // than sendTransaction. Irys needs a wallet adapter with a generic
+        // sendTransaction method, so support both provider APIs.
+        if (typeof provider.sendTransaction === "function") {
+          const result = await provider.sendTransaction(transaction, connection, options);
+          return result?.signature || result;
         }
-        const result = await provider.sendTransaction(transaction, connection, options);
-        return result?.signature || result;
+
+        if (typeof provider.signAndSendTransaction === "function") {
+          const result = await provider.signAndSendTransaction(transaction, options);
+          return result?.signature || result;
+        }
+
+        if (typeof provider.signTransaction === "function" && connection?.sendRawTransaction) {
+          const signed = await provider.signTransaction(transaction);
+          return await connection.sendRawTransaction(signed.serialize(), options);
+        }
+
+        throw new Error("This wallet does not expose a compatible Solana transaction signing method for Irys storage.");
       }
     };
   }
