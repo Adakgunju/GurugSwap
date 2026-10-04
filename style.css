@@ -1273,3 +1273,79 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin:8px 0!important;
   }
 }
+
+
+/* === DEFINITIVE SECTION ORDER ===
+   Dynamic modules are inserted around #swap by their scripts.
+   CSS order keeps the visible platform sequence fixed. */
+.workspace-main{
+  display:flex!important;
+  flex-direction:column!important;
+}
+.workspace-main>#create-token{order:1!important}
+.workspace-main>#distributeTokens{order:2!important}
+.workspace-main>#liquidity{order:3!important}
+.workspace-main>#swap{order:4!important}
+.workspace-main>#multi-airdrop{order:5!important}
+.workspace-main>#token-info{order:6!important}
+.workspace-main>#links{order:7!important}
+.workspace-main>#about{order:8!important}
+
+/* One heading rhythm for every platform section. */
+.workspace-main>#create-token,
+.workspace-main>#distributeTokens,
+.workspace-main>#liquidity,
+.workspace-main>#swap,
+.workspace-main>#multi-airdrop{
+  flex:none!important;
+  align-self:stretch!important;
+  box-sizing:border-box!important;
+  margin-top:0!important;
+  margin-bottom:36px!important;
+}
+
+/* Never let an old heading layout push the title beside the description. */
+.workspace-main>#create-token .create-token-head,
+.workspace-main>#distributeTokens .distribute-wrap,
+.workspace-main>#liquidity .liquidity-heading,
+.workspace-main>#swap .swap-intro-inner,
+.workspace-main>#multi-airdrop .platform-placeholder-head{
+  display:block!important;
+  text-align:left!important;
+}
+.workspace-main>#create-token .create-token-kicker,
+.workspace-main>#distributeTokens .distribute-kicker,
+.workspace-main>#liquidity .liquidity-kicker,
+.workspace-main>#swap .swap-intro-kicker,
+.workspace-main>#multi-airdrop .platform-section-kicker{
+  display:block!important;
+  margin-bottom:12px!important;
+}
+.workspace-main>#create-token .create-token-title,
+.workspace-main>#distributeTokens .distribute-title,
+.workspace-main>#liquidity .liquidity-title,
+.workspace-main>#swap h2,
+.workspace-main>#multi-airdrop h2{
+  display:block!important;
+  margin:0 0 14px!important;
+  text-align:left!important;
+}
+.workspace-main>#create-token .create-token-copy,
+.workspace-main>#distributeTokens .distribute-lead,
+.workspace-main>#liquidity .liquidity-sub,
+.workspace-main>#swap .swap-intro-inner p,
+.workspace-main>#multi-airdrop .platform-placeholder-head p{
+  display:block!important;
+  margin:0!important;
+  text-align:left!important;
+}
+
+@media(max-width:850px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>#swap,
+  .workspace-main>#multi-airdrop{
+    margin-bottom:28px!important;
+  }
+}
