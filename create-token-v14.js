@@ -498,45 +498,47 @@
     return {umi, modules};
   }
 
-  let bundlrConstructorPromise = null;
+  function resolveBundlrConstructor() {
+    const directCandidates = [
+      globalThis.WebBundlr,
+      globalThis.Bundlr,
+      globalThis.BundlrClient,
+      globalThis.bundlr?.WebBundlr,
+      globalThis.Bundlr?.WebBundlr,
+      globalThis.Bundlr?.default,
+      globalThis.bundlr?.default
+    ];
 
-  async function getBundlrConstructor() {
-    const direct =
-      globalThis.WebBundlr ||
-      globalThis.Bundlr ||
-      globalThis.BundlrClient ||
-      null;
-
-    if (typeof direct === "function") return direct;
-
-    if (!bundlrConstructorPromise) {
-      bundlrConstructorPromise = import(
-        "https://cdn.jsdelivr.net/npm/@bundlr-network/client@0.11.17/+esm"
-      ).then(mod => {
-        const ctor = mod?.WebBundlr || mod?.default || mod?.Bundlr || null;
-        if (typeof ctor !== "function") {
-          throw new Error("Bundlr browser module loaded, but WebBundlr was not exported.");
-        }
-        globalThis.WebBundlr = ctor;
-        return ctor;
-      });
+    for (const candidate of directCandidates) {
+      if (typeof candidate === "function") return candidate;
     }
 
-    return bundlrConstructorPromise;
+    // Some IIFE builds expose a namespace object rather than WebBundlr
+    // directly. Search the browser globals without downloading another SDK.
+    for (const key of Object.keys(globalThis)) {
+      if (!/bundlr/i.test(key)) continue;
+      const value = globalThis[key];
+      if (typeof value === "function") return value;
+      if (value && typeof value === "object") {
+        for (const prop of ["WebBundlr", "Bundlr", "default", "Client"]) {
+          if (typeof value[prop] === "function") return value[prop];
+        }
+      }
+    }
+
+    return null;
   }
 
   async function createLegacyWebBundlr(provider) {
-    let BundlrConstructor;
-    try {
-      BundlrConstructor = await getBundlrConstructor();
-    } catch (loadError) {
+    const BundlrConstructor = resolveBundlrConstructor();
+
+    if (typeof BundlrConstructor !== "function") {
       const available = Object.keys(globalThis)
         .filter(key => /bundlr/i.test(key))
-        .slice(0, 12);
+        .slice(0, 20);
       throw new Error(
-        "Irys storage client failed to load." +
-        (available.length ? " Detected: " + available.join(", ") : "") +
-        (loadError?.message ? " " + loadError.message : " Please refresh the page and try again.")
+        "Irys storage client is not available." +
+        (available.length ? " Detected browser globals: " + available.join(", ") : " The Bundlr browser bundle did not expose a usable WebBundlr constructor.")
       );
     }
 
