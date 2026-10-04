@@ -856,6 +856,38 @@
     }
   }
 
+  async function recoverCreatedTokenIfPresent(mintAddress, ataAddress, expectedAmount) {
+    if (!window.solanaWeb3 || !mintAddress || !ataAddress) return false;
+
+    const rpc = await getWorkingRpc();
+    const connection = new window.solanaWeb3.Connection(rpc, "confirmed");
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const mintInfo = await connection.getAccountInfo(
+          new window.solanaWeb3.PublicKey(mintAddress),
+          "confirmed"
+        );
+
+        if (mintInfo) {
+          const balance = await connection.getTokenAccountBalance(
+            new window.solanaWeb3.PublicKey(ataAddress),
+            "confirmed"
+          );
+          const actualAmount = BigInt(balance?.value?.amount || "0");
+
+          if (actualAmount === expectedAmount) return true;
+        }
+      } catch (error) {
+        console.warn("Created-token recovery check failed:", error);
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    }
+
+    return false;
+  }
+
   async function verifyCreatedToken(mintAddress, ataAddress, expectedAmount) {
     if (!window.solanaWeb3) throw new Error("Solana Web3 library is not available for verification.");
     const rpc = await getWorkingRpc();
@@ -1047,16 +1079,26 @@
       }
     }
 
-    if (lastError) {
-      throw new Error(lastError?.message || "Token creation transaction failed or was cancelled. No success was recorded.");
-    }
-
     const mintAddress = mint.publicKey.toString();
     const ata = findAssociatedTokenPda(umi, {
       mint: mint.publicKey,
       owner: umi.identity.publicKey
     });
     const ataAddress = ata?.toString ? ata.toString() : String(ata);
+
+    if (lastError) {
+      // The transaction may already be committed even if the client-side
+      // confirmation path reports an expired blockhash. Verify the actual
+      // mint + initial balance before showing a red error.
+      setStatus("STEP 4/4 — Checking whether the token transaction was already confirmed...", "active");
+      const recovered = await recoverCreatedTokenIfPresent(mintAddress, ataAddress, amount);
+
+      if (!recovered) {
+        throw new Error(lastError?.message || "Token creation transaction failed or was cancelled. No success was recorded.");
+      }
+
+      console.warn("Token creation recovered after confirmation error:", lastError);
+    }
 
     setStatus("STEP 4/4 — Verifying the token mint and initial balance on Solana...", "active");
     await verifyCreatedToken(mintAddress, ataAddress, amount);
