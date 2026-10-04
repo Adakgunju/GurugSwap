@@ -2058,3 +2058,24 @@ footer{margin-top:0!important}
   .workspace-main #liquidity{padding:16px!important}
   .workspace-main #liquidity .liquidity-grid{grid-template-columns:1fr}
 }
+
+
+/* --- FIXED TOP HEADER --- */
+.topbar{
+  position:fixed!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  z-index:100!important;
+}
+main{padding-top:90px!important}
+.workspace-sidebar{top:104px!important}
+@media(max-width:850px){
+  main{padding-top:82px!important}
+  .workspace-sidebar{top:84px!important}
+  .mobile-menu{z-index:110!important}
+}
+@media(max-width:520px){
+  main{padding-top:76px!important}
+}
