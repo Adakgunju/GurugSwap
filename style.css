@@ -1397,3 +1397,20 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-bottom:28px!important;
   }
 }
+
+
+/* === FINAL: use real DOM order, never reorder platform sections with flex === */
+.workspace-main{
+  display:block!important;
+}
+.workspace-main>#create-token,
+.workspace-main>#distributeTokens,
+.workspace-main>#liquidity,
+.workspace-main>#swap,
+.workspace-main>#token-info,
+.workspace-main>#multi-airdrop,
+.workspace-main>#links,
+.workspace-main>#about{
+  order:initial!important;
+  position:relative!important;
+}
