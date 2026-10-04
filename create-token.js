@@ -48,6 +48,17 @@
 @media(max-width:520px){#create-token{padding:30px 18px 14px}.create-token-card{padding:17px;border-radius:18px}.create-token-head{gap:10px}.create-token-title{font-size:21px}.create-token-grid{grid-template-columns:1fr}.create-token-field.full{grid-column:auto}.create-token-network{font-size:7px}.create-token-button{min-height:46px}}
 /* GurugSwap Create Token visual upgrade */
 /* Mobile readability pass */
+/* Mobile alignment correction */
+#create-token .create-token-head{align-items:flex-start}
+#create-token .create-token-copy{letter-spacing:normal!important;word-spacing:normal!important;max-width:none!important;width:100%!important;display:block!important;text-align:left!important}
+#create-token .create-token-title{letter-spacing:-.02em!important;word-spacing:normal!important}
+@media(max-width:560px){
+  #create-token .create-token-head{display:block!important}
+  #create-token .create-token-network{display:inline-block!important;margin-top:16px!important}
+  #create-token .create-token-copy{font-size:15px!important;line-height:1.55!important;letter-spacing:normal!important;word-spacing:normal!important}
+  #create-token .create-token-title{font-size:28px!important;line-height:1.08!important}
+}
+
 #create-token .create-token-title{color:#ffffff!important}
 #create-token .create-token-copy{color:#f2f2ec!important;font-weight:600}
 #create-token .create-token-field label{color:#f1f1e9!important;font-size:15px!important}
