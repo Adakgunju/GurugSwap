@@ -2007,3 +2007,31 @@ body{background:#151714!important}
 .workspace-main>#links .universe-feature em{
   color:#090909!important;
 }
+
+/* === GURUG NETWORK: CENTER CONTENT VERTICALLY === */
+.workspace-main>#links .link-card,
+.workspace-main>#links .universe-feature{
+  justify-content:center!important;
+  align-items:center!important;
+}
+.workspace-main>#links .link-card span,
+.workspace-main>#links .universe-feature span{
+  width:auto!important;
+  margin:0 0 18px!important;
+}
+.workspace-main>#links .link-card strong,
+.workspace-main>#links .universe-feature strong{
+  width:auto!important;
+  margin:0!important;
+}
+.workspace-main>#links .universe-feature p{
+  width:auto!important;
+  margin:18px 0 0!important;
+}
+.workspace-main>#links .link-card em,
+.workspace-main>#links .universe-feature em{
+  position:absolute!important;
+  right:22px!important;
+  bottom:20px!important;
+  margin:0!important;
+}
