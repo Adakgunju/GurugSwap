@@ -170,6 +170,47 @@
 @media(max-width:900px){.create-token-shell{grid-template-columns:1fr}.create-token-help{position:static}}
 @media(max-width:560px){#create-token{padding:34px 18px 18px}.create-token-card,.create-token-help{padding:21px}.create-token-title{font-size:25px}.create-token-copy{font-size:14px}.create-token-grid{grid-template-columns:1fr}.create-token-field.full{grid-column:auto}.create-token-logo-wrap{grid-template-columns:1fr 100px}.create-token-logo-upload{min-height:100px}}
 
+}
+/* Final section-heading layout: kicker, title, and description are stacked vertically. */
+#create-token .create-token-head{
+  position:relative!important;
+  display:block!important;
+  grid-column:1 / -1!important;
+  width:100%!important;
+  margin:0 0 28px!important;
+  padding:0!important;
+  text-align:left!important;
+}
+#create-token .create-token-kicker{
+  display:block!important;
+  margin:0 0 12px!important;
+}
+#create-token .create-token-title{
+  display:block!important;
+  margin:0 0 14px!important;
+  width:100%!important;
+  text-align:left!important;
+}
+#create-token .create-token-copy{
+  display:block!important;
+  margin:0!important;
+  width:min(100%,760px)!important;
+  max-width:760px!important;
+  text-align:left!important;
+}
+#create-token .create-token-network{
+  position:absolute!important;
+  top:0!important;
+  right:0!important;
+  margin:0!important;
+}
+@media(max-width:900px){
+  #create-token .create-token-network{
+    position:static!important;
+    display:inline-block!important;
+    margin-top:16px!important;
+  }
+}
 `;
   
   function addStyle() {
@@ -191,7 +232,6 @@
             <div class="create-token-kicker">01 / TOKEN CREATION</div>
             <h2 class="create-token-title">CREATE YOUR SPL TOKEN.</h2>
             <p class="create-token-copy">Create a new standard SPL Token mint directly from GurugSwap. Your wallet signs the transaction — GurugSwap never receives your private key.</p>
-            </div>
             <span class="create-token-network">SOLANA MAINNET</span>
           </div>
           <div class="create-token-card">
