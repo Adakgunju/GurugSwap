@@ -13,20 +13,38 @@
   <div class="site-glow"></div><div class="gurug-rain" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <header class="topbar">
     <a class="brand" href="#"><span>GURUG<span class="accent">SWAP</span></span></a>
-    <div class="market-ticker" aria-label="GURUG market price"><span class="ticker-label">GURUG</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
-    <button class="wallet-btn top-wallet" id="connectWallet" type="button">CONNECT WALLET</button>
+    <nav class="desktop-nav" aria-label="Primary">
+      <a href="#swap">SWAP</a>
+      <a href="#token-info">TOKENS</a>
+      <a href="#liquidity">LIQUIDITY</a>
+      <a href="#links">EXPLORE</a>
+    </nav>
+    <div class="top-actions">
+      <div class="market-ticker" aria-label="GURUG market price"><span class="ticker-label">GURUG</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
+      <button class="wallet-btn top-wallet" id="connectWallet" type="button">CONNECT WALLET</button>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu">MENU</button>
+    </div>
   </header>
+  <div id="mobileMenu" class="mobile-menu" hidden>
+    <a href="#swap">SWAP</a>
+    <a href="#token-info">TOKENS</a>
+    <a href="#liquidity">LIQUIDITY</a>
+    <a href="#links">EXPLORE</a>
+    <a href="#about">ABOUT</a>
+  </div>
   <main>
     <section class="hero">
       <div class="hero-art"><div class="logo-backdrop"></div><div class="gurug-frame"><div class="frame-line"></div><img src="https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png" alt="GURUG" class="gurug"></div></div>
       <div class="hero-copy">
         <div class="hero-identity">
-          <p class="hero-tagline">THE YELLOWEST FROG MEME COIN IN EXISTENCE</p>
-          <h1>GURUG</h1>
-          <p class="hero-network">SOLANA NETWORK</p>
+          <p class="hero-tagline">SOLANA TOKEN TRADING &amp; CREATION</p>
+          <h1>GURUG<span>SWAP</span></h1>
+          <p class="hero-network">TRADE TOKENS. CREATE POOLS. BUILD ON SOLANA.</p>
           <button class="wallet-btn hero-wallet" id="heroConnectWallet" type="button">CONNECT WALLET</button>
         </div>
-        <div class="contract"><span>GURUG CONTRACT</span><button id="copyMint" title="Copy contract address"><code id="mintText">G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5</code><b id="copyText">COPY</b></button></div>
+        <div class="platform-note">
+          <span>NON-CUSTODIAL</span><span>SOLANA MAINNET</span><span>RAYDIUM POWERED</span>
+        </div>
       </div>
     </section>
     <section id="swap" class="swap-section">
@@ -124,6 +142,23 @@
   <script src="distribute-token.js?v=2"></script>
   <script src="liquidity-token.js?v=13"></script>
   <script>
+    (() => {
+      const button = document.getElementById("mobileMenuBtn");
+      const menu = document.getElementById("mobileMenu");
+      if (!button || !menu) return;
+      button.addEventListener("click", () => {
+        const open = menu.hidden;
+        menu.hidden = !open;
+        button.setAttribute("aria-expanded", String(open));
+        button.textContent = open ? "CLOSE" : "MENU";
+      });
+      menu.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+        menu.hidden = true;
+        button.setAttribute("aria-expanded", "false");
+        button.textContent = "MENU";
+      }));
+    })();
+
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
     // so it does not depend on script.js function scope or async timing.
