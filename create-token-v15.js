@@ -600,6 +600,13 @@
     const rawTags = serializeIrysTags(tags);
     const rawData = data instanceof Uint8Array ? data : utf8(data);
 
+    // ANS-104 stores an 8-byte tag count and 8-byte tag-byte-length
+    // immediately before the serialized tag payload.
+    const tagHeader = concatBytes(
+      littleEndianNumber(tags.length, 8),
+      littleEndianNumber(rawTags.length, 8)
+    );
+
     // Irys Solana DataItem signature type 4.
     const signatureType = littleEndianNumber(4, 2);
     const header = concatBytes(
@@ -640,6 +647,7 @@
       new Uint8Array([0]),
       new Uint8Array([1]),
       anchor,
+      tagHeader,
       rawTags,
       rawData
     );
