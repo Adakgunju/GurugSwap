@@ -216,15 +216,15 @@
                 <span>Prevents a freeze authority from freezing token accounts later. Recommended for public liquidity pools.</span>
               </span>
             </label>
-            <div class="create-token-warning"><b>Important:</b> this creates a real token on Solana mainnet and costs SOL for rent and transaction fees. Review everything before approving in Phantom.</div>
+            <div class="create-token-warning"><b>Important:</b> this creates a real token on Solana mainnet and requires SOL for Solana account setup and transaction fees. Review everything before approving in Phantom.</div>
           </div>
 
           <div class="create-token-cost">
             <div class="create-token-cost-title">CREATION COST</div>
-            <div class="create-token-cost-row"><span>Solana network &amp; rent</span><strong id="createTokenNetworkCost">Calculating…</strong></div>
+            <div class="create-token-cost-row"><span>Solana account &amp; network cost</span><strong id="createTokenNetworkCost">Calculating…</strong></div>
             <div class="create-token-cost-row"><span>GurugSwap fee</span><strong>0 SOL</strong></div>
             <div class="create-token-cost-row create-token-cost-total"><span>Estimated total</span><strong id="createTokenTotalCost">Calculating…</strong></div>
-            <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The final network amount is calculated before you sign.</div>
+            <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The estimated Solana cost is shown before you sign.</div>
           </div>
           <button id="createTokenButton" class="create-token-button" type="button">CREATE TOKEN</button>
           <div id="createTokenStatus" class="create-token-status">Connect your Phantom wallet, enter the token details, then create the token.</div>
@@ -250,7 +250,7 @@
           <div class="create-token-help-step"><div class="create-token-help-num">2</div><div><strong>Enter token details</strong><span>Choose the name, symbol, supply and decimals.</span></div></div>
           <div class="create-token-help-step"><div class="create-token-help-num">3</div><div><strong>Upload your logo</strong><span>Upload PNG, JPG or WEBP and check the preview before creating.</span></div></div>
           <div class="create-token-help-step"><div class="create-token-help-num">4</div><div><strong>Choose supply control</strong><span>Fixed Supply and Revoke Freeze Authority are enabled by default.</span></div></div>
-          <div class="create-token-help-step"><div class="create-token-help-num">5</div><div><strong>Review the cost</strong><span>See the estimated Solana network and rent cost before signing. GurugSwap currently charges 0 SOL.</span></div></div>
+          <div class="create-token-help-step"><div class="create-token-help-num">5</div><div><strong>Review the cost</strong><span>See the estimated Solana account and network cost before signing. GurugSwap currently charges 0 SOL.</span></div></div>
           <div class="create-token-help-step"><div class="create-token-help-num">6</div><div><strong>Approve in Phantom</strong><span>Your wallet signs the on-chain transaction.</span></div></div>
           <div class="create-token-help-section"><h4>What is Fixed Total Supply?</h4><p>Revoking Mint Authority after the initial mint means no additional tokens can be minted through that authority.</p></div>
           <div class="create-token-help-section"><h4>What is Freeze Authority?</h4><p>A freeze authority can freeze token accounts. Revoking it leaves no freeze authority on the mint.</p><div class="create-token-help-tip">Recommended for public liquidity pools and transparent token launches.</div></div>
