@@ -1754,3 +1754,35 @@ footer{
 .gurug-rain i:nth-child(22){animation-duration:19s!important}
 .gurug-rain i:nth-child(23){animation-duration:26s!important}
 .gurug-rain i:nth-child(24){animation-duration:23s!important}
+
+/* === VISIBLE GURUG SNOW === */
+.gurug-rain{
+  position:fixed!important;
+  inset:0!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  display:block!important;
+  overflow:hidden!important;
+  opacity:1!important;
+}
+.gurug-rain i{
+  position:absolute!important;
+  top:-80px!important;
+  left:auto!important;
+  display:block!important;
+  width:28px!important;
+  height:28px!important;
+  border-radius:50%!important;
+  background-image:url("https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png")!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:contain!important;
+  opacity:.42!important;
+  animation-name:gurugLogoFall!important;
+  animation-timing-function:linear!important;
+  animation-iteration-count:infinite!important;
+  animation-fill-mode:both!important;
+}
+.topbar,.platform-header,.workspace-shell,footer{position:relative!important;z-index:2!important}
+@media(max-width:850px){.gurug-rain i{width:22px!important;height:22px!important;opacity:.30!important}}
+@media(prefers-reduced-motion:reduce){.gurug-rain i{animation-name:gurugLogoFall!important}}
