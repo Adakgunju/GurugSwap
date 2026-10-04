@@ -1379,3 +1379,21 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     line-height:1.02!important;
   }
 }
+
+
+/* Token market info belongs directly under the swap section. */
+.workspace-main>#swap{order:4!important}
+.workspace-main>#token-info{order:5!important}
+.workspace-main>#multi-airdrop{order:6!important}
+.workspace-main>#links{order:7!important}
+.workspace-main>#about{order:8!important}
+
+.workspace-main>#token-info{
+  margin-top:0!important;
+  margin-bottom:36px!important;
+}
+@media(max-width:850px){
+  .workspace-main>#token-info{
+    margin-bottom:28px!important;
+  }
+}
