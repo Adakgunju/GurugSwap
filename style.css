@@ -1897,3 +1897,20 @@ main{padding-top:82px!important}
   backdrop-filter:blur(2px)!important;
   -webkit-backdrop-filter:blur(2px)!important;
 }
+
+/* === RAYDIUM-STYLE FUNCTION CARD SYSTEM === */
+.workspace-main>#create-token .create-token-card,
+.workspace-main>#create-token .create-token-help,
+.workspace-main>#distributeTokens .distribute-card,
+.workspace-main>#distributeTokens .distribute-help,
+.workspace-main>#liquidity .liquidity-card,
+.workspace-main>#liquidity .liquidity-help,
+.workspace-main>#swap .swap-card,
+.workspace-main>#token-info .token-info-card,
+.workspace-main>#multi-airdrop .platform-placeholder-card{
+  background:rgba(22,22,20,.88)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:0 20px 60px rgba(0,0,0,.34)!important;
+  backdrop-filter:blur(3px)!important;
+  -webkit-backdrop-filter:blur(3px)!important;
+}
