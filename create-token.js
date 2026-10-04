@@ -420,7 +420,8 @@
         if (typeof provider.signMessage !== "function") {
           throw new Error("This wallet does not support message signing required for storage upload.");
         }
-        return provider.signMessage(message);
+        const result = await provider.signMessage(message);
+        return result?.signature || result;
       }
     };
   }
@@ -617,15 +618,11 @@
     const result = await finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}});
 
     const mintAddress = mint.publicKey.toString();
-    const signature = result?.signature
-      ? (typeof result.signature === "string" ? result.signature : modules.umi.base58?.serialize?.(result.signature))
-      : "";
-
     const ata = findAssociatedTokenPda(umi, {
       mint: mint.publicKey,
       owner: umi.identity.publicKey
     });
-    const ataAddress = ata[0]?.toString ? ata[0].toString() : String(ata);
+    const ataAddress = ata?.toString ? ata.toString() : String(ata);
 
     const solscan = "https://solscan.io/token/" + mintAddress;
     const account = "https://solscan.io/account/" + ataAddress;
@@ -647,7 +644,7 @@
 
     updateStorageCost(storageSol > 0 ? storageSol : NaN);
     setStatus("TOKEN CREATED SUCCESSFULLY — token, metadata and logo are live on Solana.", "success");
-    return {mintAddress, metadataUri, signature};
+    return {mintAddress, metadataUri, signature: result?.signature || null};
   }
 
   function bind() {
