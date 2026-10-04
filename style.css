@@ -731,3 +731,61 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
 .links-heading p{
   text-align:left!important;
 }
+
+
+/* --- UNIFORM SECTION VERTICAL RHYTHM --- */
+.workspace-main>#create-token,
+.workspace-main>#distributeTokens,
+.workspace-main>#liquidity,
+.workspace-main>.swap-intro,
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about{
+  margin-top:0!important;
+  margin-bottom:36px!important;
+}
+.workspace-main>#create-token,
+.workspace-main>#distributeTokens,
+.workspace-main>#liquidity,
+.workspace-main>.swap-intro,
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about{
+  padding-bottom:0!important;
+}
+.workspace-main>#create-token,
+.workspace-main>#distributeTokens,
+.workspace-main>#liquidity,
+.workspace-main>.swap-intro,
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about{
+  min-height:0!important;
+}
+.workspace-main>#create-token .create-token-shell,
+.workspace-main>#distributeTokens .distribute-wrap,
+.workspace-main>#liquidity.gurug-liquidity,
+.workspace-main>.swap-intro-inner,
+.workspace-main>.swap-section,
+.workspace-main>.links-section,
+.workspace-main>.about{
+  margin-bottom:0!important;
+}
+.workspace-main>#create-token .create-token-head,
+.workspace-main>#distributeTokens .distribute-wrap>.distribute-lead,
+.workspace-main>#liquidity .liquidity-heading,
+.workspace-main>.swap-intro-inner,
+.workspace-main>.links-heading{
+  margin-bottom:28px!important;
+}
+@media(max-width:850px){
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity,
+  .workspace-main>.swap-intro,
+  .workspace-main>.swap-section,
+  .workspace-main>.links-section,
+  .workspace-main>.about{
+    margin-bottom:28px!important;
+  }
+}
