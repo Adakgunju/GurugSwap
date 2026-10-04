@@ -517,8 +517,8 @@
   async function createIrysWebClient(provider) {
     if (!irysWebUploaderPromise) {
       irysWebUploaderPromise = Promise.all([
-        import("https://esm.sh/@irys/web-upload@0.0.15?bundle&target=es2020&deps=@irys/bundles@0.0.3"),
-        import("https://esm.sh/@irys/web-upload-solana@0.1.8?bundle&target=es2020&deps=@irys/bundles@0.0.3,@irys/upload-core@0.0.10,@irys/web-upload@0.0.15")
+        import("https://esm.sh/@irys/web-upload@0.0.15?bundle&target=es2020&deps=@irys/bundles@0.0.5"),
+        import("https://esm.sh/@irys/web-upload-solana@0.1.8?bundle&target=es2020&deps=@irys/bundles@0.0.5,@irys/upload-core@0.0.10,@irys/web-upload@0.0.15")
       ]).then(([webUpload, solanaUpload]) => {
         const WebUploader = webUpload?.WebUploader || webUpload?.default;
         const WebSolana = solanaUpload?.WebSolana || solanaUpload?.default;
