@@ -789,3 +789,109 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
     margin-bottom:28px!important;
   }
 }
+
+
+/* --- FINAL PLATFORM ALIGNMENT / WIDTH FIX --- */
+@media(min-width:851px){
+  .workspace-main{
+    width:min(1180px, calc(100vw - 300px))!important;
+    max-width:min(1180px, calc(100vw - 300px))!important;
+    min-width:0!important;
+  }
+  .workspace-main>section,
+  .workspace-main>#create-token,
+  .workspace-main>#distributeTokens,
+  .workspace-main>#liquidity{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  /* 03 — heading on its own row, two function cards remain side by side. */
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;
+    gap:24px!important;
+    align-items:start!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-heading{
+    grid-column:1 / -1!important;
+    grid-row:1!important;
+    width:100%!important;
+    margin:0 0 4px!important;
+    text-align:left!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-card{
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    margin:0!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-help{
+    grid-column:2!important;
+    grid-row:2!important;
+    width:100%!important;
+    margin:0!important;
+  }
+
+  /* 06 — same heading system as 01–05: kicker, title, description stacked. */
+  .workspace-main>.links-section .links-heading{
+    display:block!important;
+    width:100%!important;
+    margin:0 0 28px!important;
+    padding:0!important;
+    text-align:left!important;
+  }
+  .workspace-main>.links-section .links-heading .platform-section-kicker{
+    display:block!important;
+    margin:0 0 12px!important;
+    text-align:left!important;
+  }
+  .workspace-main>.links-section .links-heading h2{
+    display:block!important;
+    width:100%!important;
+    margin:0 0 14px!important;
+    text-align:left!important;
+  }
+  .workspace-main>.links-section .links-heading p{
+    display:block!important;
+    width:100%!important;
+    max-width:760px!important;
+    margin:0!important;
+    text-align:left!important;
+  }
+
+  /* About copy stays inside the available platform width. */
+  .workspace-main>.about .about-inner{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+  .workspace-main>.about .about-copy{
+    min-width:0!important;
+    max-width:100%!important;
+    overflow-wrap:anywhere!important;
+  }
+}
+@media(max-width:900px){
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-grid{
+    grid-template-columns:1fr!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-heading{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-card{
+    grid-column:1!important;
+    grid-row:2!important;
+  }
+  .workspace-main>#liquidity.gurug-liquidity .liquidity-help{
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+  .workspace-main>.links-section .links-heading{
+    display:block!important;
+    text-align:left!important;
+  }
+}
