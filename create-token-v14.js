@@ -511,7 +511,7 @@
 
     if (!bundlrConstructorPromise) {
       bundlrConstructorPromise = import(
-        "https://esm.sh/@bundlr-network/client@0.11.17?bundle&target=es2020"
+        "https://cdn.jsdelivr.net/npm/@bundlr-network/client@0.11.17/+esm"
       ).then(mod => {
         const ctor = mod?.WebBundlr || mod?.default || mod?.Bundlr || null;
         if (typeof ctor !== "function") {
