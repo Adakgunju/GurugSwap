@@ -516,35 +516,39 @@
 
   async function createIrysWebClient(provider) {
     if (!irysWebUploaderPromise) {
-      irysWebUploaderPromise = Promise.all([
-        import("https://esm.sh/@irys/web-upload@0.0.15?bundle&target=es2020&deps=starknet@6.24.1"),
-        import("https://esm.sh/@irys/web-upload-solana@0.1.8?bundle&target=es2020&deps=starknet@6.24.1")
-      ]).then(([webUpload, solanaUpload]) => {
-        const WebUploader = webUpload?.WebUploader || webUpload?.default;
-        const WebSolana = solanaUpload?.WebSolana || solanaUpload?.default;
-        if (typeof WebUploader !== "function" || typeof WebSolana !== "function") {
-          throw new Error("Irys browser uploader modules loaded without WebUploader/WebSolana.");
-        }
-        return {WebUploader, WebSolana};
-      });
+      irysWebUploaderPromise = import("https://esm.sh/@irys/sdk@0.2.11?bundle&target=es2020")
+        .then(module => module?.WebIrys || module?.default?.WebIrys || module?.default)
+        .then(WebIrys => {
+          if (typeof WebIrys !== "function") {
+            throw new Error("Irys browser SDK loaded without WebIrys.");
+          }
+          return WebIrys;
+        });
     }
 
-    const {WebUploader, WebSolana} = await irysWebUploaderPromise;
+    const WebIrys = await irysWebUploaderPromise;
     const wallet = createPhantomWalletAdapter(provider);
     const rpc = await getWorkingRpc();
 
     const irys = await withTimeout(
-      WebUploader(WebSolana)
-        .withProvider(wallet)
-        .withRpc(rpc)
-        .bundlerUrl("https://node1.irys.xyz")
-        .build(),
+      new WebIrys({
+        url: "https://node1.irys.xyz",
+        token: "solana",
+        wallet: { provider: wallet },
+        config: { providerUrl: rpc }
+      }),
+      60000,
+      "Irys storage client initialization timed out. Please try again."
+    );
+
+    await withTimeout(
+      irys.ready(),
       60000,
       "Irys storage connection timed out. Please try again."
     );
 
     if (!irys || typeof irys.upload !== "function") {
-      throw new Error("Irys browser uploader initialized without an upload method.");
+      throw new Error("Irys browser SDK initialized without an upload method.");
     }
 
     return irys;
