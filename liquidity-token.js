@@ -145,11 +145,12 @@
           <div class="liq-summary">
             <div><span>POOL TYPE</span><strong>RAYDIUM CPMM</strong></div>
             <div><span>INITIAL PRICE</span><strong id="liqSummaryPrice">—</strong></div>
-            <div><span>POOL CREATION COST</span><strong>CALCULATED AT SIGNING</strong></div>
+            <div><span>GURUGSWAP FEE</span><strong>0.10 SOL</strong></div>
             <div><span>EXISTING POOL</span><strong id="liqExisting">CHECKING…</strong></div>
           </div>
 
           <button id="liqCreateButton" class="liq-action" type="button">CREATE CPMM POOL</button>
+          <div class="liq-note">GurugSwap service fee: <b>0.10 SOL</b>. Solana and Raydium network/account fees are separate and paid through your wallet.</div>
           <div id="liqStatus" class="liq-status">Connect your wallet and enter the token mint and initial liquidity.</div>
         </div>
 
@@ -431,7 +432,7 @@
     };
 
     setStatus("Building the CPMM pool transaction…");
-    const { execute, extInfo } = await raydium.cpmm.createPool({
+    const { execute, extInfo, builder, transaction } = await raydium.cpmm.createPool({
       programId,
       poolFeeAccount,
       mintA: mintAInfo,
@@ -447,6 +448,22 @@
       },
       txVersion
     });
+
+    const feeInstruction = Web3.SystemProgram.transfer({
+      fromPubkey: owner,
+      toPubkey: new Web3.PublicKey(GURUG_FEE_WALLET),
+      lamports: GURUG_POOL_FEE_LAMPORTS
+    });
+    if (builder?.addInstruction) {
+      builder.addInstruction({
+        instructions: [feeInstruction],
+        instructionTypes: ["TransferAmount"]
+      });
+    } else if (transaction?.add) {
+      transaction.add(feeInstruction);
+    } else {
+      throw new Error("Could not attach the GurugSwap service fee to the pool transaction.");
+    }
 
     setStatus("Approve the pool creation transaction in Phantom…");
     const result = await execute({ sendAndConfirm: true });
