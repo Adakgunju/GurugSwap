@@ -2187,3 +2187,42 @@ body{background:#151714!important}
 @media(max-width:850px){
   .market-ticker{display:none!important}
 }
+
+
+/* === MARKET TICKER: FINAL TYPOGRAPHY / CHANGE CHIP === */
+.market-ticker{
+  gap:11px!important;
+  min-height:40px!important;
+  padding:0 8px 0 13px!important;
+  background:rgba(17,19,15,.96)!important;
+  border-color:rgba(255,229,0,.20)!important;
+}
+.market-ticker .ticker-label{
+  color:#d7d8cf!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.15em!important;
+}
+.market-ticker #gurugPrice{
+  color:#f7f7f2!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  letter-spacing:-.02em!important;
+}
+.market-ticker .ticker-change{
+  min-width:54px!important;
+  height:28px!important;
+  padding:0 8px!important;
+  border:1px solid rgba(255,229,0,.30)!important;
+  border-radius:999px!important;
+  background:#171912!important;
+  color:#ffe500!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.02em!important;
+}
+.market-ticker .ticker-change.down{
+  background:#191514!important;
+  color:#ff9b8f!important;
+  border-color:rgba(255,130,115,.30)!important;
+}
