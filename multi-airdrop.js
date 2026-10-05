@@ -453,6 +453,89 @@
       .multi-airdrop-result-recipients{margin-top:8px;display:grid;gap:5px}.multi-airdrop-result-recipients div{display:grid;grid-template-columns:1fr auto auto;gap:9px;font-size:9px;color:#bbbdb4}.multi-airdrop-result-recipients b{color:#fff}.multi-airdrop-result-recipients em{color:#ffe500;font-style:normal;font-weight:800}.multi-airdrop-result.failed em{color:#ff9f9f}
       .multi-airdrop-result p{margin:9px 0 0;color:#ffb4b4;font-size:10px}
       .multi-airdrop-help h3{margin:0 0 20px;color:#fff;font-size:26px}.multi-airdrop-help-step{display:grid;grid-template-columns:30px 1fr;gap:11px;padding:13px 0;border-top:1px solid rgba(255,255,255,.08)}.multi-airdrop-help-num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,229,0,.3);color:#ffe500;font-size:10px;font-weight:800}.multi-airdrop-help-step strong{display:block;color:#f5f5ef;font-size:12px;margin-bottom:4px}.multi-airdrop-help-step span{display:block;color:#a5a69e;font-size:10px;line-height:1.55}
+
+      @media(max-width:600px){
+        .multi-airdrop-label{
+          font-size:16px!important;
+          color:#f5f5f0!important;
+          font-weight:800!important;
+          letter-spacing:.08em!important;
+        }
+        .multi-airdrop-hint{
+          color:#d1d2cc!important;
+          font-size:13px!important;
+          line-height:1.65!important;
+        }
+        .multi-airdrop-input,
+        .multi-airdrop-amount{
+          min-height:58px!important;
+          font-size:17px!important;
+          color:#ffffff!important;
+          background:#0b0c0a!important;
+          border-color:#5b5d56!important;
+        }
+        .multi-airdrop-addresses{
+          min-height:280px!important;
+          font-size:15px!important;
+          line-height:1.7!important;
+          color:#ffffff!important;
+          background:#0b0c0a!important;
+        }
+        .multi-airdrop-line-numbers{
+          font-size:14px!important;
+          line-height:1.7!important;
+          color:#aeb0a8!important;
+          background:#080907!important;
+        }
+        .multi-airdrop-summary{
+          grid-template-columns:1fr!important;
+          gap:8px!important;
+        }
+        .multi-airdrop-stat{
+          padding:16px!important;
+          background:#191b17!important;
+          border-color:rgba(255,255,255,.22)!important;
+        }
+        .multi-airdrop-stat span{
+          color:#d0d1ca!important;
+          font-size:11px!important;
+          letter-spacing:.12em!important;
+        }
+        .multi-airdrop-stat strong{
+          color:#ffffff!important;
+          font-size:20px!important;
+          line-height:1.3!important;
+        }
+        .multi-airdrop-action{
+          min-height:58px!important;
+          font-size:14px!important;
+        }
+        .multi-airdrop-status{
+          color:#eeeeea!important;
+          font-size:13px!important;
+          line-height:1.6!important;
+        }
+        .multi-airdrop-help h3{
+          font-size:24px!important;
+          color:#ffffff!important;
+        }
+        .multi-airdrop-help-step strong{
+          font-size:14px!important;
+          color:#ffffff!important;
+        }
+        .multi-airdrop-help-step span{
+          font-size:12px!important;
+          color:#d0d1ca!important;
+          line-height:1.6!important;
+        }
+      }
+      @media(max-width:430px){
+        .multi-airdrop-label{font-size:15px!important}
+        .multi-airdrop-hint{font-size:13px!important}
+        .multi-airdrop-input,.multi-airdrop-amount{font-size:17px!important}
+        .multi-airdrop-addresses{font-size:14px!important}
+        .multi-airdrop-stat strong{font-size:19px!important}
+      }
       @media(max-width:900px){.multi-airdrop-shell{grid-template-columns:1fr}.multi-airdrop-card,.multi-airdrop-help{padding:22px}}
       @media(max-width:600px){.multi-airdrop-address-editor{grid-template-columns:38px minmax(0,1fr)}
       .multi-airdrop-line-numbers{padding-right:8px;font-size:12px}.multi-airdrop-addresses{min-height:260px;font-size:12px}.multi-airdrop-summary{grid-template-columns:1fr 1fr}.multi-airdrop-card,.multi-airdrop-help{padding:18px}.multi-airdrop-addresses{min-height:260px}.multi-airdrop-amount-row{grid-template-columns:1fr}}
