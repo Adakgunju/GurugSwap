@@ -2959,3 +2959,59 @@ body{background:#151714!important}
     font-size:9px!important;
   }
 }
+
+
+/* --- ALL HOW IT WORKS PANELS: READABLE DESKTOP TYPE --- */
+.multi-airdrop-help h3,
+.liq-help h3,
+.distribute-help h3{
+  color:#f3f3ec!important;
+  font-size:30px!important;
+  font-weight:800!important;
+  line-height:1.15!important;
+}
+.multi-airdrop-help-step strong,
+.liq-step strong,
+.distribute-help-step strong{
+  color:#f0f0e9!important;
+  font-size:15px!important;
+  font-weight:800!important;
+  line-height:1.4!important;
+}
+.multi-airdrop-help-step span,
+.liq-step p,
+.distribute-help-step span{
+  color:#d0d0c8!important;
+  font-size:14px!important;
+  line-height:1.65!important;
+  font-weight:450!important;
+}
+.multi-airdrop-help-num,
+.liq-num,
+.distribute-help-num{
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.multi-airdrop-help-step,
+.liq-step,
+.distribute-help-step{
+  padding-top:15px!important;
+  padding-bottom:15px!important;
+}
+.liq-note,
+.distribute-note{
+  color:#c8c8c0!important;
+  font-size:13px!important;
+  line-height:1.65!important;
+}
+@media(max-width:850px){
+  .multi-airdrop-help h3,
+  .liq-help h3,
+  .distribute-help h3{font-size:27px!important;}
+  .multi-airdrop-help-step strong,
+  .liq-step strong,
+  .distribute-help-step strong{font-size:14px!important;}
+  .multi-airdrop-help-step span,
+  .liq-step p,
+  .distribute-help-step span{font-size:13px!important;}
+}
