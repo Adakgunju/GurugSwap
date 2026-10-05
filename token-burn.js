@@ -11,6 +11,7 @@
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
   let activeRpc = RPCS[0];
 
+
   app.innerHTML = `
     <div class="token-burn-card">
       <div class="token-burn-head">
@@ -74,7 +75,6 @@
     return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(String(value || "").trim());
   }
 
-  let activeRpc = null;
 
   async function rpc(method, params) {
     let lastError = null;
