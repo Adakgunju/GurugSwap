@@ -9,6 +9,8 @@
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const MAX_RECIPIENTS_PER_TX = 5;
+  const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
+  const GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS = 1000000; // 0.001 SOL
 
   let splPromise = null;
   let recipientAddresses = [];
@@ -164,12 +166,20 @@
     });
   }
 
-  async function buildBatch(connection, owner, mint, batch, decimals, tokenProgram, sourceAta, spl) {
+  async function buildBatch(connection, owner, mint, batch, decimals, tokenProgram, sourceAta, spl, feeLamports = 0) {
     const web3 = window.solanaWeb3;
     const tx = new web3.Transaction();
     const latest = await connection.getLatestBlockhash("confirmed");
     tx.recentBlockhash = latest.blockhash;
     tx.feePayer = owner;
+
+    if (feeLamports > 0) {
+      tx.add(web3.SystemProgram.transfer({
+        fromPubkey: owner,
+        toPubkey: new web3.PublicKey(GURUG_FEE_WALLET),
+        lamports: feeLamports
+      }));
+    }
 
     const prepared = [];
     let newAtaCount = 0;
@@ -306,7 +316,8 @@
         mintInfo.decimals,
         mintInfo.tokenProgram,
         mintInfo.sourceAta,
-        spl
+        spl,
+        i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
       );
       estimatedNewAtas += preview.newAtaCount;
       estimatedLamports += await estimateFee(connection, preview.tx);
@@ -340,7 +351,8 @@
           mintInfo.decimals,
           mintInfo.tokenProgram,
           mintInfo.sourceAta,
-          spl
+          spl,
+          i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
         );
 
         setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom...`, "active");
@@ -381,74 +393,10 @@
   let costEstimateRequest = 0;
 
   async function updateEstimatedCost() {
-    const requestId = ++costEstimateRequest;
     const costEl = document.getElementById("multiAirdropCost");
-    const mintText = getMintText();
-    const amountText = getAirdropAmount();
-    const provider = getProvider();
-
     if (!costEl) return;
-    if (!mintText || !amountText || !recipientAddresses.length || !provider?.publicKey) {
-      costEl.textContent = "ENTER MINT, AMOUNT & WALLETS";
-      return;
-    }
-
-    try {
-      const web3 = window.solanaWeb3;
-      if (!web3) return;
-      const mint = new web3.PublicKey(mintText);
-      const amount = amountText.replace(/,/g, "");
-      if (!/^\d+(\.\d+)?$/.test(amount) || Number(amount) <= 0) {
-        costEl.textContent = "ENTER A VALID AMOUNT";
-        return;
-      }
-
-      costEl.textContent = "CALCULATING...";
-      const rpc = await getWorkingRpc();
-      const connection = new web3.Connection(rpc, "confirmed");
-      const spl = await loadSpl();
-      const mintInfo = await readMint(connection, mint, provider.publicKey, spl);
-      const amountRaw = parseAmount(amountText, mintInfo.decimals);
-      const addresses = recipientAddresses.map(v => v.trim()).filter(Boolean);
-      const validated = addresses.map((address, index) => ({
-        index,
-        address,
-        publicKey: new web3.PublicKey(address),
-        amount: amountText,
-        rawAmount: amountRaw
-      }));
-
-      const batches = [];
-      for (let i = 0; i < validated.length; i += MAX_RECIPIENTS_PER_TX) {
-        batches.push(validated.slice(i, i + MAX_RECIPIENTS_PER_TX));
-      }
-
-      let lamports = 0;
-      let newAtas = 0;
-      for (const batch of batches) {
-        const built = await buildBatch(
-          connection,
-          provider.publicKey,
-          mint,
-          batch,
-          mintInfo.decimals,
-          mintInfo.tokenProgram,
-          mintInfo.sourceAta,
-          spl
-        );
-        newAtas += built.newAtaCount;
-        lamports += await estimateFee(connection, built.tx);
-      }
-
-      const ataRent = await connection.getMinimumBalanceForRentExemption(165);
-      lamports += newAtas * ataRent;
-
-      if (requestId !== costEstimateRequest) return;
-      costEl.textContent = (lamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL";
-    } catch (error) {
-      if (requestId !== costEstimateRequest) return;
-      costEl.textContent = "ESTIMATE AVAILABLE AT SEND";
-    }
+    const count = recipientAddresses.filter(v => v.trim()).length;
+    costEl.textContent = (count * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS / 1e9).toFixed(3) + " SOL";
   }
 
   function scheduleCostEstimate() {
@@ -552,7 +500,8 @@
             <div class="multi-airdrop-stat"><span>TOTAL TOKENS</span><strong id="multiAirdropTotal">0</strong></div>
             <div class="multi-airdrop-stat"><span>TRANSACTIONS</span><strong id="multiAirdropTxCount">—</strong></div>
           </div>
-          <div class="multi-airdrop-stat" style="margin-top:8px"><span>NETWORK COST</span><strong id="multiAirdropCost">CALCULATED AT SIGNING</strong></div>
+          <div class="multi-airdrop-stat" style="margin-top:8px"><span>GURUGSWAP FEE</span><strong id="multiAirdropCost">0 SOL</strong></div>
+          <div class="multi-airdrop-hint" style="margin-top:8px">Solana network transaction fees are separate and paid through your wallet.</div>
 
           <button id="multiAirdropSend" class="multi-airdrop-action" type="button">SEND MULTI AIRDROP</button>
           <div id="multiAirdropStatus" class="multi-airdrop-status">Paste your token mint, wallet addresses and one amount per wallet.</div>
@@ -598,7 +547,7 @@
       const amount = document.getElementById("multiAirdropAmount");
       if (amount) amount.value = "";
       document.getElementById("multiAirdropResults").innerHTML = "";
-      document.getElementById("multiAirdropCost").textContent = "CALCULATED AT SIGNING";
+      document.getElementById("multiAirdropCost").textContent = "0 SOL";
       setStatus("Wallet address list cleared.");
       updateSummary();
       scheduleCostEstimate();
