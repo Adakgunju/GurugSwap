@@ -74,9 +74,15 @@
     return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(String(value || "").trim());
   }
 
+  let activeRpc = null;
+
   async function rpc(method, params) {
     let lastError = null;
-    for (const url of RPCS) {
+    const candidates = activeRpc
+      ? [activeRpc, ...RPCS.filter(url => url !== activeRpc)]
+      : RPCS;
+
+    for (const url of candidates) {
       try {
         const res = await fetch(url, {
           method: "POST",
@@ -84,14 +90,26 @@
           cache: "no-store",
           body: JSON.stringify({jsonrpc:"2.0", id:Date.now(), method, params})
         });
-        if (!res.ok) throw new Error("RPC HTTP " + res.status);
+
+        if (!res.ok) {
+          lastError = new Error("RPC HTTP " + res.status);
+          continue;
+        }
+
         const json = await res.json();
-        if (json?.error) throw new Error(json.error.message || "RPC error");
+
+        if (json?.error) {
+          lastError = new Error(json.error.message || "RPC error");
+          continue;
+        }
+
+        activeRpc = url;
         return json.result;
       } catch (err) {
         lastError = err;
       }
     }
+
     throw lastError || new Error("RPC unavailable");
   }
 
@@ -305,7 +323,7 @@
         )
       );
 
-      const connection = new solanaWeb3.Connection(RPCS[0], "confirmed");
+      const connection = new solanaWeb3.Connection(activeRpc || RPCS[0], "confirmed");
       const latest = await connection.getLatestBlockhash("confirmed");
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
@@ -374,10 +392,17 @@
     await burn();
   });
 
-  window.addEventListener("load", () => {
-    if (provider()?.publicKey) {
+  function autoRefreshConnectedWallet() {
+    if (provider()?.publicKey && isMint(mintInput.value.trim())) {
       button.textContent = "BURN TOKENS";
       refreshBalance();
     }
-  });
+  }
+
+  window.addEventListener("load", autoRefreshConnectedWallet);
+  if (document.readyState !== "loading") {
+    autoRefreshConnectedWallet();
+  } else {
+    document.addEventListener("DOMContentLoaded", autoRefreshConnectedWallet, {once:true});
+  }
 })();
