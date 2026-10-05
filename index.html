@@ -481,5 +481,155 @@
       }
     })();
   </script>
+
+    <style id="single-section-view-styles">
+      /* Platform workspace: show one menu section at a time. Feature scripts and DOM IDs remain unchanged. */
+      .workspace-main.single-section-view{
+        min-height:calc(100vh - 82px)!important;
+        padding-top:40px!important;
+      }
+      .workspace-main.single-section-view > section{
+        display:none!important;
+        margin-top:0!important;
+        margin-bottom:0!important;
+        width:100%!important;
+      }
+      .workspace-main.single-section-view > section.single-section-active{
+        display:block!important;
+      }
+      .workspace-main.single-section-view > #token-info.single-section-companion{
+        display:block!important;
+      }
+      .workspace-main.single-section-view > #swap.single-section-active{
+        margin-bottom:28px!important;
+      }
+      .workspace-main.single-section-view > #token-info.single-section-companion{
+        margin-top:28px!important;
+      }
+      .workspace-main.single-section-view .swap-intro-inner,
+      .workspace-main.single-section-view .platform-placeholder-head,
+      .workspace-main.single-section-view .links-heading,
+      .workspace-main.single-section-view .partner-ads-heading{
+        margin-bottom:28px!important;
+      }
+      @media(max-width:850px){
+        .workspace-main.single-section-view{
+          min-height:calc(100vh - 76px)!important;
+          padding-top:24px!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active{
+          min-height:0!important;
+        }
+        .workspace-main.single-section-view > #token-info.single-section-companion{
+          margin-top:20px!important;
+        }
+      }
+      @media(max-width:520px){
+        .workspace-main.single-section-view{
+          padding-top:18px!important;
+        }
+      }
+    </style>
+
+    <script>
+      // Single-section platform navigation.
+      // Only the selected menu section is visible; all existing feature scripts,
+      // DOM IDs and transaction logic remain untouched.
+      (() => {
+        const main = document.querySelector(".workspace-main");
+        if (!main) return;
+
+        const menuTargets = [
+          "create-token",
+          "distributeTokens",
+          "liquidity",
+          "swap",
+          "multi-airdrop",
+          "links",
+          "partner-ads"
+        ];
+
+        const sections = new Map(
+          menuTargets
+            .map(id => [id, document.getElementById(id)])
+            .filter(([, el]) => !!el)
+        );
+
+        function setActiveMenu(targetId, updateHash = true) {
+          if (!sections.has(targetId)) targetId = "swap";
+          main.classList.add("single-section-view");
+
+          sections.forEach((section, id) => {
+            section.classList.toggle("single-section-active", id === targetId);
+            section.setAttribute("aria-hidden", id === targetId ? "false" : "true");
+          });
+
+          // TOKEN INFO belongs to the TOKEN SWAP workspace, but is not a separate menu item.
+          const tokenInfo = document.getElementById("token-info");
+          if (tokenInfo) {
+            const showTokenInfo = targetId === "swap";
+            tokenInfo.classList.toggle("single-section-companion", showTokenInfo);
+            tokenInfo.setAttribute("aria-hidden", showTokenInfo ? "false" : "true");
+          }
+
+          if (updateHash) {
+            const nextHash = "#" + targetId;
+            if (window.location.hash !== nextHash) {
+              history.replaceState(null, "", nextHash);
+            }
+          }
+
+          // Keep the active workspace at the top so mobile users never have to
+          // scroll through unrelated tools before using the selected feature.
+          const topbar = document.querySelector(".topbar");
+          const offset = (topbar?.offsetHeight || 76) + 10;
+          const y = main.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+
+          document.querySelectorAll(".workspace-nav, .desktop-nav a, #mobileMenu a").forEach(link => {
+            const href = link.getAttribute("href");
+            const active = href === "#" + targetId;
+            link.classList.toggle("active", active);
+            if (active) link.setAttribute("aria-current", "page");
+            else link.removeAttribute("aria-current");
+          });
+        }
+
+        function getInitialSection() {
+          const hash = window.location.hash.replace(/^#/, "");
+          return sections.has(hash) ? hash : "swap";
+        }
+
+        // Bind once. Prevent normal anchor scrolling and switch the workspace instead.
+        document.querySelectorAll(".workspace-nav, .desktop-nav a, #mobileMenu a").forEach(link => {
+          const href = link.getAttribute("href") || "";
+          if (!href.startsWith("#")) return;
+          const targetId = href.slice(1);
+          if (!sections.has(targetId)) return;
+
+          link.addEventListener("click", event => {
+            event.preventDefault();
+            setActiveMenu(targetId, true);
+
+            const mobileMenu = document.getElementById("mobileMenu");
+            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+            if (mobileMenu && !mobileMenu.hidden) {
+              mobileMenu.hidden = true;
+              if (mobileMenuBtn) {
+                mobileMenuBtn.setAttribute("aria-expanded", "false");
+                mobileMenuBtn.textContent = "MENU";
+              }
+            }
+          });
+        });
+
+        window.addEventListener("hashchange", () => {
+          setActiveMenu(getInitialSection(), false);
+        });
+
+        setActiveMenu(getInitialSection(), false);
+      })();
+    </script>
+
 </body>
 </html>
