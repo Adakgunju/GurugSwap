@@ -2792,3 +2792,34 @@ body{background:#151714!important}
     height:24px!important;
   }
 }
+
+
+/* --- BUILT ON SOLANA: EMPHASIZE SOLANA --- */
+.platform-header .hero-network>span:last-child{
+  font-size:12px!important;
+  font-weight:700!important;
+  letter-spacing:.13em!important;
+  color:#a5a59e!important;
+}
+.platform-header .hero-network b{
+  display:inline-block!important;
+  margin-left:3px!important;
+  font-size:18px!important;
+  font-weight:900!important;
+  letter-spacing:.12em!important;
+  background:linear-gradient(90deg,#9945ff 0%,#b56cff 45%,#14f195 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  color:transparent!important;
+  text-shadow:0 0 18px rgba(153,69,255,.16)!important;
+}
+@media(max-width:850px){
+  .platform-header .hero-network>span:last-child{
+    font-size:10px!important;
+  }
+  .platform-header .hero-network b{
+    font-size:15px!important;
+    letter-spacing:.10em!important;
+  }
+}
