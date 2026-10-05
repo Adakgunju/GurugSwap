@@ -36,6 +36,8 @@
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
   const STYLE_ID = "gurug-create-token-style";
   const SECTION_ID = "create-token";
+  const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
+  const GURUG_TOKEN_CREATION_FEE_LAMPORTS = 500000000;
 
   const css = `
 #create-token{padding:42px 5vw 18px}
@@ -348,11 +350,8 @@
 
           <div class="create-token-cost">
             <div class="create-token-cost-title">CREATION COST</div>
-            <div class="create-token-cost-row"><span>Solana account &amp; network cost</span><strong id="createTokenNetworkCost">Calculating…</strong></div>
-            <div class="create-token-cost-row"><span>Metadata storage (Irys)</span><strong id="createTokenStorageCost">Calculated when uploaded</strong></div>
-            <div class="create-token-cost-row"><span>GurugSwap fee</span><strong>0 SOL</strong></div>
-            <div class="create-token-cost-row create-token-cost-total"><span>Estimated total</span><strong id="createTokenTotalCost">Calculating…</strong></div>
-            <div class="create-token-warning"><b>Transparent pricing:</b> GurugSwap currently adds no creation fee. The estimate includes the base Solana account/network cost plus permanent metadata storage. Final network fees and metadata-account cost are finalized when you sign.</div>
+            <div class="create-token-cost-row"><span>GurugSwap service fee</span><strong>0.50 SOL</strong></div>
+            <div class="create-token-warning"><b>Service fee:</b> 0.50 SOL is paid to GurugSwap. Solana network and storage transaction fees are separate and paid through your wallet.</div>
           </div>
           <button id="createTokenButton" class="create-token-button" type="button">CREATE TOKEN</button>
           <div id="createTokenStatus" class="create-token-status">Connect your Phantom wallet, enter the token details, then create the token.</div>
@@ -1027,7 +1026,7 @@
 
     setStatus("STEP 1/4 — Preparing permanent metadata storage...", "active");
     const {umi, modules} = await createUmiForWallet(provider);
-    const {createGenericFile, generateSigner, percentAmount, some} = modules.umi;
+    const {createGenericFile, generateSigner, percentAmount, some, publicKey, sol} = modules.umi;
     const {createV1, TokenStandard} = modules.metadata;
     const {
       createMint,
@@ -1035,7 +1034,8 @@
       findAssociatedTokenPda,
       mintTokensTo,
       setAuthority,
-      AuthorityType
+      AuthorityType,
+      transferSol
     } = modules.toolbox;
 
     const mint = generateSigner(umi);
@@ -1117,7 +1117,12 @@
             amount
           })
         )
-      );
+      )
+      .add(transferSol(umi, {
+        source: umi.identity,
+        destination: publicKey(GURUG_FEE_WALLET),
+        amount: sol(0.5)
+      }));
 
     const finalBuilder = fixedSupply
       ? tokenBuilder.add(
