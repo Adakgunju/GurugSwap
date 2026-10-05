@@ -273,9 +273,20 @@
       }
 
       navLinks.forEach(link => {
-        link.addEventListener("click", () => {
+        link.addEventListener("click", event => {
           const target = link.getAttribute("href");
-          if (target && linksByTarget.has(target)) setActive(target);
+          if (!target || !linksByTarget.has(target)) return;
+          setActive(target);
+
+          // Force platform navigation to the exact section target.
+          // This prevents the fixed/centered desktop navigation from
+          // falling through to the currently visible SWAP section.
+          const section = document.querySelector(target);
+          if (section) {
+            event.preventDefault();
+            history.pushState(null, "", target);
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         });
       });
 
