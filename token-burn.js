@@ -22,8 +22,8 @@
           <small>TOKEN MINT ADDRESS</small>
           <input id="burnMint" type="text" inputmode="text" autocomplete="off" placeholder="Paste token mint address">
         </label>
-        <label>
-          <small>AMOUNT TO BURN</small>
+        <label class="token-burn-amount-field">
+          <div class="token-burn-field-label"><small>AMOUNT TO BURN</small><button id="burnMax" class="token-burn-max" type="button" disabled>MAX</button></div>
           <input id="burnAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00">
         </label>
       </div>
@@ -40,6 +40,7 @@
 
   const mintInput = document.getElementById("burnMint");
   const amountInput = document.getElementById("burnAmount");
+  const maxButton = document.getElementById("burnMax");
   const balanceEl = document.getElementById("burnBalance");
   const button = document.getElementById("burnButton");
   const status = document.getElementById("burnStatus");
@@ -92,6 +93,17 @@
       }
     }
     throw lastError || new Error("RPC unavailable");
+  }
+
+  function rawToDecimal(value, decimals) {
+    const raw = BigInt(value || 0);
+    if (decimals === 0) return raw.toString();
+
+    const text = raw.toString().padStart(decimals + 1, "0");
+    const splitAt = text.length - decimals;
+    const whole = text.slice(0, splitAt);
+    const fraction = text.slice(splitAt).replace(/0+$/, "");
+    return fraction ? whole + "." + fraction : whole;
   }
 
   function decimalToRaw(value, decimals) {
@@ -265,12 +277,14 @@
       selectedAccount = account;
       selectedDecimals = account.decimals;
       selectedBalance = BigInt(account.rawAmount);
+      maxButton.disabled = selectedBalance <= 0n;
 
       balanceEl.textContent =
         "YOUR BALANCE  " + account.uiAmount.toLocaleString("en-US", {maximumFractionDigits: Math.min(account.decimals, 9)}) +
         "  •  " + short(account.pubkey);
       setStatus("READY TO BURN", "Review the amount carefully. Burning is permanent.");
     } catch (err) {
+      maxButton.disabled = true;
       balanceEl.textContent = "BALANCE CHECK FAILED";
       setStatus("ERROR", err.message || "Could not read your token account.", "error");
     }
@@ -366,6 +380,12 @@
       button.textContent = p?.publicKey ? "BURN TOKENS" : "CONNECT WALLET";
     }
   }
+
+  maxButton.addEventListener("click", () => {
+    if (selectedBalance === null || selectedDecimals === null || selectedBalance <= 0n) return;
+    amountInput.value = rawToDecimal(selectedBalance, selectedDecimals);
+    amountInput.dispatchEvent(new Event("input", {bubbles:true}));
+  });
 
   mintInput.addEventListener("input", () => {
     clearTimeout(lookupTimer);
