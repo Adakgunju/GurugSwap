@@ -145,31 +145,66 @@
   async function findTokenAccount(mint) {
     const p = provider();
     if (!p?.publicKey) throw new Error("Connect your wallet first.");
-    const owner = p.publicKey.toString();
 
+    const ownerKey = new solanaWeb3.PublicKey(p.publicKey.toString());
+    const mintKey = new solanaWeb3.PublicKey(mint);
+    const associatedTokenProgram = new solanaWeb3.PublicKey(
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+    );
+
+    // Do not use getTokenAccountsByOwner here. Some public RPCs block
+    // indexed token-account methods. Derive the ATA and read it directly.
     for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
-      const result = await rpc("getTokenAccountsByOwner", [
-        owner,
-        {programId},
-        {encoding:"jsonParsed", commitment:"confirmed"}
+      const tokenProgramKey = new solanaWeb3.PublicKey(programId);
+      const [ata] = solanaWeb3.PublicKey.findProgramAddressSync(
+        [ownerKey.toBuffer(), tokenProgramKey.toBuffer(), mintKey.toBuffer()],
+        associatedTokenProgram
+      );
+
+      const accountResult = await rpc("getAccountInfo", [
+        ata.toString(),
+        {encoding:"base64", commitment:"confirmed"}
       ]);
+      const value = accountResult?.value;
+      if (!value?.data?.[0] || value.owner !== programId) continue;
 
-      const matches = (result?.value || [])
-        .map(item => {
-          const info = item?.account?.data?.parsed?.info;
-          const amount = info?.tokenAmount;
-          return {
-            pubkey: item?.pubkey,
-            programId,
-            decimals: Number(amount?.decimals),
-            rawAmount: String(amount?.amount || "0"),
-            uiAmount: Number(amount?.uiAmountString || 0)
-          };
-        })
-        .filter(item => item.pubkey && item.decimals >= 0);
+      const raw = Uint8Array.from(
+        atob(value.data[0]),
+        c => c.charCodeAt(0)
+      );
+      if (raw.length < 72) continue;
 
-      const found = matches.find(item => item.rawAmount !== "0") || matches[0];
-      if (found) return found;
+      const accountMint = new solanaWeb3.PublicKey(raw.slice(0,32)).toString();
+      const accountOwner = new solanaWeb3.PublicKey(raw.slice(32,64)).toString();
+      if (accountMint !== mint || accountOwner !== ownerKey.toString()) continue;
+
+      let amount = 0n;
+      for (let i = 0; i < 8; i++) {
+        amount |= BigInt(raw[64 + i]) << BigInt(8 * i);
+      }
+
+      const mintResult = await rpc("getAccountInfo", [
+        mint,
+        {encoding:"base64", commitment:"confirmed"}
+      ]);
+      const mintValue = mintResult?.value;
+      if (!mintValue?.data?.[0] || mintValue.owner !== programId) continue;
+
+      const mintRaw = Uint8Array.from(
+        atob(mintValue.data[0]),
+        c => c.charCodeAt(0)
+      );
+      if (mintRaw.length < 45) continue;
+
+      const decimals = Number(mintRaw[44]);
+
+      return {
+        pubkey: ata.toString(),
+        programId,
+        decimals,
+        rawAmount: amount.toString(),
+        uiAmount: Number(amount) / Math.pow(10, decimals)
+      };
     }
 
     return null;
