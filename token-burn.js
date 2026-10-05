@@ -3,8 +3,10 @@
   if (!app) return;
 
   const RPCS = [
-    "https://rpc.solanatracker.io/public",
-    "https://api.mainnet-beta.solana.com"
+    "https://solana-rpc.publicnode.com",
+    "https://api.mainnet.solana.com",
+    "https://api.mainnet-beta.solana.com",
+    "https://rpc.solanatracker.io/public"
   ];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
@@ -132,50 +134,103 @@
   async function findTokenAccount(mint) {
     const p = provider();
     if (!p?.publicKey) throw new Error("Connect your wallet first.");
-    const owner = p.publicKey.toString();
 
-    // First try the exact mint filter. Some public RPCs do not support
-    // indexed mint queries reliably, so fall back to a programId scan.
+    const owner = p.publicKey.toString();
+    const mintKey = new solanaWeb3.PublicKey(mint);
+    const ownerKey = new solanaWeb3.PublicKey(owner);
+    const associatedTokenProgram = new solanaWeb3.PublicKey(
+      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+    );
+
+    // Avoid indexed getTokenAccountsByOwner for the normal path.
+    // Derive the ATA directly and read it with getAccountInfo. This works
+    // with RPCs that reject indexed token-account queries.
     for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
-      let result = null;
+      const tokenProgramKey = new solanaWeb3.PublicKey(programId);
+      const [ata] = solanaWeb3.PublicKey.findProgramAddressSync(
+        [ownerKey.toBuffer(), tokenProgramKey.toBuffer(), mintKey.toBuffer()],
+        associatedTokenProgram
+      );
 
       try {
-        result = await rpc("getTokenAccountsByOwner", [
+        const account = await rpc("getAccountInfo", [
+          ata.toString(),
+          {encoding:"base64", commitment:"confirmed"}
+        ]);
+
+        const value = account?.value;
+        if (!value?.data?.[0]) continue;
+        if (value.owner !== programId) continue;
+
+        const raw = Uint8Array.from(atob(value.data[0]), c => c.charCodeAt(0));
+        if (raw.length < 72) continue;
+
+        const accountMint = new solanaWeb3.PublicKey(raw.slice(0, 32)).toString();
+        const accountOwner = new solanaWeb3.PublicKey(raw.slice(32, 64)).toString();
+        if (accountMint !== mint || accountOwner !== owner) continue;
+
+        let amount = 0n;
+        for (let i = 0; i < 8; i++) amount |= BigInt(raw[64 + i]) << BigInt(8 * i);
+
+        const mintInfo = await rpc("getAccountInfo", [
+          mint,
+          {encoding:"base64", commitment:"confirmed"}
+        ]);
+        const mintValue = mintInfo?.value;
+        if (!mintValue?.data?.[0]) continue;
+        if (mintValue.owner !== programId) continue;
+
+        const mintRaw = Uint8Array.from(atob(mintValue.data[0]), c => c.charCodeAt(0));
+        if (mintRaw.length < 45) continue;
+        const decimals = Number(mintRaw[44]);
+
+        return {
+          pubkey: ata.toString(),
+          programId,
+          decimals,
+          rawAmount: amount.toString(),
+          uiAmount: Number(amount) / Math.pow(10, decimals),
+          mint
+        };
+      } catch (err) {
+        console.warn("Direct token account lookup failed for", programId, err);
+      }
+    }
+
+    // Fallback for wallets that hold the token in a non-ATA account.
+    for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
+      try {
+        const result = await rpc("getTokenAccountsByOwner", [
           owner,
           {mint},
           {encoding:"jsonParsed", commitment:"confirmed"}
         ]);
-      } catch (mintQueryError) {
-        console.warn("Mint-filter lookup failed; falling back to program scan.", mintQueryError);
-        result = await rpc("getTokenAccountsByOwner", [
-          owner,
-          {programId},
-          {encoding:"jsonParsed", commitment:"confirmed"}
-        ]);
+
+        const matches = (result?.value || [])
+          .map(item => {
+            const info = item?.account?.data?.parsed?.info;
+            const amount = info?.tokenAmount;
+            return {
+              pubkey:item?.pubkey,
+              programId,
+              decimals:Number(amount?.decimals),
+              rawAmount:String(amount?.amount || "0"),
+              uiAmount:Number(amount?.uiAmountString || 0),
+              mint:info?.mint
+            };
+          })
+          .filter(item =>
+            item.pubkey &&
+            item.mint === mint &&
+            Number.isFinite(item.decimals) &&
+            item.decimals >= 0
+          );
+
+        const found = matches.find(item => item.rawAmount !== "0") || matches[0];
+        if (found) return found;
+      } catch (err) {
+        console.warn("Indexed token-account fallback failed for", programId, err);
       }
-
-      const matches = (result?.value || [])
-        .map(item => {
-          const info = item?.account?.data?.parsed?.info;
-          const amount = info?.tokenAmount;
-          return {
-            pubkey: item?.pubkey,
-            programId,
-            decimals: Number(amount?.decimals),
-            rawAmount: String(amount?.amount || "0"),
-            uiAmount: Number(amount?.uiAmountString || 0),
-            mint: info?.mint
-          };
-        })
-        .filter(item =>
-          item.pubkey &&
-          item.mint === mint &&
-          Number.isFinite(item.decimals) &&
-          item.decimals >= 0
-        );
-
-      const found = matches.find(item => item.rawAmount !== "0") || matches[0];
-      if (found) return found;
     }
 
     return null;
