@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090909">
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
-  <link rel="stylesheet" href="style.css?v=56">
+  <link rel="stylesheet" href="style.css?v=57">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -20,6 +20,7 @@
       <a href="#swap">TOKEN SWAP</a>
       <a href="#multi-airdrop">MULTI AIRDROP</a>
       <a href="#token-burn">TOKEN BURN</a>
+      <a href="#token-authority">TOKEN AUTHORITY</a>
       <a href="#links">GURUG NETWORK</a>
       <a href="#partner-ads">PARTNERS</a>
     </nav>
@@ -36,6 +37,7 @@
     <a href="#swap">TOKEN SWAP</a>
     <a href="#multi-airdrop">MULTI AIRDROP</a>
     <a href="#token-burn">TOKEN BURN</a>
+    <a href="#token-authority">TOKEN AUTHORITY</a>
     <a href="#links">GURUG NETWORK</a>
     <a href="#partner-ads">PARTNERS</a>
   </div>
@@ -62,6 +64,7 @@
         <a class="workspace-nav active" href="#swap"><span>04</span><b>TOKEN SWAP</b><em>↗</em></a>
         <a class="workspace-nav" href="#multi-airdrop"><span>05</span><b>MULTI AIRDROP</b><em>↗</em></a>
         <a class="workspace-nav" href="#token-burn"><span>06</span><b>TOKEN BURN</b><em>↗</em></a>
+        <a class="workspace-nav" href="#token-authority"><span>09</span><b>TOKEN AUTHORITY</b><em>↗</em></a>
         <a class="workspace-nav" href="#links"><span>07</span><b>GURUG NETWORK</b><em>↗</em></a>
         <a class="workspace-nav" href="#partner-ads"><span>08</span><b>PARTNERS</b><em>↗</em></a>
         <div class="sidebar-foot"><span>SOLANA</span><span>NON-CUSTODIAL</span></div>
@@ -176,6 +179,15 @@
       <div id="tokenBurnApp"></div>
     </section>
 
+    <section id="token-authority" class="platform-placeholder-section token-authority-section" aria-label="Token authority manager">
+      <div class="platform-placeholder-head">
+        <div class="platform-section-kicker">09 / TOKEN AUTHORITY</div>
+        <h2>Manage your token <span class="section-title-accent">authorities.</span></h2>
+        <p>View, change or permanently revoke the Mint Authority and Freeze Authority for your Solana token.</p>
+      </div>
+      <div id="tokenAuthorityApp"></div>
+    </section>
+
     <section id="partner-ads" class="partner-ads">
       <div class="partner-ads-heading">
         <div class="platform-section-kicker">07 / PARTNER ADS</div>
@@ -211,6 +223,7 @@
   <script src="multi-airdrop.js?v=9"></script>
   <script src="liquidity-token.js?v=16"></script>
   <script src="token-burn.js?v=17"></script>
+  <script src="token-authority.js?v=1"></script>
   <script>
     (() => {
       const button = document.getElementById("mobileMenuBtn");
