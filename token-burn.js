@@ -348,6 +348,21 @@
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
 
+      // Phantom recommends simulating the exact transaction before signing.
+      // sigVerify:false is intentional because the wallet has not signed yet.
+      const simulation = await connection.simulateTransaction(transaction, {
+        sigVerify: false,
+        replaceRecentBlockhash: true
+      });
+
+      if (simulation.value?.err) {
+        const simulationLogs = (simulation.value.logs || []).slice(-3).join(" | ");
+        throw new Error(
+          "Transaction simulation failed." +
+          (simulationLogs ? " " + simulationLogs : "")
+        );
+      }
+
       setStatus("AWAITING APPROVAL", "Approve the burn transaction in your wallet.", "active");
       button.disabled = true;
 
