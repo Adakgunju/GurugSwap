@@ -2879,3 +2879,41 @@ body{background:#151714!important}
     font-size:13px!important;
   }
 }
+
+
+/* --- TOKEN DISTRIBUTION / HOW IT WORKS READABILITY --- */
+.distribute-help h3{
+  font-size:32px!important;
+  color:#f3f3ec!important;
+  font-weight:800!important;
+  letter-spacing:-.035em!important;
+  margin-bottom:20px!important;
+}
+.distribute-help-step strong{
+  font-size:15px!important;
+  color:#f0f0e9!important;
+  font-weight:800!important;
+  margin-bottom:6px!important;
+}
+.distribute-help-step span{
+  font-size:14px!important;
+  color:#d2d2ca!important;
+  line-height:1.65!important;
+  font-weight:450!important;
+}
+.distribute-help-num{
+  color:#ffe500!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.distribute-note{
+  color:#c9c9c1!important;
+  font-size:13px!important;
+  line-height:1.65!important;
+}
+@media(max-width:850px){
+  .distribute-help h3{font-size:28px!important;}
+  .distribute-help-step strong{font-size:14px!important;}
+  .distribute-help-step span{font-size:13px!important;}
+  .distribute-note{font-size:12px!important;}
+}
