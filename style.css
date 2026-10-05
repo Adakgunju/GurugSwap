@@ -2697,3 +2697,18 @@ body{background:#151714!important}
     margin-left:0!important;
   }
 }
+
+/* --- FINAL HERO WORDMARK RAIL ALIGNMENT --- */
+@media(min-width:851px){
+  /* The feature content starts at the workspace main rail.
+     Move only the hero copy to that same rail. */
+  .platform-header .hero-copy{
+    padding-left:279px!important;
+    box-sizing:border-box!important;
+  }
+}
+@media(max-width:850px){
+  .platform-header .hero-copy{
+    padding-left:0!important;
+  }
+}
