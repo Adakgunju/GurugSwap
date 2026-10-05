@@ -2645,3 +2645,16 @@ body{background:#151714!important}
   .authority-modal-box h3{font-size:22px}
   .authority-modal-actions{grid-template-columns:1fr}
 }
+
+/* --- AUTHORITY / HEADER ALIGNMENT PASS --- */
+/* Keep the GURUGSWAP wordmark on the exact same left rail as the main feature content. */
+@media(min-width:851px){
+  .platform-header .hero-identity{
+    grid-template-columns:228px minmax(0,1fr) auto!important;
+    gap:26px!important;
+  }
+  .platform-header h1{
+    justify-self:start!important;
+    margin-left:0!important;
+  }
+}
