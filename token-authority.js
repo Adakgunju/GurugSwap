@@ -295,12 +295,14 @@
       modalTitle.textContent = "Remove " + label + " permanently?";
       modalMessage.textContent = "This action is irreversible. " + label + " will be set to NONE on-chain and can never be restored.";
       modalConfirmWrap.hidden = false;
+      modalConfirmButton.className = "authority-revoke";
       modalConfirmButton.textContent = "REMOVE PERMANENTLY";
       modalConfirmButton.dataset.mode = "revoke";
     } else {
       modalTitle.textContent = "Change " + label + "?";
       modalMessage.textContent = "Change the current authority " + short(current) + " to " + short(newAuthority) + "?";
       modalConfirmWrap.hidden = true;
+      modalConfirmButton.className = "";
       modalConfirmButton.textContent = "CHANGE AUTHORITY";
       modalConfirmButton.dataset.mode = "change";
     }
@@ -393,12 +395,14 @@
     setStatus("CONFIRMING", "Checking the authority transaction on Solana…", "active");
     await waitForSignature(txId);
 
+    setStatus("TRANSACTION CONFIRMED", "Authority update confirmed on Solana.", "success");
     txLink.href = "https://solscan.io/tx/" + txId;
     txLink.hidden = false;
-    setStatus("TRANSACTION CONFIRMED", "Authority update confirmed on Solana.", "success");
 
     await new Promise(resolve => setTimeout(resolve, 500));
     await checkAuthorities();
+    txLink.href = "https://solscan.io/tx/" + txId;
+    txLink.hidden = false;
   }
 
   checkButton.addEventListener("click", checkAuthorities);
