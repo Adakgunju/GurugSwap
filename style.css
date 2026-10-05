@@ -2823,3 +2823,18 @@ body{background:#151714!important}
     letter-spacing:.10em!important;
   }
 }
+
+
+/* --- FIXED HEADER / WORKSPACE LEFT RAIL ALIGNMENT --- */
+@media(min-width:851px){
+  .topbar{
+    padding-left:calc(22px + 230px + 80px)!important;
+    padding-right:22px!important;
+  }
+  .topbar .desktop-nav{
+    margin-left:0!important;
+  }
+  .topbar .brand{
+    margin-left:0!important;
+  }
+}
