@@ -3,8 +3,10 @@
   if (!app) return;
 
   const RPCS = [
-    "https://rpc.solanatracker.io/public",
-    "https://api.mainnet-beta.solana.com"
+    "https://api.mainnet-beta.solana.com",
+    "https://solana-rpc.publicnode.com",
+    "https://solana.drpc.org",
+    "https://rpc.solanatracker.io/public"
   ];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
