@@ -347,14 +347,44 @@
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
 
-      // Phantom recommends simulating the exact transaction before signing.
-      // sigVerify:false is intentional because the wallet has not signed yet.
-      const simulation = await connection.simulateTransaction(transaction, {
-        sigVerify: false
+      // Phantom recommends simulating the exact unsigned transaction first.
+      // Use the JSON-RPC method directly because web3.js legacy Transaction
+      // overloads reject the config-object form with "Invalid arguments".
+      const wire = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      });
+      const simulationResponse = await fetch("https://api.mainnet.solana.com", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        cache: "no-store",
+        body: JSON.stringify({
+          jsonrpc:"2.0",
+          id:Date.now(),
+          method:"simulateTransaction",
+          params:[
+            btoa(String.fromCharCode(...wire)),
+            {
+              encoding:"base64",
+              sigVerify:false,
+              commitment:"confirmed"
+            }
+          ]
+        })
       });
 
-      if (simulation.value?.err) {
-        const simulationLogs = (simulation.value.logs || []).slice(-3).join(" | ");
+      if (!simulationResponse.ok) {
+        throw new Error("Transaction simulation RPC HTTP " + simulationResponse.status);
+      }
+
+      const simulationJson = await simulationResponse.json();
+      if (simulationJson?.error) {
+        throw new Error(simulationJson.error.message || "Transaction simulation failed.");
+      }
+
+      const simulationValue = simulationJson?.result?.value;
+      if (simulationValue?.err) {
+        const simulationLogs = (simulationValue.logs || []).slice(-3).join(" | ");
         throw new Error(
           "Transaction simulation failed." +
           (simulationLogs ? " " + simulationLogs : "")
