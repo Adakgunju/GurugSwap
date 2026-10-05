@@ -2658,3 +2658,42 @@ body{background:#151714!important}
     margin-left:0!important;
   }
 }
+
+/* --- HEADER / CONTENT LEFT-RAIL ALIGNMENT --- */
+.platform-header .hero-identity h1{
+  margin-left:0!important;
+  transform:translateX(0)!important;
+}
+@media(min-width:851px){
+  .platform-header .hero-copy{
+    padding-left:0!important;
+  }
+  .platform-header .hero-identity{
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    gap:26px!important;
+  }
+  .platform-header .hero-identity .hero-tagline{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+  .platform-header .hero-identity h1{
+    grid-column:1!important;
+    grid-row:2!important;
+    justify-self:start!important;
+  }
+  .platform-header .hero-identity .hero-network{
+    grid-column:1!important;
+    grid-row:3!important;
+  }
+  .platform-header .hero-identity .hero-wallet{
+    grid-column:2!important;
+    grid-row:1 / span 3!important;
+  }
+}
+@media(max-width:850px){
+  .platform-header .hero-identity h1{
+    justify-self:start!important;
+    margin-left:0!important;
+  }
+}
