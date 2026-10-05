@@ -2129,3 +2129,61 @@ body{background:#151714!important}
 .workspace-main>#links{order:7!important}
 .workspace-main>#partner-ads{order:8!important}
 .workspace-main>#about{order:9!important}
+
+
+/* === HEADER MARKET TICKER: CLEAN PRICE CHIP === */
+.market-ticker{
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  min-height:38px!important;
+  padding:0 7px 0 12px!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  border-radius:999px!important;
+  background:rgba(19,21,16,.94)!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 8px 24px rgba(0,0,0,.22)!important;
+  white-space:nowrap!important;
+}
+.market-ticker:before{
+  content:""!important;
+  width:7px!important;
+  height:7px!important;
+  flex:0 0 7px!important;
+  border-radius:50%!important;
+  background:#ffe500!important;
+  box-shadow:0 0 10px rgba(255,229,0,.55)!important;
+}
+.market-ticker .ticker-label{
+  color:#85867d!important;
+  font-size:8px!important;
+  font-weight:800!important;
+  letter-spacing:.13em!important;
+}
+.market-ticker #gurugPrice{
+  color:#f7f7f2!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  letter-spacing:-.01em!important;
+}
+.market-ticker .ticker-change{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:58px!important;
+  height:28px!important;
+  padding:0 9px!important;
+  border-radius:999px!important;
+  background:#ffe500!important;
+  color:#0a0b08!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.03em!important;
+}
+@media(max-width:1100px) and (min-width:851px){
+  .market-ticker{gap:7px!important;padding-left:9px!important}
+  .market-ticker .ticker-label{display:none!important}
+  .market-ticker .ticker-change{min-width:54px!important;padding:0 7px!important}
+}
+@media(max-width:850px){
+  .market-ticker{display:none!important}
+}
