@@ -2657,3 +2657,19 @@ body{background:#151714!important}
     transform:none!important;
   }
 }
+
+/* --- PLATFORM HEADER NETWORK LABEL --- */
+@media(min-width:851px){
+  .platform-header .hero-network{
+    font-size:15px!important;
+    letter-spacing:.16em!important;
+    font-weight:800!important;
+  }
+}
+@media(max-width:850px){
+  .platform-header .hero-network{
+    font-size:13px!important;
+    letter-spacing:.14em!important;
+    font-weight:800!important;
+  }
+}
