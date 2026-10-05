@@ -107,15 +107,28 @@
     if (txEl) txEl.textContent = txCount == null ? "—" : String(txCount);
   }
 
-  function parseAmount(value, decimals) {
-    const raw = String(value || "").trim().replace(/,/g, "");
-    if (!/^\d+(\.\d+)?$/.test(raw)) throw new Error("Enter a valid token amount.");
-    const [whole, fraction = ""] = raw.split(".");
-    if (fraction.length > decimals) {
-      throw new Error(`An amount has more than ${decimals} decimal places.`);
+  // The input is always a real token quantity (e.g. 0.01 GSWAP).
+  // It is never interpreted as a percentage of total supply.
+  function uiAmountToRaw(value, decimals) {
+    const text = String(value || "").trim().replace(/,/g, "");
+    if (!/^\d+(\.\d+)?$/.test(text)) {
+      throw new Error("Enter a valid token amount, such as 0.01.");
     }
-    return BigInt(whole) * (10n ** BigInt(decimals)) +
+    const [whole, fraction = ""] = text.split(".");
+    if (fraction.length > decimals) {
+      throw new Error(`This token supports up to ${decimals} decimal places.`);
+    }
+    const scale = 10n ** BigInt(decimals);
+    return BigInt(whole) * scale +
       BigInt((fraction + "0".repeat(decimals)).slice(0, decimals) || "0");
+  }
+
+  function formatUiAmount(rawAmount, decimals) {
+    const scale = 10n ** BigInt(decimals);
+    const whole = rawAmount / scale;
+    const fraction = rawAmount % scale;
+    if (fraction === 0n) return whole.toString();
+    return `${whole.toString()}.${fraction.toString().padStart(decimals, "0").replace(/0+$/, "")}`;
   }
 
   async function readMint(connection, mint, owner, spl) {
@@ -293,12 +306,14 @@
 
     setStatus("Checking token, balance and recipient wallets...", "active");
     const mintInfo = await readMint(connection, mint, provider.publicKey, spl);
-    const amountRaw = parseAmount(amountText, mintInfo.decimals);
+    const amountRaw = uiAmountToRaw(amountText, mintInfo.decimals);
 
     if (amountRaw <= 0n) throw new Error("Token amount must be greater than zero.");
 
     const validated = validateRows(web3, amountRaw);
     const totalRaw = amountRaw * BigInt(validated.length);
+    const uiAmount = formatUiAmount(amountRaw, mintInfo.decimals);
+    const totalUiAmount = formatUiAmount(totalRaw, mintInfo.decimals);
 
     if (totalRaw > mintInfo.rawBalance) {
       throw new Error("Your token balance is lower than the total airdrop amount.");
@@ -310,7 +325,9 @@
     }
 
     updateSummary(batches.length, mintInfo.decimals);
-    setStatus(`Ready: ${validated.length} recipient(s) × ${amountText} tokens in ${batches.length} transaction(s).`, "active");
+    const totalEl = document.getElementById("multiAirdropTotal");
+    if (totalEl) totalEl.textContent = totalUiAmount;
+    setStatus(`Ready: ${validated.length} recipient(s) × ${uiAmount} tokens = ${totalUiAmount} total in ${batches.length} transaction(s).`, "active");
 
     // GurugSwap service fee is shown separately. Solana network fees are handled by Phantom.
     const feeLamports = validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS;
@@ -320,7 +337,7 @@
     const results = [];
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
-      setStatus(`Preparing batch ${i + 1} of ${batches.length}...`, "active");
+      setStatus(`Preparing batch ${i + 1} of ${batches.length} — ${batch.length} wallet(s) × ${uiAmount} GSWAP...`, "active");
 
       try {
         const built = await buildBatch(
@@ -335,7 +352,7 @@
           i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
         );
 
-        setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom...`, "active");
+        setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom: ${batch.length} wallet(s) × ${uiAmount} GSWAP.`, "active");
         const signed = await provider.signTransaction(built.tx);
         const signature = await connection.sendRawTransaction(signed.serialize(), {
           skipPreflight: false,
@@ -365,7 +382,7 @@
       }
     }
 
-    setStatus(`MULTI AIRDROP COMPLETE — ${validated.length} recipient(s) confirmed on Solana.`, "success");
+    setStatus(`MULTI AIRDROP COMPLETE — ${validated.length} recipient(s) received ${uiAmount} GSWAP each on Solana.`, "success");
     return results;
   }
 
@@ -469,9 +486,9 @@
 
           <div class="multi-airdrop-amount-row">
             <div class="multi-airdrop-amount-wrap">
-              <label class="multi-airdrop-label" for="multiAirdropAmount">AMOUNT PER WALLET</label>
-              <input id="multiAirdropAmount" class="multi-airdrop-amount" type="text" inputmode="decimal" placeholder="e.g. 1000" autocomplete="off">
-              <div class="multi-airdrop-hint">Enter the token amount once. Every pasted wallet receives this exact amount.</div>
+              <label class="multi-airdrop-label" for="multiAirdropAmount">AMOUNT PER WALLET (TOKEN)</label>
+              <input id="multiAirdropAmount" class="multi-airdrop-amount" type="text" inputmode="decimal" placeholder="e.g. 0.01" autocomplete="off">
+              <div class="multi-airdrop-hint">Enter the actual token quantity per wallet. This is never a percentage of total supply.</div>
             </div>
           </div>
 
