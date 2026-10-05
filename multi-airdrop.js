@@ -271,7 +271,7 @@
         </div>
         <div class="multi-airdrop-result-recipients">
           ${batch.items.map(item => `
-            <div><span>${escapeHtml(item.address.slice(0, 6) + "…" + item.address.slice(-4))}</span><b>${escapeHtml(item.amount)}</b><em>${batch.ok ? "SENT" : "NOT SENT"}</em></div>
+            <div><span>${escapeHtml(item.address.slice(0, 6) + "…" + item.address.slice(-4))}</span><b>${escapeHtml(formatUiAmount(item.amount, batch.decimals))}</b><em>${batch.ok ? "SENT" : "NOT SENT"}</em></div>
           `).join("")}
         </div>
         ${batch.error ? `<p>${escapeHtml(batch.error)}</p>` : ""}
@@ -364,7 +364,7 @@
         setStatus(`Confirming batch ${i + 1} of ${batches.length}...`, "active");
         await connection.confirmTransaction(signature, "confirmed");
 
-        results.push({ ok: true, signature, items: batch });
+        results.push({ ok: true, signature, items: batch, decimals: mintInfo.decimals });
         await showResults(results);
       } catch (error) {
         console.error("MULTI AIRDROP batch failed:", error);
@@ -372,6 +372,7 @@
           ok: false,
           signature: "",
           items: batch,
+          decimals: mintInfo.decimals,
           error: error?.message || "Transaction failed or was cancelled."
         });
         await showResults(results);
