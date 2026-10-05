@@ -535,7 +535,7 @@
       // Single-section platform navigation.
       // Only the selected menu section is visible; all existing feature scripts,
       // DOM IDs and transaction logic remain untouched.
-      (() => {
+      function initSingleSectionView() {
         const main = document.querySelector(".workspace-main");
         if (!main) return;
 
@@ -628,7 +628,13 @@
         });
 
         setActiveMenu(getInitialSection(), false);
-      })();
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initSingleSectionView, {once:true});
+      } else {
+        initSingleSectionView();
+      }
     </script>
 
 </body>
