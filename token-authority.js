@@ -265,13 +265,28 @@
 
   function updateRow(type) {
     const row = rows[type];
-    const authority = mintState?.[type + "Authority"] || null;
+
+    // Before a mint has been checked, show a neutral state.
+    // Do not imply that the authority has been revoked.
+    if (!mintState) {
+      row.address.textContent = "—";
+      row.address.title = "";
+      row.state.textContent = "NOT CHECKED";
+      row.state.className = "authority-state";
+      row.change.disabled = true;
+      row.revoke.disabled = true;
+      row.input.disabled = true;
+      row.input.value = "";
+      return;
+    }
+
+    const authority = mintState[type + "Authority"] || null;
     row.address.textContent = authority ? short(authority) : "NONE — PERMANENTLY REVOKED";
     row.address.title = authority || "";
     row.state.textContent = authority ? "ACTIVE" : "REVOKED";
     row.state.className = "authority-state " + (authority ? "active" : "revoked");
 
-    const canManage = Boolean(mintState && authority && walletMatches(authority));
+    const canManage = Boolean(authority && walletMatches(authority));
     row.change.disabled = !canManage;
     row.revoke.disabled = !canManage;
     row.input.disabled = !canManage;
