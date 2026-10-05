@@ -228,7 +228,9 @@
         ));
       }
 
-      const rawAmount = parseAmount(item.amount, decimals);
+      // item.amount is already the exact raw token amount (BigInt), prepared in executeAirdrop.
+      // Do not call the removed parseAmount() helper here.
+      const rawAmount = item.amount;
       if (rawAmount <= 0n) throw new Error(`Recipient ${item.index + 1}: amount must be greater than zero.`);
 
       tx.add(spl.createTransferCheckedInstruction(
