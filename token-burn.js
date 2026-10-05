@@ -383,12 +383,82 @@
         maxRetries:3
       });
 
-      setStatus("CONFIRMING", "Waiting for Solana network confirmation…", "active");
-      await connection.confirmTransaction({
-        signature:txId,
-        blockhash:latest.blockhash,
-        lastValidBlockHeight:latest.lastValidBlockHeight
-      }, "confirmed");
+      setStatus("CONFIRMING", "Checking the burn transaction on Solana…", "active");
+
+      // Do not rely only on confirmTransaction(blockhash), because a transaction
+      // can land on-chain while the client-side blockhash confirmation window
+      // expires. Always verify the signature status before reporting failure.
+      const confirmationRpcs = [
+        activeRpc || RPCS[0],
+        ...RPCS.filter(url => url !== (activeRpc || RPCS[0]))
+      ];
+
+      let confirmed = false;
+      let lastConfirmationError = null;
+
+      for (const rpcUrl of confirmationRpcs) {
+        try {
+          const verifyConnection = new solanaWeb3.Connection(rpcUrl, "confirmed");
+
+          for (let attempt = 0; attempt < 30; attempt++) {
+            const result = await verifyConnection.getSignatureStatuses([txId], {
+              searchTransactionHistory: true
+            });
+            const sigStatus = result?.value?.[0];
+
+            if (sigStatus?.err) {
+              throw new Error("Burn transaction failed on-chain. Check the transaction details.");
+            }
+
+            if (
+              sigStatus?.confirmationStatus === "confirmed" ||
+              sigStatus?.confirmationStatus === "finalized"
+            ) {
+              confirmed = true;
+              break;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+          if (confirmed) break;
+        } catch (verifyError) {
+          lastConfirmationError = verifyError;
+          console.warn("Burn confirmation RPC failed:", rpcUrl, verifyError);
+        }
+      }
+
+      if (!confirmed) {
+        // A block-height expiration from confirmTransaction does NOT by itself
+        // prove that the transaction failed. Give the signature one final
+        // history lookup before showing BURN FAILED.
+        for (const rpcUrl of confirmationRpcs) {
+          try {
+            const verifyConnection = new solanaWeb3.Connection(rpcUrl, "confirmed");
+            const result = await verifyConnection.getSignatureStatuses([txId], {
+              searchTransactionHistory: true
+            });
+            const sigStatus = result?.value?.[0];
+
+            if (sigStatus?.err) {
+              throw new Error("Burn transaction failed on-chain. Check the transaction details.");
+            }
+
+            if (sigStatus?.confirmationStatus) {
+              confirmed = true;
+              break;
+            }
+          } catch (verifyError) {
+            lastConfirmationError = verifyError;
+          }
+        }
+      }
+
+      if (!confirmed) {
+        throw lastConfirmationError || new Error(
+          "Burn was sent, but Solana confirmation could not be verified. Check the transaction before retrying."
+        );
+      }
 
       status.className = "token-burn-status success";
       statusLabel.textContent = "BURN COMPLETE";
