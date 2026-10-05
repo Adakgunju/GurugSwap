@@ -165,13 +165,60 @@
     if (!p?.publicKey) throw new Error("Connect your wallet first.");
 
     const owner = p.publicKey.toString();
+
+    // Do not use getTokenAccountsByOwner: several public RPCs reject it.
+    // Instead, query the token programs directly with memcmp filters:
+    // mint is at byte 0 and token-account owner is at byte 32.
+    for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
+      try {
+        const result = await rpc("getProgramAccounts", [
+          programId,
+          {
+            encoding:"jsonParsed",
+            commitment:"confirmed",
+            filters:[
+              {memcmp:{offset:0, bytes:mint}},
+              {memcmp:{offset:32, bytes:owner}}
+            ]
+          }
+        ]);
+
+        const matches = (result || [])
+          .map(item => {
+            const info = item?.account?.data?.parsed?.info;
+            const amount = info?.tokenAmount;
+            return {
+              pubkey:item?.pubkey,
+              programId,
+              decimals:Number(amount?.decimals),
+              rawAmount:String(amount?.amount || "0"),
+              uiAmount:Number(amount?.uiAmountString || 0),
+              mint:info?.mint,
+              owner:info?.owner
+            };
+          })
+          .filter(item =>
+            item.pubkey &&
+            item.mint === mint &&
+            item.owner === owner &&
+            Number.isFinite(item.decimals) &&
+            item.decimals >= 0
+          );
+
+        const found = matches.find(item => item.rawAmount !== "0") || matches[0];
+        if (found) return found;
+      } catch (err) {
+        console.warn("Program-account token lookup failed:", err);
+      }
+    }
+
+    // Fallback: derive the standard ATA and read it directly.
     const ownerKey = new solanaWeb3.PublicKey(owner);
     const mintKey = new solanaWeb3.PublicKey(mint);
     const associatedTokenProgram = new solanaWeb3.PublicKey(
       "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
     );
 
-    // Preferred path: derive the standard ATA and read it directly.
     for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
       try {
         const tokenProgramKey = new solanaWeb3.PublicKey(programId);
@@ -209,20 +256,18 @@
 
         const decimals = Number(mintRaw[44]);
         return {
-          pubkey: ata.toString(),
+          pubkey:ata.toString(),
           programId,
           decimals,
-          rawAmount: amount.toString(),
-          uiAmount: Number(amount) / Math.pow(10, decimals)
+          rawAmount:amount.toString(),
+          uiAmount:Number(amount) / Math.pow(10, decimals),
+          mint,
+          owner
         };
       } catch (err) {
-        console.warn("Direct token account lookup failed:", err);
+        console.warn("Direct ATA token lookup failed:", err);
       }
     }
-
-    // The standard ATA path above is the stable path for GurugSwap.
-    // Do not call getTokenAccountsByOwner here: several public RPCs reject
-    // indexed token-account queries, which can make a valid balance look missing.
 
     return null;
   }
