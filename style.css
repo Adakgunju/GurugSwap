@@ -1416,9 +1416,10 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
 }
 
 
-/* === 04 / 05 TITLE SIZE FIX === */
+/* === SECTION TITLE SIZE FIX === */
 .workspace-main>#swap .swap-intro-inner h2,
-.workspace-main>#multi-airdrop .platform-placeholder-head h2{
+.workspace-main>#multi-airdrop .platform-placeholder-head h2,
+.workspace-main>#token-burn .platform-placeholder-head h2{
   font-size:48px!important;
   line-height:.98!important;
   letter-spacing:-.035em!important;
@@ -1429,14 +1430,16 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
 }
 @media(max-width:850px){
   .workspace-main>#swap .swap-intro-inner h2,
-  .workspace-main>#multi-airdrop .platform-placeholder-head h2{
+  .workspace-main>#multi-airdrop .platform-placeholder-head h2,
+  .workspace-main>#token-burn .platform-placeholder-head h2{
     font-size:36px!important;
     line-height:1.02!important;
   }
 }
 @media(max-width:520px){
   .workspace-main>#swap .swap-intro-inner h2,
-  .workspace-main>#multi-airdrop .platform-placeholder-head h2{
+  .workspace-main>#multi-airdrop .platform-placeholder-head h2,
+  .workspace-main>#token-burn .platform-placeholder-head h2{
     font-size:31px!important;
     line-height:1.04!important;
   }
