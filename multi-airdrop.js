@@ -308,6 +308,7 @@
     const costEl = document.getElementById("multiAirdropCost");
     if (costEl) costEl.textContent = (feeLamports / 1e9).toFixed(3) + " SOL";
 
+    const results = [];
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       setStatus(`Preparing batch ${i + 1} of ${batches.length}...`, "active");
