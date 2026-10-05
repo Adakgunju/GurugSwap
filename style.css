@@ -2758,3 +2758,37 @@ body{background:#151714!important}
     width:22px!important;height:3px!important;min-height:3px!important;
   }
 }
+
+
+/* --- GOLD SOLANA HEADER LOGO --- */
+.platform-header .hero-network .solana-mark{
+  width:30px!important;
+  height:30px!important;
+  min-width:30px!important;
+  flex:0 0 30px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:visible!important;
+}
+.platform-header .hero-network .solana-mark img{
+  display:block!important;
+  width:30px!important;
+  height:30px!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+@media(max-width:850px){
+  .platform-header .hero-network .solana-mark{
+    width:24px!important;
+    height:24px!important;
+    min-width:24px!important;
+    flex-basis:24px!important;
+  }
+  .platform-header .hero-network .solana-mark img{
+    width:24px!important;
+    height:24px!important;
+  }
+}
