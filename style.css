@@ -2268,7 +2268,7 @@ body{background:#151714!important}
 @media(max-width:520px){.workspace-main>#token-burn .platform-placeholder-head{margin-bottom:20px!important}.token-burn-card{padding:16px!important;border-radius:14px!important}.token-burn-head{font-size:9px!important}.token-burn-fields input{min-height:52px!important}.token-burn-button{min-height:54px!important}.token-burn-foot{flex-direction:column!important;gap:7px!important}}
 
 /* === TOKEN AUTHORITY MANAGER === */
-.workspace-main>#token-authority{
+.workspace-main>#authority-manager{
   width:100%!important;
   max-width:100%!important;
   margin:0 0 36px!important;
@@ -2277,7 +2277,7 @@ body{background:#151714!important}
   background:transparent!important;
   box-sizing:border-box!important;
 }
-.workspace-main>#token-authority .platform-placeholder-head{
+.workspace-main>#authority-manager .platform-placeholder-head{
   display:block!important;
   width:100%!important;
   max-width:none!important;
@@ -2285,12 +2285,12 @@ body{background:#151714!important}
   padding:0!important;
   text-align:left!important;
 }
-.workspace-main>#token-authority .platform-section-kicker{
+.workspace-main>#authority-manager .platform-section-kicker{
   display:block!important;
   margin:0 0 12px!important;
   text-align:left!important;
 }
-.workspace-main>#token-authority .platform-placeholder-head h2{
+.workspace-main>#authority-manager .platform-placeholder-head h2{
   display:block!important;
   margin:0 0 14px!important;
   font-size:48px!important;
@@ -2301,7 +2301,7 @@ body{background:#151714!important}
   font-style:normal!important;
   text-align:left!important;
 }
-.workspace-main>#token-authority .platform-placeholder-head p{
+.workspace-main>#authority-manager .platform-placeholder-head p{
   display:block!important;
   max-width:760px!important;
   margin:0!important;
@@ -2615,23 +2615,23 @@ body{background:#151714!important}
 #authorityModalConfirmButton.authority-revoke:hover{border-color:#85857b}
 
 @media(max-width:850px){
-  .workspace-main>#token-authority{
+  .workspace-main>#authority-manager{
     margin:0 0 28px!important;
     padding:28px 0 0!important;
   }
-  .workspace-main>#token-authority .platform-placeholder-head{
+  .workspace-main>#authority-manager .platform-placeholder-head{
     margin-bottom:22px!important;
   }
-  .workspace-main>#token-authority .platform-placeholder-head h2{
+  .workspace-main>#authority-manager .platform-placeholder-head h2{
     font-size:36px!important;
     line-height:1.02!important;
   }
-  .workspace-main>#token-authority .platform-placeholder-head p{font-size:14px!important}
+  .workspace-main>#authority-manager .platform-placeholder-head p{font-size:14px!important}
   .token-authority-grid{grid-template-columns:1fr}
   .token-authority-lookup{grid-template-columns:1fr}
 }
 @media(max-width:520px){
-  .workspace-main>#token-authority .platform-placeholder-head h2{
+  .workspace-main>#authority-manager .platform-placeholder-head h2{
     font-size:31px!important;
     line-height:1.04!important;
   }
