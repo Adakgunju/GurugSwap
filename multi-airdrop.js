@@ -303,41 +303,11 @@
     updateSummary(batches.length, mintInfo.decimals);
     setStatus(`Ready: ${validated.length} recipient(s) × ${amountText} tokens in ${batches.length} transaction(s).`, "active");
 
-    const ataRent = await connection.getMinimumBalanceForRentExemption(165);
-    let estimatedLamports = 0;
-    let estimatedNewAtas = 0;
-
-    for (const batch of batches) {
-      const preview = await buildBatch(
-        connection,
-        provider.publicKey,
-        mint,
-        batch,
-        mintInfo.decimals,
-        mintInfo.tokenProgram,
-        mintInfo.sourceAta,
-        spl,
-        i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
-      );
-      estimatedNewAtas += preview.newAtaCount;
-      estimatedLamports += await estimateFee(connection, preview.tx);
-    }
-
-    estimatedLamports += estimatedNewAtas * ataRent;
-
-    const solBalance = await connection.getBalance(provider.publicKey, "confirmed");
+    // GurugSwap service fee is shown separately. Solana network fees are handled by Phantom.
+    const feeLamports = validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS;
     const costEl = document.getElementById("multiAirdropCost");
-    if (costEl) {
-      costEl.textContent = (estimatedLamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL est.";
-    }
-    if (solBalance < estimatedLamports) {
-      throw new Error(
-        "Not enough SOL for the estimated network cost and new recipient token accounts. " +
-        "You need at least " + (estimatedLamports / web3.LAMPORTS_PER_SOL).toFixed(6) + " SOL."
-      );
-    }
+    if (costEl) costEl.textContent = (feeLamports / 1e9).toFixed(3) + " SOL";
 
-    const results = [];
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       setStatus(`Preparing batch ${i + 1} of ${batches.length}...`, "active");
