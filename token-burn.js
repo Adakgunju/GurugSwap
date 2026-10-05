@@ -3,11 +3,11 @@
   if (!app) return;
 
   const RPCS = [
-    "https://solana-rpc.publicnode.com",
-    "https://api.mainnet.solana.com",
+    "https://rpc.solanatracker.io/public",
     "https://api.mainnet-beta.solana.com",
-    "https://rpc.solanatracker.io/public"
+    "https://solana-rpc.publicnode.com"
   ];
+  let activeRpc = RPCS[0];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
 
@@ -88,6 +88,7 @@
         if (!res.ok) throw new Error("RPC HTTP " + res.status);
         const json = await res.json();
         if (json?.error) throw new Error(json.error.message || "RPC error");
+        activeRpc = url;
         return json.result;
       } catch (err) {
         lastError = err;
@@ -346,7 +347,7 @@
         )
       );
 
-      const connection = new solanaWeb3.Connection(RPCS[0], "confirmed");
+      const connection = new solanaWeb3.Connection(activeRpc, "confirmed");
       const latest = await connection.getLatestBlockhash("confirmed");
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
@@ -358,7 +359,7 @@
         requireAllSignatures: false,
         verifySignatures: false
       });
-      const simulationResponse = await fetch(RPCS[0], {
+      const simulationResponse = await fetch(activeRpc, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         cache: "no-store",
