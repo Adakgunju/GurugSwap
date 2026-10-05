@@ -29,7 +29,7 @@
         </label>
       </div>
       <div class="token-burn-balance" id="burnBalance">Enter a token mint to check your balance.</div>
-      <button class="connect token-burn-button" id="burnButton" type="button">CONNECT WALLET</button>
+      <button class="connect token-burn-button" id="burnButton" type="button" disabled>BURN TOKENS</button>
       <div class="token-burn-status" id="burnStatus">
         <div class="token-burn-status-top"><span class="token-burn-dot"></span><span id="burnStatusLabel">READY TO BURN</span></div>
         <div id="burnStatusMessage">Burned tokens are permanently removed from the selected wallet and token supply.</div>
@@ -55,6 +55,7 @@
   let lookupTimer = null;
 
   function provider() {
+    if (typeof getPhantomProvider === "function") return getPhantomProvider();
     if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
     if (window.solana?.isPhantom) return window.solana;
     return null;
@@ -65,6 +66,20 @@
     statusLabel.textContent = label;
     statusMessage.textContent = message;
     txLink.hidden = true;
+  }
+
+  function updateBurnButtonState() {
+    if (!button) return;
+    if (!provider()?.publicKey || !selectedAccount || selectedBalance === null || selectedBalance <= 0n) {
+      button.disabled = true;
+      return;
+    }
+    try {
+      const raw = decimalToRaw(amountInput.value, selectedDecimals);
+      button.disabled = raw <= 0n || raw > selectedBalance;
+    } catch {
+      button.disabled = true;
+    }
   }
 
   function short(value) {
@@ -284,7 +299,10 @@
     }
 
     if (!provider()?.publicKey) {
-      balanceEl.textContent = "Connect wallet to check your token balance.";
+      maxButton.disabled = true;
+      updateBurnButtonState();
+      balanceEl.textContent = "Connect your wallet using the top-right button.";
+      setStatus("WALLET REQUIRED", "Connect your wallet from the top-right of GurugSwap first.", "error");
       return;
     }
 
@@ -293,6 +311,8 @@
     try {
       const account = await findTokenAccount(mint);
       if (!account) {
+        maxButton.disabled = true;
+        updateBurnButtonState();
         balanceEl.textContent = "No token account found for this wallet.";
         setStatus("READY TO BURN", "No token account was found for this mint.");
         return;
@@ -307,38 +327,20 @@
         "YOUR BALANCE  " + account.uiAmount.toLocaleString("en-US", {maximumFractionDigits: Math.min(account.decimals, 9)}) +
         "  •  " + short(account.pubkey);
       setStatus("READY TO BURN", "Review the amount carefully. Burning is permanent.");
+      updateBurnButtonState();
     } catch (err) {
       maxButton.disabled = true;
+      updateBurnButtonState();
       balanceEl.textContent = "BALANCE CHECK FAILED";
       setStatus("ERROR", err.message || "Could not read your token account.", "error");
-    }
-  }
-
-  async function connect() {
-    const p = provider();
-    if (!p) {
-      setStatus("WALLET REQUIRED", "Open GurugSwap in a wallet-enabled browser or connect Phantom first.", "error");
-      return null;
-    }
-
-    try {
-      const response = await p.connect();
-      const key = response?.publicKey || p.publicKey;
-      if (!key) throw new Error("Wallet connection failed.");
-      button.textContent = "BURN TOKENS";
-      await refreshBalance();
-      return key;
-    } catch (err) {
-      setStatus("CONNECTION CANCELLED", err.message || "Wallet connection was cancelled.", "error");
-      return null;
     }
   }
 
   async function burn() {
     const p = provider();
     if (!p?.publicKey) {
-      const key = await connect();
-      if (!key) return;
+      setStatus("WALLET REQUIRED", "Connect your wallet from the top-right of GurugSwap first.", "error");
+      return;
     }
 
     const mint = mintInput.value.trim();
@@ -401,7 +403,8 @@
       setStatus("BURN FAILED", err?.message || "The burn transaction could not be completed.", "error");
     } finally {
       button.disabled = false;
-      button.textContent = p?.publicKey ? "BURN TOKENS" : "CONNECT WALLET";
+      button.textContent = "BURN TOKENS";
+      updateBurnButtonState();
     }
   }
 
@@ -409,6 +412,7 @@
     if (selectedBalance === null || selectedDecimals === null || selectedBalance <= 0n) return;
     amountInput.value = rawToDecimal(selectedBalance, selectedDecimals);
     amountInput.dispatchEvent(new Event("input", {bubbles:true}));
+    updateBurnButtonState();
   });
 
   mintInput.addEventListener("input", () => {
@@ -417,7 +421,10 @@
   });
 
   amountInput.addEventListener("input", () => {
-    if (selectedDecimals === null) return;
+    if (selectedDecimals === null) {
+      updateBurnButtonState();
+      return;
+    }
     try {
       const raw = decimalToRaw(amountInput.value, selectedDecimals);
       if (raw > selectedBalance) {
@@ -426,24 +433,43 @@
         setStatus("READY TO BURN", "Review the amount carefully. Burning is permanent.");
       }
     } catch {}
+    updateBurnButtonState();
   });
 
   button.addEventListener("click", async () => {
     if (!provider()?.publicKey) {
-      await connect();
+      setStatus("WALLET REQUIRED", "Connect your wallet from the top-right of GurugSwap first.", "error");
       return;
     }
     await burn();
   });
 
   function autoRefreshConnectedWallet() {
+    button.textContent = "BURN TOKENS";
+    updateBurnButtonState();
     if (provider()?.publicKey && isMint(mintInput.value.trim())) {
-      button.textContent = "BURN TOKENS";
       refreshBalance();
     }
   }
 
+  const globalProvider = provider();
+  if (globalProvider?.on) {
+    globalProvider.on("connect", () => autoRefreshConnectedWallet());
+    globalProvider.on("accountChanged", () => autoRefreshConnectedWallet());
+    globalProvider.on("disconnect", () => {
+      selectedAccount = null;
+      selectedDecimals = null;
+      selectedBalance = null;
+      maxButton.disabled = true;
+      button.disabled = true;
+      balanceEl.textContent = "Connect your wallet using the top-right button.";
+      setStatus("WALLET REQUIRED", "Connect your wallet from the top-right of GurugSwap first.", "error");
+    });
+  }
+
   window.addEventListener("load", autoRefreshConnectedWallet);
+  updateBurnButtonState();
+
   if (document.readyState !== "loading") {
     autoRefreshConnectedWallet();
   } else {
