@@ -342,7 +342,7 @@
         )
       );
 
-      const connection = new solanaWeb3.Connection("https://api.mainnet.solana.com", "confirmed");
+      const connection = new solanaWeb3.Connection(RPCS[0], "confirmed");
       const latest = await connection.getLatestBlockhash("confirmed");
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
@@ -354,7 +354,7 @@
         requireAllSignatures: false,
         verifySignatures: false
       });
-      const simulationResponse = await fetch("https://api.mainnet.solana.com", {
+      const simulationResponse = await fetch(RPCS[0], {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         cache: "no-store",
