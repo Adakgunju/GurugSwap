@@ -3,11 +3,11 @@
   if (!app) return;
 
   const RPCS = [
-    "https://rpc.solanatracker.io/public",
+    "https://solana-rpc.publicnode.com",
+    "https://api.mainnet.solana.com",
     "https://api.mainnet-beta.solana.com",
-    "https://solana-rpc.publicnode.com"
+    "https://rpc.solanatracker.io/public"
   ];
-  let activeRpc = RPCS[0];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
 
@@ -52,7 +52,6 @@
   let selectedDecimals = null;
   let selectedBalance = null;
   let lookupTimer = null;
-  let maxBurnSelected = false;
 
   function provider() {
     if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
@@ -88,7 +87,6 @@
         if (!res.ok) throw new Error("RPC HTTP " + res.status);
         const json = await res.json();
         if (json?.error) throw new Error(json.error.message || "RPC error");
-        activeRpc = url;
         return json.result;
       } catch (err) {
         lastError = err;
@@ -129,16 +127,16 @@
     return bytes;
   }
 
-  function burnInstruction(account, mint, owner, amount, programId) {
-    const data = new Uint8Array(9);
-    data[0] = 8; // Burn
+  function burnCheckedInstruction(account, mint, owner, amount, decimals, programId) {
+    const data = new Uint8Array(10);
+    data[0] = 15; // BurnChecked
     data.set(u64le(amount), 1);
-
+    data[9] = decimals;
     return new solanaWeb3.TransactionInstruction({
       programId: new solanaWeb3.PublicKey(programId),
       keys: [
         {pubkey: new solanaWeb3.PublicKey(account), isSigner:false, isWritable:true},
-        {pubkey: new solanaWeb3.PublicKey(mint), isSigner:false, isWritable:true},
+        {pubkey: new solanaWeb3.PublicKey(mint), isSigner:false, isWritable:false},
         {pubkey: new solanaWeb3.PublicKey(owner), isSigner:true, isWritable:false}
       ],
       data
@@ -329,74 +327,27 @@
       if (!selectedAccount || selectedDecimals === null) await refreshBalance();
       if (!selectedAccount) throw new Error("No token account found for this wallet.");
 
-      const rawAmount = maxBurnSelected
-        ? selectedBalance
-        : decimalToRaw(amountInput.value, selectedDecimals);
-      if (rawAmount <= 0n) throw new Error("Burn amount must be greater than 0.");
+      const rawAmount = decimalToRaw(amountInput.value, selectedDecimals);
       if (rawAmount > selectedBalance) throw new Error("Burn amount exceeds your wallet balance.");
 
       const owner = p.publicKey.toString();
       const transaction = new solanaWeb3.Transaction();
       transaction.add(
-        burnInstruction(
+        burnCheckedInstruction(
           selectedAccount.pubkey,
           mint,
           owner,
           rawAmount,
+          selectedDecimals,
           selectedAccount.programId
         )
       );
 
-      const connection = new solanaWeb3.Connection(activeRpc, "confirmed");
+      const connection = new solanaWeb3.Connection(RPCS[0], "confirmed");
       const latest = await connection.getLatestBlockhash("confirmed");
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
 
-      // Phantom recommends simulating the exact unsigned transaction first.
-      // Use the JSON-RPC method directly because web3.js legacy Transaction
-      // overloads reject the config-object form with "Invalid arguments".
-      const wire = transaction.serialize({
-        requireAllSignatures: false,
-        verifySignatures: false
-      });
-      const simulationResponse = await fetch(activeRpc, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        cache: "no-store",
-        body: JSON.stringify({
-          jsonrpc:"2.0",
-          id:Date.now(),
-          method:"simulateTransaction",
-          params:[
-            btoa(String.fromCharCode(...wire)),
-            {
-              encoding:"base64",
-              sigVerify:false,
-              commitment:"confirmed"
-            }
-          ]
-        })
-      });
-
-      if (!simulationResponse.ok) {
-        throw new Error("Transaction simulation RPC HTTP " + simulationResponse.status);
-      }
-
-      const simulationJson = await simulationResponse.json();
-      if (simulationJson?.error) {
-        throw new Error(simulationJson.error.message || "Transaction simulation failed.");
-      }
-
-      const simulationValue = simulationJson?.result?.value;
-      if (simulationValue?.err) {
-        const simulationLogs = (simulationValue.logs || []).slice(-3).join(" | ");
-        throw new Error(
-          "Transaction simulation failed." +
-          (simulationLogs ? " " + simulationLogs : "")
-        );
-      }
-
-      txLink.hidden = true;
       setStatus("AWAITING APPROVAL", "Approve the burn transaction in your wallet.", "active");
       button.disabled = true;
 
@@ -433,7 +384,6 @@
   maxButton.addEventListener("click", () => {
     if (selectedBalance === null || selectedDecimals === null || selectedBalance <= 0n) return;
     amountInput.value = rawToDecimal(selectedBalance, selectedDecimals);
-    maxBurnSelected = true;
     amountInput.dispatchEvent(new Event("input", {bubbles:true}));
   });
 
@@ -444,9 +394,6 @@
 
   amountInput.addEventListener("input", () => {
     if (selectedDecimals === null) return;
-    if (document.activeElement === amountInput && amountInput.value !== rawToDecimal(selectedBalance || 0n, selectedDecimals)) {
-      maxBurnSelected = false;
-    }
     try {
       const raw = decimalToRaw(amountInput.value, selectedDecimals);
       if (raw > selectedBalance) {
