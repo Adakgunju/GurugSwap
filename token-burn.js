@@ -168,7 +168,7 @@
       programId: new solanaWeb3.PublicKey(programId),
       keys: [
         {pubkey: new solanaWeb3.PublicKey(account), isSigner:false, isWritable:true},
-        {pubkey: new solanaWeb3.PublicKey(mint), isSigner:false, isWritable:false},
+        {pubkey: new solanaWeb3.PublicKey(mint), isSigner:false, isWritable:true},
         {pubkey: new solanaWeb3.PublicKey(owner), isSigner:true, isWritable:false}
       ],
       data
