@@ -3,14 +3,13 @@
   if (!app) return;
 
   const RPCS = [
-    "https://api.mainnet-beta.solana.com",
     "https://solana-rpc.publicnode.com",
-    "https://solana.drpc.org",
-    "https://rpc.solanatracker.io/public"
+    "https://rpc.solanatracker.io/public",
+    "https://api.mainnet-beta.solana.com"
   ];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
-  let activeRpc = null;
+  let activeRpc = RPCS[0];
 
   app.innerHTML = `
     <div class="token-burn-card">
@@ -221,41 +220,9 @@
       }
     }
 
-    // Fallback: some wallets use a non-ATA token account.
-    for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
-      try {
-        const result = await rpc("getTokenAccountsByOwner", [
-          owner,
-          {mint},
-          {encoding:"jsonParsed", commitment:"confirmed"}
-        ]);
-
-        const matches = (result?.value || [])
-          .map(item => {
-            const info = item?.account?.data?.parsed?.info;
-            const amount = info?.tokenAmount;
-            return {
-              pubkey:item?.pubkey,
-              programId,
-              decimals:Number(amount?.decimals),
-              rawAmount:String(amount?.amount || "0"),
-              uiAmount:Number(amount?.uiAmountString || 0),
-              mint:info?.mint
-            };
-          })
-          .filter(item =>
-            item.pubkey &&
-            item.mint === mint &&
-            Number.isFinite(item.decimals) &&
-            item.decimals >= 0
-          );
-
-        const found = matches.find(item => item.rawAmount !== "0") || matches[0];
-        if (found) return found;
-      } catch (err) {
-        console.warn("Indexed token-account lookup failed:", err);
-      }
-    }
+    // The standard ATA path above is the stable path for GurugSwap.
+    // Do not call getTokenAccountsByOwner here: several public RPCs reject
+    // indexed token-account queries, which can make a valid balance look missing.
 
     return null;
   }
