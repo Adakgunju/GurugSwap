@@ -52,6 +52,7 @@
   let selectedDecimals = null;
   let selectedBalance = null;
   let lookupTimer = null;
+  let maxBurnSelected = false;
 
   function provider() {
     if (window.phantom?.solana?.isPhantom) return window.phantom.solana;
@@ -327,7 +328,10 @@
       if (!selectedAccount || selectedDecimals === null) await refreshBalance();
       if (!selectedAccount) throw new Error("No token account found for this wallet.");
 
-      const rawAmount = decimalToRaw(amountInput.value, selectedDecimals);
+      const rawAmount = maxBurnSelected
+        ? selectedBalance
+        : decimalToRaw(amountInput.value, selectedDecimals);
+      if (rawAmount <= 0n) throw new Error("Burn amount must be greater than 0.");
       if (rawAmount > selectedBalance) throw new Error("Burn amount exceeds your wallet balance.");
 
       const owner = p.publicKey.toString();
@@ -428,6 +432,7 @@
   maxButton.addEventListener("click", () => {
     if (selectedBalance === null || selectedDecimals === null || selectedBalance <= 0n) return;
     amountInput.value = rawToDecimal(selectedBalance, selectedDecimals);
+    maxBurnSelected = true;
     amountInput.dispatchEvent(new Event("input", {bubbles:true}));
   });
 
@@ -438,6 +443,9 @@
 
   amountInput.addEventListener("input", () => {
     if (selectedDecimals === null) return;
+    if (document.activeElement === amountInput && amountInput.value !== rawToDecimal(selectedBalance || 0n, selectedDecimals)) {
+      maxBurnSelected = false;
+    }
     try {
       const raw = decimalToRaw(amountInput.value, selectedDecimals);
       if (raw > selectedBalance) {
