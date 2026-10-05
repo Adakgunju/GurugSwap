@@ -273,22 +273,14 @@
       }
 
       navLinks.forEach(link => {
-        link.addEventListener("click", event => {
+        link.addEventListener("click", () => {
           const target = link.getAttribute("href");
-          if (!target || !linksByTarget.has(target)) return;
-          setActive(target);
-
-          // Force platform navigation to the exact section target.
-          // This prevents the fixed/centered desktop navigation from
-          // falling through to the currently visible SWAP section.
-          const section = document.querySelector(target);
-          if (section) {
-            event.preventDefault();
-            history.pushState(null, "", target);
-            section.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
+          if (target && linksByTarget.has(target)) setActive(target);
         });
       });
+
+      // Native hash navigation is intentionally preserved here.
+      // The href itself is the single source of truth for section navigation.
 
       const sectionIds = Array.from(linksByTarget.keys())
         .map(hash => hash.slice(1))
