@@ -8,11 +8,13 @@
     "https://rpc.solanatracker.io/public"
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
+  const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
   const MAX_RECIPIENTS_PER_TX = 5;
   const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
   const GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS = 1000000; // 0.001 SOL
 
   let splPromise = null;
+  let bufferPromise = null;
   let recipientAddresses = [];
 
   function getProvider() {
@@ -41,6 +43,13 @@
   }
 
   async function loadSpl() {
+    if (!bufferPromise) {
+      bufferPromise = import(BUFFER_CDN).then(mod => {
+        if (!globalThis.Buffer && mod?.Buffer) globalThis.Buffer = mod.Buffer;
+        return mod;
+      });
+    }
+    await bufferPromise;
     if (!splPromise) splPromise = import(SPL_CDN);
     return splPromise;
   }
