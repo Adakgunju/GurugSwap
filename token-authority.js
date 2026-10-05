@@ -211,6 +211,32 @@
   }
 
   async function readMint(mint) {
+    // Prefer Solana's parsed mint response. This correctly handles both
+    // classic SPL Token mints and Token-2022 mints without relying on
+    // extension length or manual byte-layout assumptions.
+    const parsedResult = await rpc("getAccountInfo", [
+      mint,
+      {encoding:"jsonParsed", commitment:"confirmed"}
+    ]);
+    const parsedValue = parsedResult?.value;
+    if (!parsedValue) throw new Error("Token mint account was not found.");
+    if (parsedValue.owner !== TOKEN_PROGRAM && parsedValue.owner !== TOKEN_2022_PROGRAM) {
+      throw new Error("This address is not an SPL Token or Token-2022 mint.");
+    }
+
+    const parsed = parsedValue.data?.parsed;
+    const info = parsed?.info;
+    const type = parsed?.type;
+    if (type === "mint" && info) {
+      return {
+        mint,
+        programId: parsedValue.owner,
+        mintAuthority: info.mintAuthority || null,
+        freezeAuthority: info.freezeAuthority || null
+      };
+    }
+
+    // Fallback for RPCs that do not return jsonParsed for this mint.
     const result = await rpc("getAccountInfo", [
       mint,
       {encoding:"base64", commitment:"confirmed"}
