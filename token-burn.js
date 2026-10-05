@@ -3,10 +3,8 @@
   if (!app) return;
 
   const RPCS = [
-    "https://solana-rpc.publicnode.com",
-    "https://api.mainnet.solana.com",
-    "https://api.mainnet-beta.solana.com",
-    "https://rpc.solanatracker.io/public"
+    "https://rpc.solanatracker.io/public",
+    "https://api.mainnet-beta.solana.com"
   ];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
@@ -98,7 +96,6 @@
   function rawToDecimal(value, decimals) {
     const raw = BigInt(value || 0);
     if (decimals === 0) return raw.toString();
-
     const text = raw.toString().padStart(decimals + 1, "0");
     const splitAt = text.length - decimals;
     const whole = text.slice(0, splitAt);
@@ -146,86 +143,31 @@
   async function findTokenAccount(mint) {
     const p = provider();
     if (!p?.publicKey) throw new Error("Connect your wallet first.");
-
     const owner = p.publicKey.toString();
 
-    // First use the RPC's token-account index and filter by the exact mint.
-    // This also finds non-ATA token accounts.
     for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
-      try {
-        const result = await rpc("getTokenAccountsByOwner", [
-          owner,
-          {programId},
-          {encoding:"jsonParsed", commitment:"confirmed"}
-        ]);
+      const result = await rpc("getTokenAccountsByOwner", [
+        owner,
+        {programId},
+        {encoding:"jsonParsed", commitment:"confirmed"}
+      ]);
 
-        const matches = (result?.value || [])
-          .map(item => {
-            const info = item?.account?.data?.parsed?.info;
-            const amount = info?.tokenAmount;
-            return {
-              pubkey:item?.pubkey,
-              programId,
-              mint:info?.mint,
-              decimals:Number(amount?.decimals),
-              rawAmount:String(amount?.amount || "0"),
-              uiAmount:Number(amount?.uiAmountString || 0)
-            };
-          })
-          .filter(item =>
-            item.pubkey &&
-            item.mint === mint &&
-            Number.isFinite(item.decimals) &&
-            item.decimals >= 0
-          );
-
-        const found = matches.find(item => item.rawAmount !== "0") || matches[0];
-        if (found) return found;
-      } catch (err) {
-        console.warn("Program token-account lookup failed for", programId, err);
-      }
-    }
-
-    // Fallback: derive the standard ATA and read it directly.
-    const mintKey = new solanaWeb3.PublicKey(mint);
-    const ownerKey = new solanaWeb3.PublicKey(owner);
-    const associatedTokenProgram = new solanaWeb3.PublicKey(
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-    );
-
-    for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
-      const tokenProgramKey = new solanaWeb3.PublicKey(programId);
-      const [ata] = solanaWeb3.PublicKey.findProgramAddressSync(
-        [ownerKey.toBuffer(), tokenProgramKey.toBuffer(), mintKey.toBuffer()],
-        associatedTokenProgram
-      );
-
-      try {
-        const account = await rpc("getAccountInfo", [
-          ata.toString(),
-          {encoding:"jsonParsed", commitment:"confirmed"}
-        ]);
-        const info = account?.value?.data?.parsed?.info;
-        const amount = info?.tokenAmount;
-        if (
-          account?.value &&
-          account.value.owner === programId &&
-          info?.mint === mint &&
-          info?.owner === owner &&
-          amount
-        ) {
+      const matches = (result?.value || [])
+        .map(item => {
+          const info = item?.account?.data?.parsed?.info;
+          const amount = info?.tokenAmount;
           return {
-            pubkey:ata.toString(),
+            pubkey: item?.pubkey,
             programId,
-            decimals:Number(amount.decimals),
-            rawAmount:String(amount.amount || "0"),
-            uiAmount:Number(amount.uiAmountString || 0),
-            mint
+            decimals: Number(amount?.decimals),
+            rawAmount: String(amount?.amount || "0"),
+            uiAmount: Number(amount?.uiAmountString || 0)
           };
-        }
-      } catch (err) {
-        console.warn("ATA fallback lookup failed for", programId, err);
-      }
+        })
+        .filter(item => item.pubkey && item.decimals >= 0);
+
+      const found = matches.find(item => item.rawAmount !== "0") || matches[0];
+      if (found) return found;
     }
 
     return null;
