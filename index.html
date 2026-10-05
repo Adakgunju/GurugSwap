@@ -21,6 +21,7 @@
       <a href="#multi-airdrop">MULTI AIRDROP</a>
       <a href="#links">GURUG NETWORK</a>
       <a href="#partner-ads">PARTNERS</a>
+      <a href="#token-burn">TOKEN BURN</a>
     </nav>
     <div class="top-actions">
       <div class="market-ticker" aria-label="GURUG market price"><span class="ticker-label">GURUG</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
@@ -35,6 +36,7 @@
     <a href="#swap">TOKEN SWAP</a>
     <a href="#multi-airdrop">MULTI AIRDROP</a>
     <a href="#links">GURUG NETWORK</a>
+    <a href="#token-burn">TOKEN BURN</a>
   </div>
   <main>
     <section class="hero platform-header">
@@ -60,6 +62,7 @@
         <a class="workspace-nav" href="#multi-airdrop"><span>05</span><b>MULTI AIRDROP</b><em>↗</em></a>
         <a class="workspace-nav" href="#links"><span>06</span><b>GURUG NETWORK</b><em>↗</em></a>
         <a class="workspace-nav" href="#partner-ads"><span>07</span><b>PARTNERS</b><em>↗</em></a>
+        <a class="workspace-nav" href="#token-burn"><span>08</span><b>TOKEN BURN</b><em>↗</em></a>
         <div class="sidebar-foot"><span>SOLANA</span><span>NON-CUSTODIAL</span></div>
       </aside>
       <div class="workspace-main">
@@ -163,6 +166,15 @@
       </div>
     </section>
 
+    <section id="token-burn" class="platform-placeholder-section token-burn-section" aria-label="Token burn">
+      <div class="platform-placeholder-head">
+        <div class="platform-section-kicker">08 / TOKEN BURN</div>
+        <h2>Burn <span class="section-title-accent">Tokens.</span></h2>
+        <p>Permanently remove your SPL tokens from circulation on Solana.</p>
+      </div>
+      <div id="tokenBurnApp"></div>
+    </section>
+
     <section id="partner-ads" class="partner-ads">
       <div class="partner-ads-heading">
         <div class="platform-section-kicker">07 / PARTNER ADS</div>
@@ -197,6 +209,7 @@
   <script src="distribute-token.js?v=4"></script>
   <script src="multi-airdrop.js?v=9"></script>
   <script src="liquidity-token.js?v=16"></script>
+  <script src="token-burn.js?v=1"></script>
   <script>
     (() => {
       const button = document.getElementById("mobileMenuBtn");
@@ -546,7 +559,8 @@
           "swap",
           "multi-airdrop",
           "links",
-          "partner-ads"
+          "partner-ads",
+          "token-burn"
         ];
 
         const sections = new Map(
