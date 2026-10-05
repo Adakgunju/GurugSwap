@@ -2725,3 +2725,36 @@ body{background:#151714!important}
     height:3px!important;
   }
 }
+
+/* --- SOLANA LOGO VISIBILITY FIX --- */
+.platform-header .hero-network .solana-mark{
+  position:relative!important;
+  display:inline-flex!important;
+  width:26px!important;
+  height:22px!important;
+  min-width:26px!important;
+  flex:0 0 26px!important;
+  opacity:1!important;
+  visibility:visible!important;
+  overflow:visible!important;
+  z-index:3!important;
+}
+.platform-header .hero-network .solana-mark i{
+  position:relative!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:26px!important;
+  height:4px!important;
+  min-height:4px!important;
+  background:linear-gradient(90deg,#9945ff 0%,#14f195 100%)!important;
+  border-radius:2px!important;
+}
+@media(max-width:850px){
+  .platform-header .hero-network .solana-mark{
+    width:22px!important;height:20px!important;min-width:22px!important;flex-basis:22px!important;
+  }
+  .platform-header .hero-network .solana-mark i{
+    width:22px!important;height:3px!important;min-height:3px!important;
+  }
+}
