@@ -134,10 +134,12 @@
     if (!p?.publicKey) throw new Error("Connect your wallet first.");
     const owner = p.publicKey.toString();
 
+    // Ask the RPC for this exact mint instead of scanning every token account.
+    // Solana's getTokenAccountsByOwner supports a mint filter directly.
     for (const programId of [TOKEN_PROGRAM, TOKEN_2022_PROGRAM]) {
       const result = await rpc("getTokenAccountsByOwner", [
         owner,
-        {programId},
+        {mint},
         {encoding:"jsonParsed", commitment:"confirmed"}
       ]);
 
@@ -145,16 +147,24 @@
         .map(item => {
           const info = item?.account?.data?.parsed?.info;
           const amount = info?.tokenAmount;
+          const accountMint = info?.mint;
           return {
             pubkey: item?.pubkey,
             programId,
             decimals: Number(amount?.decimals),
             rawAmount: String(amount?.amount || "0"),
-            uiAmount: Number(amount?.uiAmountString || 0)
+            uiAmount: Number(amount?.uiAmountString || 0),
+            mint: accountMint
           };
         })
-        .filter(item => item.pubkey && item.decimals >= 0);
+        .filter(item =>
+          item.pubkey &&
+          item.mint === mint &&
+          Number.isFinite(item.decimals) &&
+          item.decimals >= 0
+        );
 
+      // Prefer an account that actually has a balance.
       const found = matches.find(item => item.rawAmount !== "0") || matches[0];
       if (found) return found;
     }
