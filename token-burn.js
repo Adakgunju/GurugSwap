@@ -127,11 +127,11 @@
     return bytes;
   }
 
-  function burnCheckedInstruction(account, mint, owner, amount, decimals, programId) {
-    const data = new Uint8Array(10);
-    data[0] = 15; // BurnChecked
+  function burnInstruction(account, mint, owner, amount, programId) {
+    const data = new Uint8Array(9);
+    data[0] = 8; // Burn
     data.set(u64le(amount), 1);
-    data[9] = decimals;
+
     return new solanaWeb3.TransactionInstruction({
       programId: new solanaWeb3.PublicKey(programId),
       keys: [
@@ -333,17 +333,16 @@
       const owner = p.publicKey.toString();
       const transaction = new solanaWeb3.Transaction();
       transaction.add(
-        burnCheckedInstruction(
+        burnInstruction(
           selectedAccount.pubkey,
           mint,
           owner,
           rawAmount,
-          selectedDecimals,
           selectedAccount.programId
         )
       );
 
-      const connection = new solanaWeb3.Connection(RPCS[0], "confirmed");
+      const connection = new solanaWeb3.Connection("https://api.mainnet.solana.com", "confirmed");
       const latest = await connection.getLatestBlockhash("confirmed");
       transaction.recentBlockhash = latest.blockhash;
       transaction.feePayer = p.publicKey;
