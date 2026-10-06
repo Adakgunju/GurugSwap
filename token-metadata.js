@@ -123,6 +123,48 @@
     return value ? value.slice(0, 6) + "…" + value.slice(-6) : "—";
   }
 
+  function uriCandidates(uri, baseUri = "") {
+    const raw = String(uri || "").trim();
+    if (!raw) return [];
+    if (raw.startsWith("data:")) return [raw];
+
+    if (raw.startsWith("ipfs://")) {
+      const path = raw.slice(7).replace(/^ipfs\//, "");
+      return [
+        "https://ipfs.io/ipfs/" + path,
+        "https://dweb.link/ipfs/" + path,
+        "https://gateway.pinata.cloud/ipfs/" + path
+      ];
+    }
+
+    if (raw.startsWith("ar://")) {
+      return ["https://arweave.net/" + raw.slice(5)];
+    }
+
+    if (raw.startsWith("//")) return ["https:" + raw];
+
+    try {
+      return [new URL(raw, baseUri || window.location.href).href];
+    } catch {
+      return [raw];
+    }
+  }
+
+  async function fetchJsonFromUri(uri) {
+    const candidates = uriCandidates(uri);
+    let lastError = null;
+    for (const candidate of candidates) {
+      try {
+        const response = await fetch(candidate, {cache:"no-store"});
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        return {json: await response.json(), url: candidate};
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError || new Error("Metadata JSON could not be loaded.");
+  }
+
   function setStatus(label, message, type = "") {
     status.className = "token-metadata-status" + (type ? " " + type : "");
     statusLabel.textContent = label;
@@ -438,20 +480,29 @@
       currentPlaceholder.style.display = "flex";
       if (md.uri) {
         try {
-          const json = await fetch(md.uri, {cache:"no-store"}).then(r => r.json());
+          const loaded = await fetchJsonFromUri(md.uri);
+          const json = loaded.json;
           tokenState.json = json;
-          if (json?.image) {
-            currentLogo.src = json.image;
+
+          const imageCandidates = uriCandidates(json?.image, loaded.url);
+          let imageIndex = 0;
+          const showNextImage = () => {
+            if (imageIndex >= imageCandidates.length) {
+              currentLogo.hidden = true;
+              currentPlaceholder.style.display = "flex";
+              return;
+            }
+            const candidate = imageCandidates[imageIndex++];
             currentLogo.onload = () => {
               currentLogo.hidden = false;
               currentPlaceholder.style.display = "none";
             };
-            currentLogo.onerror = () => {
-              currentLogo.hidden = true;
-              currentPlaceholder.style.display = "flex";
-            };
-          }
-        } catch {
+            currentLogo.onerror = showNextImage;
+            currentLogo.src = candidate;
+          };
+          showNextImage();
+        } catch (error) {
+          console.warn("Current token metadata/logo could not be loaded:", error);
           tokenState.json = null;
         }
       }
