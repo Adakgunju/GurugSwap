@@ -19,6 +19,7 @@
   let activeRpc = RPCS[0];
   let metadataModulesPromise = null;
   let tokenState = null;
+  const GURUG_METADATA_FEE_LAMPORTS = 100000000;
 
   app.innerHTML = `
     <div class="token-metadata-card">
@@ -66,7 +67,7 @@
         <div class="token-metadata-replace">
           <div>
             <span>ON-CHAIN UPDATE</span>
-            <strong>Replace the metadata URI with a new permanent Arweave record.</strong>
+            <strong>Replace the metadata URI with a new permanent Arweave record. <b>GurugSwap fee: 0.10 SOL.</b></strong>
           </div>
           <button id="metadataUpdate" class="connect" type="button" disabled>UPDATE LOGO</button>
         </div>
@@ -82,7 +83,7 @@
       <div class="token-metadata-foot">
         <span>NON-CUSTODIAL</span>
         <span>METAPLEX TOKEN METADATA</span>
-        <span>PERMANENT ARWEAVE STORAGE</span>
+        <span>GURUGSWAP FEE: 0.10 SOL</span>
       </div>
     </div>
   `;
@@ -505,7 +506,7 @@
       "Metadata"
     );
 
-    setStatus("UPDATING ON-CHAIN", "Approve the metadata update in Phantom. The token Mint Address will not change…", "active");
+    setStatus("UPDATING ON-CHAIN", "Approve the metadata update + 0.10 SOL GurugSwap service fee in Phantom. The token Mint Address will not change…", "active");
 
     const {umi, modules} = await createUmiForWallet(p);
     const {publicKey} = modules.umi;
@@ -518,7 +519,13 @@
         ...tokenState.asset.metadata,
         uri: metadataUri
       }
-    });
+    }).add(
+      modules.umi.transferSol(umi, {
+        source: umi.identity,
+        destination: publicKey("ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH"),
+        amount: modules.umi.sol(0.10)
+      })
+    );
 
     const result = await builder.sendAndConfirm(umi, {send:{commitment:"confirmed", skipPreflight:false}});
     const signature = result?.signature ? String(result.signature) : "";
@@ -534,7 +541,7 @@
       throw new Error("Transaction confirmed, but the new metadata URI could not be verified yet. Please wait for RPC indexing and check again.");
     }
 
-    setStatus("LOGO UPDATED", "New logo metadata is now registered on-chain. Wallets and services can refresh their cached token data.", "success");
+    setStatus("LOGO UPDATED", "New logo metadata is now registered on-chain. The 0.10 SOL GurugSwap service fee was included in the same transaction. Wallets and services can refresh their cached token data.", "success");
     txLink.href = "https://solscan.io/tx/" + signature;
     txLink.hidden = false;
     uriLink.href = metadataUri;
