@@ -166,12 +166,15 @@
 
   async function loadMetadataModules() {
     if (!metadataModulesPromise) {
-      metadataModulesPromise = Promise.all([
-        import(UMI_CDN),
-        import(UMI_DEFAULTS_CDN),
-        import(UMI_WALLET_CDN),
-        import(MPL_METADATA_CDN)
-      ]).then(([umi, defaults, walletAdapters, metadata]) => ({
+      metadataModulesPromise = import("https://esm.sh/buffer@6.0.3?bundle").then(bufferModule => {
+        if (!globalThis.Buffer) globalThis.Buffer = bufferModule.Buffer;
+        return Promise.all([
+          import(UMI_CDN),
+          import(UMI_DEFAULTS_CDN),
+          import(UMI_WALLET_CDN),
+          import(MPL_METADATA_CDN)
+        ]);
+      }).then(([umi, defaults, walletAdapters, metadata]) => ({
         umi, defaults, walletAdapters, metadata
       }));
     }
