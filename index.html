@@ -41,6 +41,73 @@
     <a href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN AUTHORITY</a>
     <a href="#links">GURUG NETWORK</a>
   </div>
+  <script>
+    // EARLY NAVIGATION GUARD
+    // Keep core navigation independent from feature scripts.
+    (() => {
+      const menuButton = document.getElementById("mobileMenuBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      if (menuButton && mobileMenu) {
+        menuButton.addEventListener("click", () => {
+          const open = mobileMenu.hidden;
+          mobileMenu.hidden = !open;
+          menuButton.setAttribute("aria-expanded", String(open));
+          menuButton.textContent = open ? "CLOSE" : "MENU";
+        });
+      }
+
+      document.addEventListener("click", event => {
+        const link = event.target.closest(".workspace-nav, .desktop-nav a, #mobileMenu a");
+        if (!link) return;
+
+        const href = link.getAttribute("href") || "";
+        if (!href.startsWith("#")) return;
+
+        const targetId = href.slice(1);
+        if (!targetId) return;
+
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
+        event.preventDefault();
+
+        document.querySelectorAll(".workspace-main > section").forEach(section => {
+          const active = section.id === targetId || (targetId === "swap" && section.id === "token-info");
+          section.classList.toggle("single-section-active", section.id === targetId);
+          if (section.id === "token-info") {
+            section.classList.toggle("single-section-companion", targetId === "swap");
+          }
+          section.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+
+        const main = document.querySelector(".workspace-main");
+        if (main) main.classList.add("single-section-view");
+
+        document.querySelectorAll(".workspace-nav, .desktop-nav a, #mobileMenu a").forEach(item => {
+          const active = item.getAttribute("href") === "#" + targetId;
+          item.classList.toggle("active", active);
+          if (active) item.setAttribute("aria-current", "page");
+          else item.removeAttribute("aria-current");
+        });
+
+        history.replaceState(null, "", "#" + targetId);
+
+        if (mobileMenu && !mobileMenu.hidden) {
+          mobileMenu.hidden = true;
+          if (menuButton) {
+            menuButton.setAttribute("aria-expanded", "false");
+            menuButton.textContent = "MENU";
+          }
+        }
+
+        const topbar = document.querySelector(".topbar");
+        const offset = (topbar?.offsetHeight || 76) + 10;
+        const y = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({top: Math.max(0, y), behavior: "smooth"});
+      });
+    })();
+  </script>
   <main>
     <section class="hero platform-header">
       <div class="hero-copy">
