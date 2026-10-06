@@ -55,6 +55,8 @@
             <strong id="metadataTokenName">—</strong>
             <small id="metadataTokenSymbol">—</small>
             <code id="metadataAuthority">—</code>
+            <code id="metadataDebugUri" style="display:block;margin-top:8px;white-space:normal;word-break:break-all;font-size:9px;color:#9b9b91;">METADATA: —</code>
+            <code id="metadataDebugImage" style="display:block;margin-top:4px;white-space:normal;word-break:break-all;font-size:9px;color:#9b9b91;">IMAGE: —</code>
           </div>
         </div>
 
@@ -96,6 +98,8 @@
   const nameEl = document.getElementById("metadataTokenName");
   const symbolEl = document.getElementById("metadataTokenSymbol");
   const authorityEl = document.getElementById("metadataAuthority");
+  const debugUriEl = document.getElementById("metadataDebugUri");
+  const debugImageEl = document.getElementById("metadataDebugImage");
   const walletNote = document.getElementById("metadataWalletNote");
   const logoInput = document.getElementById("metadataLogo");
   const newLogo = document.getElementById("metadataNewLogo");
@@ -482,6 +486,8 @@
       symbolEl.textContent = md.symbol ? "$" + md.symbol : "—";
       authorityEl.textContent = authority ? short(authority) : "NO UPDATE AUTHORITY";
       authorityEl.title = authority;
+      debugUriEl.textContent = "METADATA: " + (md.uri || "NONE");
+      debugImageEl.textContent = "IMAGE: loading…";
 
       const connected = provider()?.publicKey?.toString();
       walletNote.textContent = connected
@@ -495,6 +501,8 @@
           const loaded = await fetchJsonFromUri(md.uri);
           const json = loaded.json;
           tokenState.json = json;
+          debugUriEl.textContent = "METADATA: " + loaded.url;
+          debugImageEl.textContent = "IMAGE: " + (json?.image || json?.properties?.image || "NONE");
 
           const imageUris = [];
           if (typeof json?.image === "string") imageUris.push(json.image);
@@ -526,6 +534,7 @@
           };
           showNextImage();
         } catch (error) {
+          debugImageEl.textContent = "IMAGE: metadata JSON could not be loaded";
           console.warn("Current token metadata/logo could not be loaded:", error);
           tokenState.json = null;
         }
