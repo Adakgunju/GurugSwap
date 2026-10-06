@@ -12,6 +12,8 @@
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
   const ASSOCIATED_TOKEN_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
   const SYSTEM_PROGRAM = "11111111111111111111111111111111";
+  const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
+  const GURUG_MINT_SERVICE_FEE_LAMPORTS = 200000000;
   let activeRpc = RPCS[0];
   let mintState = null;
 
@@ -107,7 +109,7 @@
               <a id="tokenMintTx" class="token-mint-tx" href="#" target="_blank" rel="noopener noreferrer" hidden>VIEW TRANSACTION ↗</a>
             </div>
 
-            <div class="token-mint-foot"><span>NON-CUSTODIAL</span><span>ON-CHAIN MINT</span><span>PHANTOM SIGNATURE</span></div>
+            <div class="token-mint-foot"><span>NON-CUSTODIAL</span><span>GURUGSWAP FEE: 0.20 SOL</span><span>PHANTOM SIGNATURE</span></div>
           </div>
         </div>
       </section>
@@ -395,7 +397,7 @@
 
     const button=document.getElementById("tokenMintButton");
     button.disabled=true;
-    setStatus("AWAITING APPROVAL","Approve the token mint transaction in Phantom.","active");
+    setStatus("AWAITING APPROVAL","Approve the mint + 0.20 SOL GurugSwap service fee in Phantom.","active");
     const signed=await p.signTransaction(tx);
     const txId=await connection.sendRawTransaction(signed.serialize(),{skipPreflight:false,maxRetries:3});
     setStatus("CONFIRMING","Checking the mint transaction on Solana…","active");
