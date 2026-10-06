@@ -8,6 +8,9 @@
   ];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxwEb";
+  const SYSTEM_PROGRAM = "11111111111111111111111111111111";
+  const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
+  const GURUG_REVOKE_FEE_LAMPORTS = 50000000;
   let activeRpc = RPCS[0];
   let mintState = null;
 
@@ -418,10 +421,22 @@
     // GurugSwap service fee applies only to permanent revocation.
     // Keep authority changes free; add the 0.05 SOL fee to the same transaction.
     if (isRevoke) {
-      transaction.add(solanaWeb3.SystemProgram.transfer({
-        fromPubkey: p.publicKey,
-        toPubkey: new solanaWeb3.PublicKey(GURUG_FEE_WALLET),
-        lamports: GURUG_REVOKE_FEE_LAMPORTS
+      // Build the native SOL transfer directly so this browser bundle does
+      // not depend on a global Buffer implementation.
+      const feeData = new Uint8Array(12);
+      feeData[0] = 2; // System Program: Transfer
+      let feeLamports = BigInt(GURUG_REVOKE_FEE_LAMPORTS);
+      for (let i = 0; i < 8; i++) {
+        feeData[4 + i] = Number(feeLamports & 255n);
+        feeLamports >>= 8n;
+      }
+      transaction.add(new solanaWeb3.TransactionInstruction({
+        programId: new solanaWeb3.PublicKey(SYSTEM_PROGRAM),
+        keys: [
+          {pubkey:p.publicKey, isSigner:true, isWritable:true},
+          {pubkey:new solanaWeb3.PublicKey(GURUG_FEE_WALLET), isSigner:false, isWritable:true}
+        ],
+        data: feeData
       }));
     }
 
