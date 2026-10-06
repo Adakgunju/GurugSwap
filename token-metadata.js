@@ -536,6 +536,7 @@
         const fallbackImages = [
           "https://dd.dexscreener.com/ds-data/tokens/solana/" + mint + ".png"
         ];
+
         try {
           const jupiter = await fetch(
             "https://lite-api.jup.ag/tokens/v2/search?query=" + encodeURIComponent(mint),
@@ -549,6 +550,7 @@
         } catch (error) {
           console.warn("Jupiter logo fallback unavailable:", error);
         }
+
         try {
           const fm = await fetch(
             "https://api.solana.fm/v1/tokens/" + encodeURIComponent(mint),
@@ -558,11 +560,6 @@
           if (fmImage) fallbackImages.unshift(fmImage);
         } catch (error) {
           console.warn("SolanaFM logo fallback unavailable:", error);
-        }
-
-        let fallbackIndex = 0;
-        } catch (error) {
-          console.warn("Jupiter logo fallback unavailable:", error);
         }
 
         let fallbackIndex = 0;
