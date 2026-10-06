@@ -263,14 +263,32 @@
       document.getElementById("tokenMintDecimals").textContent=String(mintState.decimals);
       document.getElementById("tokenMintSupply").textContent=rawToUi(mintState.supply,mintState.decimals);
       const p=provider();
-      const ata=ataAddress(p?.publicKey||new solanaWeb3.PublicKey("11111111111111111111111111111111"),new solanaWeb3.PublicKey(mint),mintState.programId);
-      document.getElementById("tokenMintAccount").textContent=p?.publicKey?ata.toString():"Connect wallet";
       const check=document.getElementById("tokenMintAuthorityCheck");
+
+      // Read the authority state first. A revoked Mint Authority must be
+      // reported cleanly without attempting any ATA derivation.
       if(!authority){
         check.textContent="MINT AUTHORITY REVOKED";
+        document.getElementById("tokenMintAccount").textContent=p?.publicKey ? "—" : "Connect wallet";
         setStatus("MINT DISABLED","This token has no Mint Authority. Additional tokens cannot be minted.","error");
         return;
       }
+
+      if(!p?.publicKey){
+        check.textContent="WALLET NOT CONNECTED";
+        document.getElementById("tokenMintAccount").textContent="Connect wallet";
+        setStatus("CONNECT WALLET","This token can be minted, but you must connect the current Mint Authority wallet first.","");
+        return;
+      }
+
+      // Only derive the ATA after the mint has an active authority and a
+      // real wallet public key is available.
+      const walletKey = p.publicKey instanceof solanaWeb3.PublicKey
+        ? p.publicKey
+        : new solanaWeb3.PublicKey(String(p.publicKey));
+      const ata=ataAddress(walletKey,new solanaWeb3.PublicKey(mint),mintState.programId);
+      document.getElementById("tokenMintAccount").textContent=ata.toString();
+
       if(!authorityMatches()){
         check.textContent="AUTHORITY IS ANOTHER WALLET";
         setStatus("AUTHORITY REQUIRED","This token has an active Mint Authority, but the connected wallet is not that authority.","");
