@@ -293,23 +293,6 @@
   <script src="token-authority.js?v=4"></script>
   <script src="token-mint.js?v=23"></script>
   <script>
-    (() => {
-      const button = document.getElementById("mobileMenuBtn");
-      const menu = document.getElementById("mobileMenu");
-      if (!button || !menu) return;
-      button.addEventListener("click", () => {
-        const open = menu.hidden;
-        menu.hidden = !open;
-        button.setAttribute("aria-expanded", String(open));
-        button.textContent = open ? "CLOSE" : "MENU";
-      });
-      menu.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
-        menu.hidden = true;
-        button.setAttribute("aria-expanded", "false");
-        button.textContent = "MENU";
-      }));
-    })();
-
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
     // so it does not depend on script.js function scope or async timing.
