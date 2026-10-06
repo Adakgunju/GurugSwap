@@ -531,7 +531,27 @@
       })
     );
 
-    const result = await builder.sendAndConfirm(umi, {send:{commitment:"confirmed", skipPreflight:false}});
+    let result = null;
+    let lastError = null;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        // Fetch a fresh blockhash immediately before the wallet signing prompt.
+        const freshBuilder = await builder.setLatestBlockhash(umi);
+        result = await freshBuilder.sendAndConfirm(umi, {
+          send:{commitment:"confirmed", skipPreflight:false},
+          confirm:{commitment:"confirmed"}
+        });
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || error || "");
+        const expired = /block height exceeded|expired|blockhash/i.test(message);
+        if (!expired || attempt === 2) throw error;
+        setStatus("RETRYING", "The Solana blockhash expired before confirmation. A fresh transaction will be prepared — please approve it again in Phantom…", "active");
+      }
+    }
+    if (lastError) throw lastError;
     const signature = result?.signature ? String(result.signature) : "";
     if (!signature) throw new Error("Wallet did not return a metadata transaction signature.");
 
