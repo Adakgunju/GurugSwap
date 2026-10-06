@@ -4,9 +4,9 @@
  */
 (() => {
   const RPCS = [
-    "https://solana-rpc.publicnode.com",
     "https://api.mainnet-beta.solana.com",
-    "https://api.mainnet.solana.com"
+    "https://api.mainnet.solana.com",
+    "https://solana-rpc.publicnode.com"
   ];
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxu";
