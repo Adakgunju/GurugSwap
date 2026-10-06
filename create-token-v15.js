@@ -1145,7 +1145,7 @@
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         result = await withTimeout(
-          finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed"}}),
+          finalBuilder.sendAndConfirm(umi, {send: {commitment: "confirmed", skipPreflight: true}}),
           180000,
           "Token creation timed out. Check Phantom/Solscan before retrying."
         );
