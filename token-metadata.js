@@ -172,7 +172,8 @@
           import(UMI_CDN),
           import(UMI_DEFAULTS_CDN),
           import(UMI_WALLET_CDN),
-          import(MPL_METADATA_CDN)
+          import(MPL_METADATA_CDN),
+          import(MPL_TOOLBOX_CDN)
         ]);
       }).then(([umi, defaults, walletAdapters, metadata]) => ({
         umi, defaults, walletAdapters, metadata
@@ -523,7 +524,7 @@
         uri: metadataUri
       }
     }).add(
-      modules.umi.transferSol(umi, {
+      modules.toolbox.transferSol(umi, {
         source: umi.identity,
         destination: publicKey("ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH"),
         amount: modules.umi.sol(0.10)
