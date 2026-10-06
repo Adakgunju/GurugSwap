@@ -532,33 +532,72 @@
     );
 
     let result = null;
+    let signature = "";
     let lastError = null;
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        // Fetch a fresh blockhash immediately before the wallet signing prompt.
-        const freshBuilder = await builder.setLatestBlockhash(umi);
-        result = await freshBuilder.sendAndConfirm(umi, {
-          send:{commitment:"confirmed", skipPreflight:false},
-          confirm:{commitment:"confirmed"}
-        });
-        lastError = null;
-        break;
-      } catch (error) {
-        lastError = error;
-        const message = String(error?.message || error || "");
-        const expired = /block height exceeded|expired|blockhash/i.test(message);
-        if (!expired || attempt === 2) throw error;
-        setStatus("RETRYING", "The Solana blockhash expired before confirmation. A fresh transaction will be prepared — please approve it again in Phantom…", "active");
+
+    // First send the transaction and capture the signature. After Phantom signs,
+    // never charge or rebuild blindly: always inspect that exact signature first.
+    try {
+      result = await builder.sendAndConfirm(umi, {
+        send:{commitment:"confirmed", skipPreflight:false},
+        confirm:{commitment:"confirmed"}
+      });
+      signature = result?.signature ? String(result.signature) : "";
+    } catch (error) {
+      lastError = error;
+      const message = String(error?.message || error || "");
+      const candidate = error?.signature || error?.transactionSignature || "";
+      if (candidate) signature = String(candidate);
+      if (!signature && /block height exceeded|expired|blockhash/i.test(message)) {
+        setStatus("CHECKING TRANSACTION", "The wallet submitted the transaction, but confirmation timed out. Checking Solana for the submitted signature before asking for another approval…", "active");
+        // Umi may expose the signature even when confirmation throws.
+        if (error?.result?.signature) signature = String(error.result.signature);
       }
     }
-    if (lastError) throw lastError;
-    const signature = result?.signature ? String(result.signature) : "";
-    if (!signature) throw new Error("Wallet did not return a metadata transaction signature.");
+
+    if (!signature) {
+      if (lastError) throw lastError;
+      throw new Error("Wallet did not return a metadata transaction signature.");
+    }
+
+    // A confirmation exception does NOT mean the transaction failed.
+    // Search the full transaction history before considering any retry.
+    const connection = new solanaWeb3.Connection(activeRpc, "confirmed");
+    let confirmedStatus = null;
+    for (let i = 0; i < 30; i++) {
+      const statuses = await connection.getSignatureStatuses([signature], {
+        searchTransactionHistory:true
+      });
+      const s = statuses?.value?.[0];
+      if (s) {
+        if (s.err) {
+          throw new Error("Metadata transaction failed on-chain.");
+        }
+        if (s.confirmationStatus === "confirmed" || s.confirmationStatus === "finalized") {
+          confirmedStatus = s;
+          break;
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    if (!confirmedStatus) {
+      // Only now is it safe to inspect whether the transaction actually expired.
+      const txInfo = await connection.getTransaction(signature, {
+        commitment:"confirmed",
+        maxSupportedTransactionVersion:0
+      });
+      if (!txInfo) {
+        throw new Error("The metadata transaction was not confirmed. No additional fee was charged by GurugSwap.");
+      }
+      if (txInfo.meta?.err) {
+        throw new Error("Metadata transaction failed on-chain.");
+      }
+      confirmedStatus = {confirmationStatus:"confirmed"};
+    }
+
 
     setStatus("CONFIRMING", "Verifying the new metadata on Solana…", "active");
-    const connection = new solanaWeb3.Connection(activeRpc, "confirmed");
-    await waitForConfirmation(connection, signature);
-
     const verifyAsset = await fetchDigitalAsset(umi, publicKey(tokenState.mint));
     const verifiedUri = verifyAsset.metadata?.uri || "";
     if (verifiedUri !== metadataUri) {
