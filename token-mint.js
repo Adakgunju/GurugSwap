@@ -27,7 +27,7 @@
 .token-mint-field label{color:#f1f1e9;font-size:14px;font-weight:800;letter-spacing:.12em}
 .token-mint-field input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.18);border-radius:11px;background:#0b0d0a;color:#fff;padding:15px 14px;outline:0;font-size:16px}
 .token-mint-field input:focus{border-color:rgba(255,229,0,.55);box-shadow:0 0 0 2px rgba(255,229,0,.05)}
-.token-mint-field small{color:#c8c9bd;font-size:12px;line-height:1.45}
+.token-mint-field small{color:#e1e1d8;font-size:13px;line-height:1.5;font-weight:500}
 .token-mint-check{min-height:51px;border:1px solid rgba(255,255,255,.10);border-radius:11px;background:#10110d;color:#ddd;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:.08em}
 .token-mint-check.active{border-color:rgba(255,229,0,.35);color:#ffe500}
 .token-mint-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
@@ -37,13 +37,13 @@
 .token-mint-button{width:100%;margin-top:18px;min-height:54px;border:0;border-radius:11px;background:#ffe500;color:#10110d;font-size:14px;font-weight:900;letter-spacing:.13em;cursor:pointer}
 .token-mint-button:hover{filter:brightness(1.04)}
 .token-mint-button:disabled{opacity:.5;cursor:not-allowed}
-.token-mint-status{margin-top:12px;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:11px;background:#10110d;color:#d4d5ca;font-size:13px;line-height:1.55}
+.token-mint-status{margin-top:12px;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:11px;background:#10110d;color:#eeeeE7;font-size:14px;line-height:1.6}
 .token-mint-status.success{border-color:rgba(255,229,0,.45);color:#fff}
 .token-mint-status.error{border-color:rgba(255,120,120,.35);color:#ffadad}
-.token-mint-status-top{display:flex;align-items:center;gap:8px;font-weight:900;letter-spacing:.06em}
+.token-mint-status-top{display:flex;align-items:center;gap:8px;font-weight:900;letter-spacing:.06em;color:#f5f5ee}
 .token-mint-dot{width:7px;height:7px;border-radius:50%;background:#ffe500;box-shadow:0 0 10px rgba(255,229,0,.55)}
-.token-mint-tx{display:inline-block;margin-top:9px;color:#ffe500;text-decoration:none;font-size:12px;font-weight:800}
-.token-mint-foot{display:flex;justify-content:space-between;gap:10px;margin-top:13px;color:#77786f;font-size:10px;letter-spacing:.11em}
+.token-mint-tx{display:inline-block;margin-top:9px;color:#ffe500;font-weight:900;text-decoration:none;font-size:12px;font-weight:800}
+.token-mint-foot{display:flex;justify-content:space-between;gap:10px;margin-top:13px;color:#bfc0b7;font-size:10px;letter-spacing:.11em;font-weight:600}
 @media(max-width:700px){
   #token-mint{padding:34px 18px 18px}
   .token-mint-card{padding:21px}
