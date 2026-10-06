@@ -144,7 +144,19 @@
     if (raw.startsWith("//")) return ["https:" + raw];
 
     try {
-      return [new URL(raw, baseUri || window.location.href).href];
+      const absolute = new URL(raw, baseUri || window.location.href).href;
+      const candidates = [absolute];
+      const ipfsMatch = absolute.match(/\/ipfs\/([^?#]+)/i);
+      if (ipfsMatch) {
+        const path = ipfsMatch[1];
+        candidates.push(
+          "https://ipfs.io/ipfs/" + path,
+          "https://dweb.link/ipfs/" + path,
+          "https://cloudflare-ipfs.com/ipfs/" + path,
+          "https://gateway.pinata.cloud/ipfs/" + path
+        );
+      }
+      return [...new Set(candidates)];
     } catch {
       return [raw];
     }
