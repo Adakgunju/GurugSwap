@@ -149,7 +149,7 @@
     try{
       const bytes=decodeBase58(value);
       if(bytes.length!==32) return null;
-      return new solanaWeb3.PublicKey(bytes).toBase58();
+      return new solanaWeb3.PublicKey(Array.from(bytes)).toBase58();
     }catch{
       return null;
     }
