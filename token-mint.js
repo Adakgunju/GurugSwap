@@ -249,16 +249,20 @@
   }
 
   function ataAddress(owner,mint,programId){
-    const ownerKey = owner instanceof solanaWeb3.PublicKey ? owner : new solanaWeb3.PublicKey(owner);
-    const mintKey = mint instanceof solanaWeb3.PublicKey ? mint : new solanaWeb3.PublicKey(mint);
-    const tokenProgramKey = programId === TOKEN_2022_PROGRAM
-      ? new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM)
-      : new solanaWeb3.PublicKey(TOKEN_PROGRAM);
-    const associatedProgramKey = new solanaWeb3.PublicKey(ASSOCIATED_TOKEN_PROGRAM);
-    return solanaWeb3.PublicKey.findProgramAddressSync(
-      [ownerKey.toBytes(), tokenProgramKey.toBytes(), mintKey.toBytes()],
-      associatedProgramKey
-    )[0];
+    const ownerKey = owner instanceof solanaWeb3.PublicKey ? owner : new solanaWeb3.PublicKey(String(owner));
+    const mintKey = mint instanceof solanaWeb3.PublicKey ? mint : new solanaWeb3.PublicKey(String(mint));
+    let tokenProgramKey;
+    if(programId===TOKEN_2022_PROGRAM){
+      tokenProgramKey=new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM);
+    }else if(programId===TOKEN_PROGRAM){
+      tokenProgramKey=new solanaWeb3.PublicKey(TOKEN_PROGRAM);
+    }else{
+      throw new Error("Unknown token program: "+String(programId));
+    }
+    const associatedProgramKey=new solanaWeb3.PublicKey(ASSOCIATED_TOKEN_PROGRAM);
+    const seedBytes=[ownerKey.toBytes(),tokenProgramKey.toBytes(),mintKey.toBytes()];
+    if(seedBytes.some(b=>b.length!==32)) throw new Error("ATA seed length error");
+    return solanaWeb3.PublicKey.findProgramAddressSync(seedBytes,associatedProgramKey)[0];
   }
 
   function createAtaInstruction(ata,owner,mint,programId){
