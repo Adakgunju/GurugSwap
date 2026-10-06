@@ -61,7 +61,7 @@
         <label class="token-metadata-upload" for="metadataLogo">
           <input id="metadataLogo" type="file" accept="image/png,image/jpeg,image/webp">
           <div id="metadataUploadPlaceholder"><b>UPLOAD NEW LOGO</b><span>PNG, JPG or WEBP · 2 MB MAX</span></div>
-          <img id="metadataNewLogo" alt="New token logo preview">
+          <img id="metadataNewLogo" alt="New token logo preview" hidden>
         </label>
 
         <div class="token-metadata-replace">
