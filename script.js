@@ -1485,3 +1485,228 @@ if (heroConnectWalletBtn) {
     }
   });
 }
+
+
+/* GURUGSWAP — KOREAN LANGUAGE
+ * Polished Korean UI layer. Keeps all transaction logic unchanged.
+ */
+(() => {
+  const translations = {
+    "TOKEN CREATION":"토큰 생성",
+    "TOKEN DISTRIBUTION":"토큰 배포",
+    "LIQUIDITY POOL":"유동성 풀",
+    "TOKEN SWAP":"토큰 스왑",
+    "MULTI AIRDROP":"멀티 에어드롭",
+    "TOKEN BURN":"토큰 소각",
+    "TOKEN MINT":"토큰 추가 발행",
+    "TOKEN AUTHORITY":"토큰 권한 관리",
+    "GURUG NETWORK":"구루그 네트워크",
+    "CONNECT WALLET":"지갑 연결",
+    "CLOSE":"닫기",
+    "MENU":"메뉴",
+    "SOLANA TOKEN TRADING & CREATION":"솔라나 토큰 거래 & 생성",
+    "BUILT ON":"SOLANA 기반",
+    "NON-CUSTODIAL":"비수탁형",
+    "SOLANA MAINNET":"솔라나 메인넷",
+    "RAYDIUM POWERED":"RAYDIUM 기반",
+    "RAYDIUM":"RAYDIUM",
+    "Trade Tokens on":"솔라나에서 토큰을 거래하세요.",
+    "Swap SOL, GURUG and supported Solana tokens with a simple, transparent trading interface.":"간편하고 투명한 인터페이스로 SOL, GURUG 및 지원되는 솔라나 토큰을 스왑하세요.",
+    "GURUG SWAP":"GURUG SWAP",
+    "● LIVE ROUTE":"● 실시간 경로",
+    "YOU PAY":"지불",
+    "YOU RECEIVE":"수령",
+    "SELECT TOKEN":"토큰 선택",
+    "Search token or paste mint address":"토큰 검색 또는 민트 주소 입력",
+    "SLIPPAGE":"슬리피지",
+    "SWAP":"스왑",
+    "READY TO SWAP":"스왑 준비 완료",
+    "Enter SOL to get a live GURUG quote.":"SOL을 입력하면 실시간 GURUG 견적을 확인할 수 있습니다.",
+    "VIEW TRANSACTION ↗":"거래 내역 보기 ↗",
+    "TOKEN INFO":"토큰 정보",
+    "LIVE MARKET":"실시간 시장",
+    "LOADING MARKET":"시장 정보 불러오는 중",
+    "NO MARKET DATA":"시장 정보 없음",
+    "MARKET DATA UNAVAILABLE":"시장 정보를 불러올 수 없습니다",
+    "CONTRACT":"컨트랙트",
+    "COPY":"복사",
+    "COPIED!":"복사 완료!",
+    "PRICE":"가격",
+    "LIQUIDITY":"유동성",
+    "24H VOLUME":"24시간 거래량",
+    "24H":"24시간",
+    "VIEW CHART ↗":"차트 보기 ↗",
+    "Multi":"멀티",
+    "Airdrop.":"에어드롭.",
+    "Send your SPL tokens to multiple Solana wallets in one batch.":"여러 솔라나 지갑으로 SPL 토큰을 한 번에 전송하세요.",
+    "Burn":"소각",
+    "Tokens.":"토큰.",
+    "Permanently remove your SPL tokens from circulation on Solana.":"솔라나에서 SPL 토큰을 영구적으로 소각합니다.",
+    "Manage your token":"토큰",
+    "authorities.":"권한을 관리하세요.",
+    "View, change or permanently revoke the Mint Authority and Freeze Authority for your Solana token.":"솔라나 토큰의 Mint Authority와 Freeze Authority를 확인하고 변경하거나 영구 폐기할 수 있습니다.",
+    "Explore the Gurug ecosystem — SNS, Arcade, Mining and community.":"Gurug 생태계를 둘러보세요 — SNS, Arcade, Mining, 커뮤니티.",
+    "OFFICIAL":"공식",
+    "MARKET":"시장",
+    "FOLLOW":"팔로우",
+    "COMMUNITY":"커뮤니티",
+    "TRACK":"차트",
+    "WEBSITE":"웹사이트",
+    "CHART":"차트",
+    "FACEBOOK":"페이스북",
+    "TELEGRAM":"텔레그램",
+    "DEX TOOLS":"DEX TOOLS",
+    "PLAY":"플레이",
+    "EXPLORE":"탐험",
+    "GURUG ARCADE":"GURUG ARCADE",
+    "PLAY THE SPACE SHOOTER.":"우주 슈팅 게임을 플레이하세요.",
+    "GURUG MINING":"GURUG MINING",
+    "ENTER THE GURUG WORLD.":"GURUG 세계로 들어가세요.",
+    "PARTNER ADS":"파트너 광고",
+    "Partner":"파트너",
+    "Ads.":"광고.",
+    "Support the Gurug ecosystem with advertising. Reach the Solana community through GurugSwap.":"광고를 통해 Gurug 생태계를 함께 키워보세요. GurugSwap을 통해 솔라나 커뮤니티에 알릴 수 있습니다.",
+    "SPONSOR":"스폰서",
+    "YOUR AD HERE":"광고 문의",
+    "ABOUT GURUG":"ABOUT GURUG",
+    "Think.":"생각하고.",
+    "Swap.":"스왑하고.",
+    "Gurug.":"구루그.",
+    "Gurug is a meme character with a questionable plan and a very confident face.":"Gurug는 알 수 없는 계획과 자신감 넘치는 표정을 가진 밈 캐릭터입니다.",
+    "Built on Solana and built for fun, GurugSwap is the first brick of the Gurug web universe.":"Solana 위에서, 재미를 위해 만들어진 GurugSwap은 Gurug 웹 생태계의 첫 번째 시작점입니다.",
+    "CHAIN":"체인",
+    "ASSET":"자산",
+    "MOOD":"무드",
+    "UNSERIOUS":"진지하지 않음",
+    "BUILT ON SOLANA":"SOLANA 기반",
+    "GURUGSWAP — V1.0":"GURUGSWAP — V1.0",
+    "Create Token":"토큰 생성",
+    "Create Token on Solana":"솔라나에서 토큰 생성",
+    "TOKEN NAME":"토큰 이름",
+    "SYMBOL":"심볼",
+    "TOTAL SUPPLY":"총 발행량",
+    "DECIMALS":"소수점",
+    "TOKEN LOGO":"토큰 로고",
+    "UPLOAD LOGO":"로고 업로드",
+    "FIX TOTAL SUPPLY":"총 발행량 고정",
+    "REVOKE FREEZE AUTHORITY":"Freeze Authority 폐기",
+    "CREATE TOKEN":"토큰 생성하기",
+    "TOKEN MINT ADDRESS":"토큰 Mint 주소",
+    "AMOUNT TO MINT":"추가 발행 수량",
+    "MINT TOKENS":"토큰 추가 발행",
+    "TOKEN PROGRAM":"토큰 프로그램",
+    "CURRENT SUPPLY":"현재 발행량",
+    "YOUR TOKEN ACCOUNT":"내 토큰 계정",
+    "AUTHORITY NOT CHECKED":"권한 확인 전",
+    "READY":"준비 완료",
+    "Enter a token mint address to inspect its Mint Authority.":"토큰 Mint 주소를 입력하면 Mint Authority를 확인할 수 있습니다.",
+    "PHANTOM SIGNATURE":"Phantom 서명",
+    "PERMANENTLY REVOKE":"영구 폐기",
+    "CHANGE AUTHORITY":"권한 변경",
+    "MINT AUTHORITY":"Mint Authority",
+    "FREEZE AUTHORITY":"Freeze Authority",
+    "ACTIVE":"활성",
+    "REVOKED":"폐기됨",
+    "NONE — PERMANENTLY REVOKED":"없음 — 영구 폐기됨",
+    "CHECKING":"확인 중",
+    "CHECK FAILED":"확인 실패",
+    "INVALID MINT":"잘못된 Mint 주소",
+    "AUTHORITIES LOADED":"권한 확인 완료",
+    "NO":"아니오",
+    "YES":"예",
+    "NON-CUSTODIAL":"비수탁형"
+  };
+
+  const reverse = Object.fromEntries(Object.entries(translations).map(([en,ko]) => [ko,en]));
+  const attrs = ["placeholder","aria-label","title"];
+  let korean = localStorage.getItem("gurug-language") === "ko";
+  let observer = null;
+  let translating = false;
+
+  function translateString(value, toKorean) {
+    if (!value) return value;
+    const map = toKorean ? translations : reverse;
+    if (map[value]) return map[value];
+    let out = value;
+    for (const [from,to] of Object.entries(map)) {
+      if (out.includes(from) && from.length > 3) out = out.split(from).join(to);
+    }
+    return out;
+  }
+
+  function translate(root, toKorean) {
+    if (!root || translating) return;
+    translating = true;
+    try {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      let node;
+      while ((node = walker.nextNode())) {
+        const parent = node.parentElement;
+        if (!parent || ["SCRIPT","STYLE","NOSCRIPT"].includes(parent.tagName)) continue;
+        if (node.nodeValue.trim()) nodes.push(node);
+      }
+      nodes.forEach(n => {
+        n.nodeValue = translateString(n.nodeValue, toKorean);
+      });
+      if (root.querySelectorAll) {
+        root.querySelectorAll(attrs.map(a => "["+a+"]").join(",")).forEach(el => {
+          attrs.forEach(attr => {
+            if (el.hasAttribute(attr)) {
+              const v = el.getAttribute(attr);
+              el.setAttribute(attr, translateString(v, toKorean));
+            }
+          });
+        });
+      }
+    } finally {
+      translating = false;
+    }
+  }
+
+  function updateLanguageButton() {
+    const btn = document.getElementById("languageToggle");
+    if (btn) {
+      btn.textContent = korean ? "ENGLISH" : "한국어";
+      btn.setAttribute("aria-label", korean ? "Switch to English" : "한국어로 전환");
+    }
+    document.documentElement.lang = korean ? "ko" : "en";
+    document.title = korean ? "GURUG SWAP — SOL ↔ GURUG" : "GURUG SWAP — SOL ↔ GURUG";
+  }
+
+  function applyLanguage() {
+    if (observer) observer.disconnect();
+    translate(document.body, korean);
+    updateLanguageButton();
+    if (observer) observer.observe(document.body, {childList:true,subtree:true,characterData:true});
+  }
+
+  function initKoreanLanguage() {
+    const btn = document.getElementById("languageToggle");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      korean = !korean;
+      localStorage.setItem("gurug-language", korean ? "ko" : "en");
+      applyLanguage();
+    });
+    observer = new MutationObserver(mutations => {
+      if (!korean || translating) return;
+      for (const m of mutations) {
+        if (m.type === "characterData" && m.target.parentElement) translate(m.target.parentElement, true);
+        if (m.type === "childList") m.addedNodes.forEach(n => {
+          if (n.nodeType === 1) translate(n, true);
+          else if (n.nodeType === 3 && n.parentElement) translate(n.parentElement, true);
+        });
+      }
+    });
+    updateLanguageButton();
+    if (korean) applyLanguage();
+    else observer.observe(document.body, {childList:true,subtree:true,characterData:true});
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initKoreanLanguage, {once:true});
+  } else {
+    initKoreanLanguage();
+  }
+})();
