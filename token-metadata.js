@@ -480,58 +480,10 @@
       currentPlaceholder.style.display = "flex";
       if (md.uri) {
         try {
-          const loaded = await fetchJsonFromUri(md.uri);
-          const json = loaded.json;
+          const json = await fetch(md.uri, {cache:"no-store"}).then(r => r.json());
           tokenState.json = json;
-
-          const imageUris = [];
-          if (typeof json?.image === "string") imageUris.push(json.image);
-          if (Array.isArray(json?.properties?.files)) {
-            for (const file of json.properties.files) {
-              if (typeof file?.uri === "string") imageUris.push(file.uri);
-            }
-          }
-          if (typeof json?.properties?.image === "string") imageUris.push(json.properties.image);
-
-          const imageCandidates = [...new Set(
-            imageUris.flatMap(uri => uriCandidates(uri, loaded.url))
-          )];
-
-          let imageIndex = 0;
-          const showNextImage = () => {
-            if (imageIndex >= imageCandidates.length) {
-              currentLogo.hidden = true;
-              currentPlaceholder.style.display = "flex";
-              return;
-            }
-            const candidate = imageCandidates[imageIndex++];
-            currentLogo.onload = () => {
-              currentLogo.hidden = false;
-              currentPlaceholder.style.display = "none";
-            };
-            currentLogo.onerror = showNextImage;
-            currentLogo.src = candidate;
-          };
-          showNextImage();
-        } catch (error) {
-          console.warn("Current token metadata/logo could not be loaded:", error);
-          tokenState.json = null;
-        }
-      }
-
-      // Last-resort display fallback: use Jupiter's public token metadata cache.
-      // This is display-only; on-chain metadata and update authority remain unchanged.
-      if (currentLogo.hidden) {
-        try {
-          const jupiter = await fetch(
-            "https://lite-api.jup.ag/tokens/v2/search?query=" + encodeURIComponent(mint),
-            {cache:"no-store"}
-          ).then(r => r.ok ? r.json() : null);
-          const token = Array.isArray(jupiter)
-            ? jupiter.find(item => item?.id === mint || item?.address === mint) || jupiter[0]
-            : null;
-          const cachedImage = token?.icon || token?.logoURI || token?.logoUri;
-          if (cachedImage) {
+          if (json?.image) {
+            currentLogo.src = json.image;
             currentLogo.onload = () => {
               currentLogo.hidden = false;
               currentPlaceholder.style.display = "none";
@@ -540,10 +492,9 @@
               currentLogo.hidden = true;
               currentPlaceholder.style.display = "flex";
             };
-            currentLogo.src = cachedImage;
           }
-        } catch (error) {
-          console.warn("Jupiter logo fallback unavailable:", error);
+        } catch {
+          tokenState.json = null;
         }
       }
 
