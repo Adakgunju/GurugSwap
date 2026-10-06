@@ -121,9 +121,39 @@
     return null;
   }
 
+  const BASE58="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
   function validAddress(value){
     const text=String(value||"").trim().replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
-    return text || null;
+    if(!text) return null;
+    try{
+      let bytes=[0];
+      for(const ch of text){
+        const digit=BASE58.indexOf(ch);
+        if(digit<0) return null;
+        let carry=digit;
+        for(let i=0;i<bytes.length;i++){
+          const n=bytes[i]*58+carry;
+          bytes[i]=n&255;
+          carry=Math.floor(n/256);
+        }
+        while(carry){bytes.push(carry&255);carry=Math.floor(carry/256);}
+      }
+      let leading=0;
+      while(leading<text.length&&text[leading]==="1") leading++;
+      const decoded=new Uint8Array(leading+bytes.length-(bytes.length&&bytes[bytes.length-1]===0?1:0));
+      for(let i=0;i<leading;i++) decoded[i]=0;
+      const reversed=bytes.reverse();
+      let offset=0;
+      while(offset<reversed.length&&reversed[offset]===0) offset++;
+      for(let i=0;i<reversed.length-offset;i++) decoded[leading+i]=reversed[offset+i];
+      if(decoded.length!==32) return null;
+      let n=0n;
+      for(const byte of decoded)n=(n<<8n)|BigInt(byte);
+      let out="";
+      while(n>0n){out=BASE58[Number(n%58n)]+out;n/=58n;}
+      for(let i=0;i<decoded.length&&decoded[i]===0;i++)out="1"+out;
+      return out;
+    }catch{return null;}
   }
 
   async function rpc(method, params){
