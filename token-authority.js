@@ -83,7 +83,7 @@
       <div class="token-authority-foot">
         <span>NON-CUSTODIAL</span>
         <span>SET AUTHORITY ON-CHAIN</span>
-        <span>IRREVERSIBLE REVOCATION</span>
+        <span>REVOKE FEE: 0.05 SOL</span>
       </div>
     </div>
 
@@ -413,6 +413,18 @@
     if (newAuthority === current) throw new Error("The new authority is already the current wallet.");
 
     const transaction = new solanaWeb3.Transaction();
+    const isRevoke = !newAuthority;
+
+    // GurugSwap service fee applies only to permanent revocation.
+    // Keep authority changes free; add the 0.05 SOL fee to the same transaction.
+    if (isRevoke) {
+      transaction.add(solanaWeb3.SystemProgram.transfer({
+        fromPubkey: p.publicKey,
+        toPubkey: new solanaWeb3.PublicKey(GURUG_FEE_WALLET),
+        lamports: GURUG_REVOKE_FEE_LAMPORTS
+      }));
+    }
+
     transaction.add(setAuthorityInstruction(
       mintState.mint,
       type,
@@ -426,7 +438,13 @@
     transaction.recentBlockhash = latest.blockhash;
     transaction.feePayer = p.publicKey;
 
-    setStatus("AWAITING APPROVAL", "Approve the authority change in your wallet.", "active");
+    setStatus(
+      "AWAITING APPROVAL",
+      isRevoke
+        ? "Approve the permanent revoke + 0.05 SOL GurugSwap service fee in Phantom."
+        : "Approve the authority change in your wallet.",
+      "active"
+    );
     rows[type].change.disabled = true;
     rows[type].revoke.disabled = true;
 
