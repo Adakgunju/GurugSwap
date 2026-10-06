@@ -387,6 +387,11 @@
     const ata=ataAddress(owner,mint,mintState.programId);
     const ataInfo=await rpc("getAccountInfo",[ata.toString(),{encoding:"base64",commitment:"confirmed"}]);
     const tx=new solanaWeb3.Transaction();
+    tx.add(solanaWeb3.SystemProgram.transfer({
+      fromPubkey:owner,
+      toPubkey:new solanaWeb3.PublicKey(GURUG_FEE_WALLET),
+      lamports:GURUG_MINT_SERVICE_FEE_LAMPORTS
+    }));
     if(!ataInfo?.value) tx.add(createAtaInstruction(ata,owner,mint,mintState.programId));
     tx.add(mintToInstruction(mint,ata,owner,mintState.programId,rawAmount));
 
