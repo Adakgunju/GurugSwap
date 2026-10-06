@@ -201,24 +201,29 @@
     return raw;
   }
 
-  function walletPublicKey(){
+  function walletAddress(){
     const value=provider()?.publicKey;
     if(!value) return null;
-    if(value instanceof solanaWeb3.PublicKey) return value;
-    if(typeof value.toBase58==="function"){
-      return new solanaWeb3.PublicKey(value.toBase58());
-    }
-    if(typeof value.toBytes==="function"){
-      return new solanaWeb3.PublicKey(value.toBytes());
-    }
-    const text=String(value);
-    if(!text || text==="[object Object]") throw new Error("Connected wallet returned an invalid public key.");
-    return new solanaWeb3.PublicKey(text);
+    try{
+      if(typeof value.toBase58==="function") return value.toBase58();
+      if(typeof value.toString==="function"){
+        const text=value.toString();
+        if(text && text!=="[object Object]") return text;
+      }
+      const text=String(value);
+      if(text && text!=="[object Object]") return text;
+    }catch{}
+    throw new Error("Connected wallet returned an invalid public key.");
+  }
+
+  function walletPublicKey(){
+    const address=walletAddress();
+    return address ? new solanaWeb3.PublicKey(address) : null;
   }
 
   function authorityMatches(){
     try{
-      const wallet=walletPublicKey()?.toBase58();
+      const wallet=walletAddress();
       return Boolean(wallet&&mintState?.mintAuthority&&wallet===mintState.mintAuthority);
     }catch{
       return false;
@@ -300,25 +305,42 @@
         return;
       }
 
-      // Only derive the ATA after the mint has an active authority and a
-      // real wallet public key is available.
-      const walletKey = walletPublicKey();
-      if(!walletKey) throw new Error("Connected wallet public key is unavailable.");
-      const ata=ataAddress(walletKey,new solanaWeb3.PublicKey(mint),mintState.programId);
-      document.getElementById("tokenMintAccount").textContent=ata.toString();
+      // Compare the connected wallet to the on-chain authority first.
+      // Do not derive an ATA until the wallet is confirmed as the authority.
+      let walletAddressValue;
+      try{
+        walletAddressValue=walletAddress();
+      }catch(e){
+        throw new Error("Connected wallet public key could not be read.");
+      }
 
-      if(!authorityMatches()){
+      if(!walletAddressValue){
+        check.textContent="WALLET NOT CONNECTED";
+        document.getElementById("tokenMintAccount").textContent="Connect wallet";
+        setStatus("CONNECT WALLET","This token can be minted, but you must connect the current Mint Authority wallet first.","");
+        return;
+      }
+
+      if(walletAddressValue!==authority){
         check.textContent="AUTHORITY IS ANOTHER WALLET";
         setStatus("AUTHORITY REQUIRED","This token has an active Mint Authority, but the connected wallet is not that authority.","");
         return;
       }
+
+      const walletKey=new solanaWeb3.PublicKey(walletAddressValue);
+      const mintKey=new solanaWeb3.PublicKey(mint);
+      const ata=ataAddress(walletKey,mintKey,mintState.programId);
+      document.getElementById("tokenMintAccount").textContent=ata.toString();
+
       check.textContent="MINT AUTHORITY VERIFIED";
       check.className="token-mint-check active";
       document.getElementById("tokenMintButton").disabled=false;
       setStatus("READY TO MINT","Your connected wallet is the current Mint Authority. Enter an amount and mint on-chain.","success");
     }catch(e){
       reset();
-      setStatus("CHECK FAILED",e?.message||"Could not read the token mint.","error");
+      const message=e?.message||"Could not read the token mint.";
+      console.error("TOKEN MINT CHECK FAILED:",e);
+      setStatus("CHECK FAILED",message,"error");
     }
   }
 
