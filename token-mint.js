@@ -410,8 +410,7 @@
     const button=document.getElementById("tokenMintButton");
     button.disabled=true;
     setStatus("AWAITING APPROVAL","Approve the mint + 0.20 SOL GurugSwap service fee in Phantom.","active");
-    const signed=await p.signTransaction(tx);
-    const txId=await connection.sendRawTransaction(signed.serialize(),{skipPreflight:false,maxRetries:3});
+    const txId=await p.sendTransaction(tx,connection,{skipPreflight:false,maxRetries:3});
     setStatus("CONFIRMING","Checking the mint transaction on Solana…","active");
 
     for(let i=0;i<40;i++){
