@@ -2729,7 +2729,7 @@ body{background:#151714!important}
 /* --- GURUGSWAP WORDMARK ONLY: FEATURE RAIL --- */
 @media(min-width:851px){
   .platform-header .hero-identity h1{
-    transform:translateX(42px)!important;
+    transform:translateX(42px)!important; font-size:54px!important; font-weight:800!important; letter-spacing:-.075em!important;
   }
 }
 @media(max-width:850px){
