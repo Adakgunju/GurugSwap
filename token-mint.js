@@ -201,9 +201,28 @@
     return raw;
   }
 
+  function walletPublicKey(){
+    const value=provider()?.publicKey;
+    if(!value) return null;
+    if(value instanceof solanaWeb3.PublicKey) return value;
+    if(typeof value.toBase58==="function"){
+      return new solanaWeb3.PublicKey(value.toBase58());
+    }
+    if(typeof value.toBytes==="function"){
+      return new solanaWeb3.PublicKey(value.toBytes());
+    }
+    const text=String(value);
+    if(!text || text==="[object Object]") throw new Error("Connected wallet returned an invalid public key.");
+    return new solanaWeb3.PublicKey(text);
+  }
+
   function authorityMatches(){
-    const wallet=provider()?.publicKey?.toString();
-    return Boolean(wallet&&mintState?.mintAuthority&&wallet===mintState.mintAuthority);
+    try{
+      const wallet=walletPublicKey()?.toBase58();
+      return Boolean(wallet&&mintState?.mintAuthority&&wallet===mintState.mintAuthority);
+    }catch{
+      return false;
+    }
   }
 
   function ataAddress(owner,mint,programId){
@@ -283,9 +302,8 @@
 
       // Only derive the ATA after the mint has an active authority and a
       // real wallet public key is available.
-      const walletKey = p.publicKey instanceof solanaWeb3.PublicKey
-        ? p.publicKey
-        : new solanaWeb3.PublicKey(String(p.publicKey));
+      const walletKey = walletPublicKey();
+      if(!walletKey) throw new Error("Connected wallet public key is unavailable.");
       const ata=ataAddress(walletKey,new solanaWeb3.PublicKey(mint),mintState.programId);
       document.getElementById("tokenMintAccount").textContent=ata.toString();
 
