@@ -126,7 +126,7 @@
   function decodeBase58(value){
     const text=String(value||"").replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
     if(!text) throw new Error("Mint address is empty.");
-    const bytes=[0];
+    const bytes=[];
     for(const ch of text){
       const digit=BASE58_ALPHABET.indexOf(ch);
       if(digit<0) throw new Error("Mint address contains an invalid character.");
@@ -142,7 +142,9 @@
       }
     }
     for(let i=0;i<text.length&&text[i]==="1";i++) bytes.push(0);
-    return Uint8Array.from(bytes.reverse());
+    const result=Uint8Array.from(bytes.reverse());
+    if(result.length!==32) throw new Error("Mint address must decode to 32 bytes.");
+    return result;
   }
 
   function validAddress(value){
