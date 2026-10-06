@@ -410,7 +410,17 @@
     const button=document.getElementById("tokenMintButton");
     button.disabled=true;
     setStatus("AWAITING APPROVAL","Approve the mint + 0.20 SOL GurugSwap service fee in Phantom.","active");
-    const txId=await p.sendTransaction(tx,connection,{skipPreflight:false,maxRetries:3});
+    let txId;
+    if(typeof p.signAndSendTransaction==="function"){
+      const result=await p.signAndSendTransaction(tx,{skipPreflight:false,maxRetries:3});
+      txId=typeof result==="string" ? result : result?.signature;
+      if(!txId) throw new Error("Phantom did not return a transaction signature.");
+    }else if(typeof p.signTransaction==="function"){
+      const signed=await p.signTransaction(tx);
+      txId=await connection.sendRawTransaction(signed.serialize(),{skipPreflight:false,maxRetries:3});
+    }else{
+      throw new Error("This wallet does not support transaction signing.");
+    }
     setStatus("CONFIRMING","Checking the mint transaction on Solana…","active");
 
     for(let i=0;i<40;i++){
