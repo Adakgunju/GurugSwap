@@ -121,9 +121,38 @@
     return null;
   }
 
+  const BASE58_ALPHABET="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+  function decodeBase58(value){
+    const text=String(value||"").replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
+    if(!text) throw new Error("Mint address is empty.");
+    const bytes=[0];
+    for(const ch of text){
+      const digit=BASE58_ALPHABET.indexOf(ch);
+      if(digit<0) throw new Error("Mint address contains an invalid character.");
+      let carry=digit;
+      for(let i=0;i<bytes.length;i++){
+        const n=bytes[i]*58+carry;
+        bytes[i]=n&255;
+        carry=n>>8;
+      }
+      while(carry){
+        bytes.push(carry&255);
+        carry>>=8;
+      }
+    }
+    for(let i=0;i<text.length&&text[i]==="1";i++) bytes.push(0);
+    return Uint8Array.from(bytes.reverse());
+  }
+
   function validAddress(value){
-    try { return new solanaWeb3.PublicKey(String(value||"").trim()).toString(); }
-    catch { return null; }
+    try{
+      const bytes=decodeBase58(value);
+      if(bytes.length!==32) return null;
+      return new solanaWeb3.PublicKey(bytes).toBase58();
+    }catch{
+      return null;
+    }
   }
 
   async function rpc(method, params){
