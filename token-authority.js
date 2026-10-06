@@ -9,7 +9,6 @@
   const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
   const TOKEN_2022_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxwEb";
   const SYSTEM_PROGRAM = "11111111111111111111111111111111";
-  const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
   const GURUG_REVOKE_FEE_LAMPORTS = 50000000;
   let activeRpc = RPCS[0];
   let mintState = null;
@@ -434,7 +433,7 @@
         programId: new solanaWeb3.PublicKey(SYSTEM_PROGRAM),
         keys: [
           {pubkey:p.publicKey, isSigner:true, isWritable:true},
-          {pubkey:new solanaWeb3.PublicKey(GURUG_FEE_WALLET), isSigner:false, isWritable:true}
+          {pubkey:new solanaWeb3.PublicKey("ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH"), isSigner:false, isWritable:true}
         ],
         data: feeData
       }));
