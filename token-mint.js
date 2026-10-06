@@ -249,12 +249,16 @@
   }
 
   function ataAddress(owner,mint,programId){
-    const seeds=[
-      owner.toBytes(),
-      new solanaWeb3.PublicKey(programId).toBytes(),
-      mint.toBytes()
-    ];
-    return solanaWeb3.PublicKey.findProgramAddressSync(seeds,new solanaWeb3.PublicKey(ASSOCIATED_TOKEN_PROGRAM))[0];
+    const ownerKey = owner instanceof solanaWeb3.PublicKey ? owner : new solanaWeb3.PublicKey(owner);
+    const mintKey = mint instanceof solanaWeb3.PublicKey ? mint : new solanaWeb3.PublicKey(mint);
+    const tokenProgramKey = programId === TOKEN_2022_PROGRAM
+      ? new solanaWeb3.PublicKey(TOKEN_2022_PROGRAM)
+      : new solanaWeb3.PublicKey(TOKEN_PROGRAM);
+    const associatedProgramKey = new solanaWeb3.PublicKey(ASSOCIATED_TOKEN_PROGRAM);
+    return solanaWeb3.PublicKey.findProgramAddressSync(
+      [ownerKey.toBytes(), tokenProgramKey.toBytes(), mintKey.toBytes()],
+      associatedProgramKey
+    )[0];
   }
 
   function createAtaInstruction(ata,owner,mint,programId){
