@@ -484,7 +484,19 @@
           const json = loaded.json;
           tokenState.json = json;
 
-          const imageCandidates = uriCandidates(json?.image, loaded.url);
+          const imageUris = [];
+          if (typeof json?.image === "string") imageUris.push(json.image);
+          if (Array.isArray(json?.properties?.files)) {
+            for (const file of json.properties.files) {
+              if (typeof file?.uri === "string") imageUris.push(file.uri);
+            }
+          }
+          if (typeof json?.properties?.image === "string") imageUris.push(json.properties.image);
+
+          const imageCandidates = [...new Set(
+            imageUris.flatMap(uri => uriCandidates(uri, loaded.url))
+          )];
+
           let imageIndex = 0;
           const showNextImage = () => {
             if (imageIndex >= imageCandidates.length) {
