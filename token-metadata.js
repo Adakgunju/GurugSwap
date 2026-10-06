@@ -480,18 +480,29 @@
       currentPlaceholder.style.display = "flex";
       if (md.uri) {
         try {
-          const json = await fetch(md.uri, {cache:"no-store"}).then(r => r.json());
+          const loaded = await fetchJsonFromUri(md.uri);
+          const json = loaded.json;
           tokenState.json = json;
           if (json?.image) {
-            currentLogo.src = json.image;
-            currentLogo.onload = () => {
-              currentLogo.hidden = false;
-              currentPlaceholder.style.display = "none";
-            };
-            currentLogo.onerror = () => {
+            const imageCandidates = uriCandidates(json.image, loaded.url);
+            let shown = false;
+            for (const imageUrl of imageCandidates) {
+              try {
+                await new Promise((resolve, reject) => {
+                  currentLogo.onload = resolve;
+                  currentLogo.onerror = reject;
+                  currentLogo.src = imageUrl;
+                });
+                currentLogo.hidden = false;
+                currentPlaceholder.style.display = "none";
+                shown = true;
+                break;
+              } catch {}
+            }
+            if (!shown) {
               currentLogo.hidden = true;
               currentPlaceholder.style.display = "flex";
-            };
+            }
           }
         } catch {
           tokenState.json = null;
