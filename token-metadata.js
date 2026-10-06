@@ -519,9 +519,11 @@
         }
       }
 
-      // Display-only fallback: use Jupiter's public token metadata cache.
-      // This never changes on-chain metadata or update authority.
+      // Display-only fallbacks. These never change on-chain metadata or authority.
       if (currentLogo.hidden) {
+        const fallbackImages = [
+          "https://dd.dexscreener.com/ds-data/tokens/solana/" + mint + ".png"
+        ];
         try {
           const jupiter = await fetch(
             "https://lite-api.jup.ag/tokens/v2/search?query=" + encodeURIComponent(mint),
@@ -531,20 +533,23 @@
             ? jupiter.find(item => item?.id === mint || item?.address === mint) || jupiter[0]
             : null;
           const cachedImage = token?.icon || token?.logoURI || token?.logoUri;
-          if (cachedImage) {
-            currentLogo.onload = () => {
-              currentLogo.hidden = false;
-              currentPlaceholder.style.display = "none";
-            };
-            currentLogo.onerror = () => {
-              currentLogo.hidden = true;
-              currentPlaceholder.style.display = "flex";
-            };
-            currentLogo.src = cachedImage;
-          }
+          if (cachedImage) fallbackImages.unshift(cachedImage);
         } catch (error) {
           console.warn("Jupiter logo fallback unavailable:", error);
         }
+
+        let fallbackIndex = 0;
+        const showFallback = () => {
+          if (fallbackIndex >= fallbackImages.length) return;
+          const candidate = fallbackImages[fallbackIndex++];
+          currentLogo.onload = () => {
+            currentLogo.hidden = false;
+            currentPlaceholder.style.display = "none";
+          };
+          currentLogo.onerror = showFallback;
+          currentLogo.src = candidate;
+        };
+        showFallback();
       }
 
       details.hidden = false;
