@@ -283,8 +283,10 @@
       return;
     }
     setStatus("CHECKING","Reading the mint directly from Solana…","active");
+    let stage="RPC mint lookup";
     try{
       mintState=await readMint(mint);
+      stage="mint metadata";
       const authority= mintState.mintAuthority;
       const program=mintState.programId===TOKEN_2022_PROGRAM?"TOKEN-2022":"SPL TOKEN";
       document.getElementById("tokenMintProgram").textContent=program;
@@ -331,8 +333,11 @@
         return;
       }
 
+      stage="wallet public key conversion";
       const walletKey=new solanaWeb3.PublicKey(walletAddressValue);
+      stage="mint public key conversion";
       const mintKey=new solanaWeb3.PublicKey(mint);
+      stage="associated token account derivation";
       const ata=ataAddress(walletKey,mintKey,mintState.programId);
       document.getElementById("tokenMintAccount").textContent=ata.toString();
 
@@ -343,8 +348,8 @@
     }catch(e){
       reset();
       const message=e?.message||"Could not read the token mint.";
-      console.error("TOKEN MINT CHECK FAILED:",e);
-      setStatus("CHECK FAILED",message,"error");
+      console.error("TOKEN MINT CHECK FAILED:",{stage,error:e,mint});
+      setStatus("CHECK FAILED",stage+": "+message,"error");
     }
   }
 
