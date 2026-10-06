@@ -292,7 +292,7 @@
           <div class="create-token-head">
             <div class="create-token-kicker">01 / 토큰 생성</div>
             <h2 class="create-token-title">Create your <span class="section-title-accent">SPL Token.</span></h2>
-            <p class="create-token-copy">Create a new standard SPL Token mint directly from Gurug스왑하고. Your wallet signs the transaction — GurugSwap never receives your private key.</p>
+            <p class="create-token-copy">Create a new standard SPL Token mint directly from GurugSwap. Your wallet signs the transaction — GurugSwap never receives your private key.</p>
             <span class="create-token-network">솔라나 메인넷</span>
           </div>
           <div class="create-token-card">
@@ -351,7 +351,7 @@
           <div class="create-token-cost">
             <div class="create-token-cost-title">CREATION COST</div>
             <div class="create-token-cost-row"><span>GurugSwap service fee</span><strong>0.50 SOL</strong></div>
-            <div class="create-token-warning"><b>Service fee:</b> 0.50 SOL is paid to Gurug스왑하고. Solana network and storage transaction fees are separate and paid through your wallet.</div>
+            <div class="create-token-warning"><b>Service fee:</b> 0.50 SOL is paid to GurugSwap. Solana network and storage transaction fees are separate and paid through your wallet.</div>
           </div>
           <button id="createTokenButton" class="create-token-button" type="button">CREATE TOKEN</button>
           <div id="createTokenStatus" class="create-token-status">Connect your Phantom wallet, enter the token details, then create the token.</div>
