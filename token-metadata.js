@@ -483,29 +483,67 @@
           const loaded = await fetchJsonFromUri(md.uri);
           const json = loaded.json;
           tokenState.json = json;
-          if (json?.image) {
-            const imageCandidates = uriCandidates(json.image, loaded.url);
-            let shown = false;
-            for (const imageUrl of imageCandidates) {
-              try {
-                await new Promise((resolve, reject) => {
-                  currentLogo.onload = resolve;
-                  currentLogo.onerror = reject;
-                  currentLogo.src = imageUrl;
-                });
-                currentLogo.hidden = false;
-                currentPlaceholder.style.display = "none";
-                shown = true;
-                break;
-              } catch {}
-            }
-            if (!shown) {
-              currentLogo.hidden = true;
-              currentPlaceholder.style.display = "flex";
+
+          const imageUris = [];
+          if (typeof json?.image === "string") imageUris.push(json.image);
+          if (Array.isArray(json?.properties?.files)) {
+            for (const file of json.properties.files) {
+              if (typeof file?.uri === "string") imageUris.push(file.uri);
             }
           }
-        } catch {
+          if (typeof json?.properties?.image === "string") imageUris.push(json.properties.image);
+
+          const imageCandidates = [...new Set(
+            imageUris.flatMap(uri => uriCandidates(uri, loaded.url))
+          )];
+
+          let imageIndex = 0;
+          const showNextImage = () => {
+            if (imageIndex >= imageCandidates.length) {
+              currentLogo.hidden = true;
+              currentPlaceholder.style.display = "flex";
+              return;
+            }
+            const candidate = imageCandidates[imageIndex++];
+            currentLogo.onload = () => {
+              currentLogo.hidden = false;
+              currentPlaceholder.style.display = "none";
+            };
+            currentLogo.onerror = showNextImage;
+            currentLogo.src = candidate;
+          };
+          showNextImage();
+        } catch (error) {
+          console.warn("Current token metadata/logo could not be loaded:", error);
           tokenState.json = null;
+        }
+      }
+
+      // Display-only fallback: use Jupiter's public token metadata cache.
+      // This never changes on-chain metadata or update authority.
+      if (currentLogo.hidden) {
+        try {
+          const jupiter = await fetch(
+            "https://lite-api.jup.ag/tokens/v2/search?query=" + encodeURIComponent(mint),
+            {cache:"no-store"}
+          ).then(r => r.ok ? r.json() : null);
+          const token = Array.isArray(jupiter)
+            ? jupiter.find(item => item?.id === mint || item?.address === mint) || jupiter[0]
+            : null;
+          const cachedImage = token?.icon || token?.logoURI || token?.logoUri;
+          if (cachedImage) {
+            currentLogo.onload = () => {
+              currentLogo.hidden = false;
+              currentPlaceholder.style.display = "none";
+            };
+            currentLogo.onerror = () => {
+              currentLogo.hidden = true;
+              currentPlaceholder.style.display = "flex";
+            };
+            currentLogo.src = cachedImage;
+          }
+        } catch (error) {
+          console.warn("Jupiter logo fallback unavailable:", error);
         }
       }
 
