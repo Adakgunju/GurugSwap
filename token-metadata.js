@@ -508,19 +508,16 @@
     setStatus("UPDATING ON-CHAIN", "Approve the metadata update in Phantom. The token Mint Address will not change…", "active");
 
     const {umi, modules} = await createUmiForWallet(p);
-    const {publicKey, some} = modules.umi;
+    const {publicKey} = modules.umi;
     const {updateV1, fetchDigitalAsset} = modules.metadata;
 
     const builder = updateV1(umi, {
       mint: publicKey(tokenState.mint),
       authority: umi.identity,
-      data: some({
-        name: tokenState.name || "",
-        symbol: tokenState.symbol || "",
-        uri: metadataUri,
-        sellerFeeBasisPoints: tokenState.sellerFeeBasisPoints || 0,
-        creators: tokenState.creators ? some(tokenState.creators) : modules.umi.none()
-      })
+      data: {
+        ...tokenState.asset.metadata,
+        uri: metadataUri
+      }
     });
 
     const result = await builder.sendAndConfirm(umi, {send:{commitment:"confirmed", skipPreflight:false}});
