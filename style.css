@@ -1462,6 +1462,69 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
   .workspace-main>#token-mint .platform-placeholder-head h2{font-size:31px!important;line-height:1.04!important}
 }
 
+/* === TOKEN MINT: ALIGN WITH OTHER PLATFORM SECTIONS === */
+.workspace-main>#token-mint{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:left!important;
+}
+.workspace-main>#token-mint .platform-placeholder-head{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0 0 28px!important;
+  padding:0!important;
+  text-align:left!important;
+}
+.workspace-main>#token-mint .platform-section-kicker{
+  display:block!important;
+  margin:0 0 12px!important;
+  text-align:left!important;
+}
+.workspace-main>#token-mint .platform-placeholder-head h2{
+  display:block!important;
+  width:100%!important;
+  margin:0 0 14px!important;
+  font-size:48px!important;
+  line-height:.98!important;
+  letter-spacing:-.035em!important;
+  font-family:'Space Grotesk',sans-serif!important;
+  font-weight:700!important;
+  text-align:left!important;
+}
+.workspace-main>#token-mint .platform-placeholder-head p{
+  display:block!important;
+  max-width:760px!important;
+  margin:0!important;
+  text-align:left!important;
+}
+.workspace-main>#token-mint .token-mint-shell{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  text-align:left!important;
+}
+.workspace-main>#token-mint .token-mint-card{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:850px){
+  .workspace-main>#token-mint .platform-placeholder-head h2{
+    font-size:36px!important;
+    line-height:1.02!important;
+  }
+}
+@media(max-width:520px){
+  .workspace-main>#token-mint .platform-placeholder-head h2{
+    font-size:31px!important;
+    line-height:1.04!important;
+  }
+}
+
 /* === 07 / ABOUT GURUG === */
 .workspace-main>.about .about-inner{
   align-items:start!important;
