@@ -562,6 +562,17 @@
           console.warn("SolanaFM logo fallback unavailable:", error);
         }
 
+        try {
+          const solscan = await fetch(
+            "https://pro-api.solscan.io/playground/token/meta?address=" + encodeURIComponent(mint),
+            {cache:"no-store"}
+          ).then(r => r.ok ? r.json() : null);
+          const icon = solscan?.data?.icon;
+          if (icon) fallbackImages.unshift(icon);
+        } catch (error) {
+          console.warn("Solscan logo fallback unavailable:", error);
+        }
+
         let fallbackIndex = 0;
         const showFallback = () => {
           if (fallbackIndex >= fallbackImages.length) return;
