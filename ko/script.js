@@ -806,7 +806,7 @@ async function renderTokenList(query = "") {
     }
   }
 
-  remote토큰.forEach(token => {
+  remoteTokens.forEach(token => {
     applyCanonicalTokenIcon(token);
 
     const existing = TOKEN_CATALOG.find(item => item.mint === token.mint);
