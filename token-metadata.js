@@ -175,9 +175,9 @@
           import(MPL_METADATA_CDN),
           import(MPL_TOOLBOX_CDN)
         ]);
-      }).then(([umi, defaults, walletAdapters, metadata]) => ({
-        umi, defaults, walletAdapters, metadata
-      }));
+      }).then(([umi, defaults, walletAdapters, metadata, toolbox]) => ({
+      umi, defaults, walletAdapters, metadata, toolbox
+    }));
     }
     return metadataModulesPromise;
   }
