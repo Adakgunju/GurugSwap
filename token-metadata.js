@@ -519,15 +519,18 @@
         }
       }
 
-      // Last-resort display fallback: use SolanaFM's public token image cache.
+      // Last-resort display fallback: use Jupiter's public token metadata cache.
       // This is display-only; on-chain metadata and update authority remain unchanged.
       if (currentLogo.hidden) {
         try {
-          const fm = await fetch(
-            "https://api.solana.fm/v1/tokens/" + encodeURIComponent(mint),
+          const jupiter = await fetch(
+            "https://lite-api.jup.ag/tokens/v2/search?query=" + encodeURIComponent(mint),
             {cache:"no-store"}
           ).then(r => r.ok ? r.json() : null);
-          const cachedImage = fm?.tokenList?.image;
+          const token = Array.isArray(jupiter)
+            ? jupiter.find(item => item?.id === mint || item?.address === mint) || jupiter[0]
+            : null;
+          const cachedImage = token?.icon || token?.logoURI || token?.logoUri;
           if (cachedImage) {
             currentLogo.onload = () => {
               currentLogo.hidden = false;
@@ -540,7 +543,7 @@
             currentLogo.src = cachedImage;
           }
         } catch (error) {
-          console.warn("SolanaFM logo fallback unavailable:", error);
+          console.warn("Jupiter logo fallback unavailable:", error);
         }
       }
 
