@@ -549,6 +549,21 @@
         } catch (error) {
           console.warn("Jupiter logo fallback unavailable:", error);
         }
+        try {
+          const fm = await fetch(
+            "https://api.solana.fm/v1/tokens/" + encodeURIComponent(mint),
+            {cache:"no-store"}
+          ).then(r => r.ok ? r.json() : null);
+          const fmImage = fm?.tokenList?.image;
+          if (fmImage) fallbackImages.unshift(fmImage);
+        } catch (error) {
+          console.warn("SolanaFM logo fallback unavailable:", error);
+        }
+
+        let fallbackIndex = 0;
+        } catch (error) {
+          console.warn("Jupiter logo fallback unavailable:", error);
+        }
 
         let fallbackIndex = 0;
         const showFallback = () => {
