@@ -519,6 +519,31 @@
         }
       }
 
+      // Last-resort display fallback: use SolanaFM's public token image cache.
+      // This is display-only; on-chain metadata and update authority remain unchanged.
+      if (currentLogo.hidden) {
+        try {
+          const fm = await fetch(
+            "https://api.solana.fm/v1/tokens/" + encodeURIComponent(mint),
+            {cache:"no-store"}
+          ).then(r => r.ok ? r.json() : null);
+          const cachedImage = fm?.tokenList?.image;
+          if (cachedImage) {
+            currentLogo.onload = () => {
+              currentLogo.hidden = false;
+              currentPlaceholder.style.display = "none";
+            };
+            currentLogo.onerror = () => {
+              currentLogo.hidden = true;
+              currentPlaceholder.style.display = "flex";
+            };
+            currentLogo.src = cachedImage;
+          }
+        } catch (error) {
+          console.warn("SolanaFM logo fallback unavailable:", error);
+        }
+      }
+
       details.hidden = false;
       updateButton.disabled = !(Boolean(authority) && mutable && walletMatches(authority) && logoInput.files?.[0]);
       if (!mutable) {
