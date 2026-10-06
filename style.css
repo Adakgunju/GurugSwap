@@ -3366,3 +3366,7 @@ body{background:#151714!important}
   .token-metadata-replace .connect{width:100%;margin-top:12px}
   .token-metadata-foot{flex-direction:column;gap:7px}
 }
+
+/* --- TOKEN METADATA LOGO PREVIEW FIX --- */
+#metadataNewLogo[hidden]{display:none!important}
+#metadataCurrentLogo[hidden]{display:none!important}
