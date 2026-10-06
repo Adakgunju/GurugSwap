@@ -123,7 +123,7 @@
 
   const BASE58="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
   function validAddress(value){
-    const text=String(value||"").trim().replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
+    const text=String(value||"").trim().replace(/[\s\u200B-\u200D\uFEFF]/g,"");
     if(!text) return null;
     try{
       let n=0n;
