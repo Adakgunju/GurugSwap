@@ -107,7 +107,7 @@
     if (txEl) txEl.textContent = txCount == null ? "—" : String(txCount);
   }
 
-  // The input is always a real token quantity (e.g. 0.01 G스왑).
+  // The input is always a real token quantity (e.g. 0.01 GURUG).
   // It is never interpreted as a percentage of total supply.
   function uiAmountToRaw(value, decimals) {
     const text = String(value || "").trim().replace(/,/g, "");
@@ -339,7 +339,7 @@
     const results = [];
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
-      setStatus(`배치 준비 중 ${i + 1} of ${batches.length} — ${batch.length} wallet(s) × ${uiAmount} G스왑...`, "active");
+      setStatus(`배치 준비 중 ${i + 1} of ${batches.length} — ${batch.length} wallet(s) × ${uiAmount} GURUG...`, "active");
 
       try {
         const built = await buildBatch(
@@ -354,7 +354,7 @@
           i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
         );
 
-        setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom: ${batch.length} wallet(s) × ${uiAmount} G스왑.`, "active");
+        setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom: ${batch.length} wallet(s) × ${uiAmount} GURUG.`, "active");
         const signed = await provider.signTransaction(built.tx);
         const signature = await connection.sendRawTransaction(signed.serialize(), {
           skipPreflight: false,
@@ -385,7 +385,7 @@
       }
     }
 
-    setStatus(`멀티 에어드롭 완료 — ${validated.length} recipient(s) received ${uiAmount} G스왑 each on 토큰을 거래하세요.`, "success");
+    setStatus(`멀티 에어드롭 완료 — ${validated.length} recipient(s) received ${uiAmount} GURUG each on 토큰을 거래하세요.`, "success");
     return results;
   }
 
@@ -583,7 +583,7 @@
             <div class="multi-airdrop-stat"><span>TOTAL TOKENS</span><strong id="multiAirdropTotal">0</strong></div>
             <div class="multi-airdrop-stat"><span>TRANSACTIONS</span><strong id="multiAirdropTxCount">—</strong></div>
           </div>
-          <div class="multi-airdrop-stat" style="margin-top:8px"><span>GURUG스왑 FEE</span><strong id="multiAirdropCost">0 SOL</strong></div>
+          <div class="multi-airdrop-stat" style="margin-top:8px"><span>GURUGURUG FEE</span><strong id="multiAirdropCost">0 SOL</strong></div>
           <div class="multi-airdrop-hint" style="margin-top:8px">Solana network transaction fees are separate and paid through your wallet.</div>
 
           <button id="multiAirdropSend" class="multi-airdrop-action" type="button">SEND 멀티 에어드롭</button>
