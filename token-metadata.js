@@ -142,7 +142,8 @@
     }
 
     if (raw.startsWith("ar://")) {
-      return ["https://arweave.net/" + raw.slice(5)];
+      const id = raw.slice(5);
+      return ["https://arweave.net/" + id, "https://ar-io.net/" + id, "https://ardrive.net/" + id, "https://arweave.asia/" + id, "https://arweave.live/" + id];
     }
 
     if (raw.startsWith("//")) return ["https:" + raw];
@@ -150,6 +151,12 @@
     try {
       const absolute = new URL(raw, baseUri || window.location.href).href;
       const candidates = [absolute];
+      const arMatch = absolute.match(/^https:\/\/arweave\.net\/([^?#/]+)$/i);
+      if (arMatch) {
+        const id = arMatch[1];
+        candidates.push("https://ar-io.net/" + id, "https://ardrive.net/" + id, "https://arweave.asia/" + id, "https://arweave.live/" + id);
+      }
+
       const ipfsMatch = absolute.match(/\/ipfs\/([^?#]+)/i);
       if (ipfsMatch) {
         const path = ipfsMatch[1];
