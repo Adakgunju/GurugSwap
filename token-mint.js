@@ -122,12 +122,8 @@
   }
 
   function validAddress(value){
-    const text=String(value||"").trim().replace(/\\s|\\u200B|\\u200C|\\u200D|\\uFEFF/g,"");
-    // Do only lightweight Base58 syntax validation here. The RPC mint
-    // lookup below is the authoritative check for whether this address
-    // is an actual SPL mint account.
-    if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(text)) return null;
-    return text;
+    const text=String(value||"").trim().replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
+    return text || null;
   }
 
   async function rpc(method, params){
