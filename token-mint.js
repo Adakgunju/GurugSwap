@@ -121,37 +121,11 @@
     return null;
   }
 
-  const BASE58_ALPHABET="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-  function decodeBase58(value){
-    const text=String(value||"").replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
-    if(!text) throw new Error("Mint address is empty.");
-    const bytes=[];
-    for(const ch of text){
-      const digit=BASE58_ALPHABET.indexOf(ch);
-      if(digit<0) throw new Error("Mint address contains an invalid character.");
-      let carry=digit;
-      for(let i=0;i<bytes.length;i++){
-        const n=bytes[i]*58+carry;
-        bytes[i]=n&255;
-        carry=n>>8;
-      }
-      while(carry){
-        bytes.push(carry&255);
-        carry>>=8;
-      }
-    }
-    for(let i=0;i<text.length&&text[i]==="1";i++) bytes.push(0);
-    const result=Uint8Array.from(bytes.reverse());
-    if(result.length!==32) throw new Error("Mint address must decode to 32 bytes.");
-    return result;
-  }
-
   function validAddress(value){
+    const text=String(value||"").trim().replace(/[\\s\\u200B-\\u200D\\uFEFF]/g,"");
+    if(!text) return null;
     try{
-      const bytes=decodeBase58(value);
-      if(bytes.length!==32) return null;
-      return new solanaWeb3.PublicKey(Array.from(bytes)).toBase58();
+      return new solanaWeb3.PublicKey(text).toBase58();
     }catch{
       return null;
     }
