@@ -3449,3 +3449,22 @@ body{background:#151714!important}
 /* --- TOKEN METADATA LOGO PREVIEW FIX --- */
 #metadataNewLogo[hidden]{display:none!important}
 #metadataCurrentLogo[hidden]{display:none!important}
+
+
+/* Korean / English language switch */
+.lang-btn{
+  min-height:38px;
+  padding:0 13px;
+  border:1px solid rgba(255,229,0,.32);
+  border-radius:10px;
+  background:rgba(255,229,0,.04);
+  color:#ffe500;
+  font:800 10px/1 'Space Grotesk',sans-serif;
+  letter-spacing:.08em;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.lang-btn:hover{background:rgba(255,229,0,.10);border-color:rgba(255,229,0,.55)}
+@media(max-width:850px){
+  .lang-btn{min-height:34px;padding:0 10px;font-size:9px}
+}
