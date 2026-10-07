@@ -21,6 +21,8 @@
       <a href="#multi-airdrop">MULTI AIRDROP</a>
       <a href="#token-burn">TOKEN BURN</a>
       <a href="#token-mint" onclick="document.getElementById('token-mint')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN MINT</a>
+    <a href="#trading-bot">TRADING BOT</a>
+      <a href="#trading-bot">TRADING BOT</a>
       <a href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN AUTHORITY</a>
       <a href="#links">GURUG NETWORK</a>
     </nav>
@@ -132,6 +134,7 @@
         <a class="workspace-nav" href="#multi-airdrop"><span>05</span><b>MULTI AIRDROP</b><em>↗</em></a>
         <a class="workspace-nav" href="#token-burn"><span>06</span><b>TOKEN BURN</b><em>↗</em></a>
         <a class="workspace-nav" href="#token-mint" onclick="document.getElementById('token-mint')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;"><span>10</span><b>TOKEN MINT</b><em>↗</em></a>
+        <a class="workspace-nav" href="#trading-bot"><span>11</span><b>TRADING BOT</b><em>↗</em></a>
         <a class="workspace-nav" href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;"><span>09</span><b>TOKEN AUTHORITY</b><em>↗</em></a>
         <a class="workspace-nav" href="#links"><span>07</span><b>GURUG NETWORK</b><em>↗</em></a>
         <div class="sidebar-foot"><span>SOLANA</span><span>NON-CUSTODIAL</span></div>
@@ -213,6 +216,113 @@
       <div id="multiAirdropApp"></div>
     </section>
 
+
+    <section id="trading-bot" class="trading-bot-section" aria-label="Automated trading bot">
+      <div class="trading-bot-intro">
+        <div class="platform-section-kicker">11 / TRADING BOT</div>
+        <h2>Automate your <span class="section-title-accent">strategy.</span></h2>
+        <p>Run rule-based Solana trades with clear limits, scheduled execution and full transaction history.</p>
+      </div>
+
+      <div class="trading-bot-card">
+        <div class="trading-bot-head">
+          <div>
+            <span class="trading-bot-kicker">GURUG BOT</span>
+            <h3>Automated <span>Trading</span></h3>
+            <p>Built for DCA, target-price entries and controlled buy/sell strategies.</p>
+          </div>
+          <div class="trading-bot-status-pill"><i></i><span id="botBackendStatus">BACKEND NOT CONNECTED</span></div>
+        </div>
+
+        <div class="bot-strategy-grid" role="tablist" aria-label="Trading strategy">
+          <button class="bot-strategy active" type="button" data-strategy="dca">
+            <span>01</span><strong>DCA</strong><small>Buy or sell at a fixed interval.</small>
+          </button>
+          <button class="bot-strategy" type="button" data-strategy="target">
+            <span>02</span><strong>TARGET PRICE</strong><small>Trade when your target price is reached.</small>
+          </button>
+          <button class="bot-strategy" type="button" data-strategy="advanced">
+            <span>03</span><strong>ADVANCED</strong><small>Combine limits, stops and profit targets.</small>
+          </button>
+        </div>
+
+        <div class="bot-form-grid">
+          <label class="bot-field bot-field-wide">
+            <small>TOKEN MINT ADDRESS</small>
+            <input id="botTokenMint" type="text" placeholder="Paste Solana token mint address">
+          </label>
+
+          <label class="bot-field">
+            <small>SIDE</small>
+            <select id="botSide"><option value="buy">BUY</option><option value="sell">SELL</option></select>
+          </label>
+
+          <label class="bot-field">
+            <small>TRADE AMOUNT</small>
+            <input id="botTradeAmount" type="number" min="0" step="0.001" placeholder="0.10">
+          </label>
+
+          <label class="bot-field" id="botIntervalField">
+            <small>INTERVAL</small>
+            <select id="botInterval">
+              <option value="60">Every 1 minute</option>
+              <option value="300" selected>Every 5 minutes</option>
+              <option value="900">Every 15 minutes</option>
+              <option value="1800">Every 30 minutes</option>
+              <option value="3600">Every 1 hour</option>
+            </select>
+          </label>
+
+          <label class="bot-field">
+            <small>MAX TRADES</small>
+            <input id="botMaxTrades" type="number" min="1" step="1" value="10">
+          </label>
+
+          <label class="bot-field bot-target-field">
+            <small>TARGET PRICE (USD)</small>
+            <input id="botTargetPrice" type="number" min="0" step="0.00000001" placeholder="0.00000000">
+          </label>
+
+          <label class="bot-field bot-advanced-field">
+            <small>STOP LOSS (%)</small>
+            <input id="botStopLoss" type="number" min="0" step="0.1" placeholder="5">
+          </label>
+
+          <label class="bot-field bot-advanced-field">
+            <small>TAKE PROFIT (%)</small>
+            <input id="botTakeProfit" type="number" min="0" step="0.1" placeholder="10">
+          </label>
+
+          <label class="bot-field">
+            <small>MAX TOTAL SPEND (SOL)</small>
+            <input id="botMaxSpend" type="number" min="0" step="0.01" placeholder="1.00">
+          </label>
+        </div>
+
+        <div class="bot-safety-box">
+          <div><i>!</i><strong>24/7 AUTOMATION REQUIRES THE GURUG BOT BACKEND</strong></div>
+          <p>This interface will use Supabase Cron + Edge Functions for scheduled execution. Your Phantom private key must never be placed in this page or stored as plain text in the database.</p>
+        </div>
+
+        <div class="bot-actions">
+          <button id="botSaveButton" class="bot-secondary" type="button">SAVE STRATEGY</button>
+          <button id="botStartButton" class="bot-primary" type="button" disabled>BACKEND NOT CONNECTED</button>
+        </div>
+
+        <div id="botStatusCard" class="bot-status-card">
+          <div class="bot-status-top"><span class="bot-status-dot"></span><strong id="botStatusLabel">READY</strong><span id="botStatusMeta">No active bot</span></div>
+          <div id="botStatusMessage">Configure your strategy above. Live execution will be enabled after the Supabase runner is connected.</div>
+        </div>
+
+        <div class="bot-history">
+          <div class="bot-history-head"><strong>TRADE HISTORY</strong><span>ON-CHAIN RECORDS</span></div>
+          <div class="bot-history-empty">No automated trades yet.</div>
+        </div>
+
+        <div class="trading-bot-foot"><span>RULE-BASED</span><span>NON-CUSTODIAL UI</span><span>SOLANA MAINNET</span></div>
+      </div>
+    </section>
+
     <section id="links" class="links-section">
       <div class="links-heading">
   <div class="platform-section-kicker">06 / GURUG NETWORK</div>
@@ -292,6 +402,7 @@
   <script src="token-burn.js?v=17"></script>
   <script src="token-authority.js?v=4"></script>
   <script src="token-mint.js?v=23"></script>
+  <script src="trading-bot.js?v=1"></script>
   <script>
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
