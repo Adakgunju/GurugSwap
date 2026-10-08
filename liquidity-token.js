@@ -193,6 +193,15 @@
     else summary.textContent = "—";
   }
 
+  function updateLiquidityButtonState() {
+    const button = document.getElementById("liqCreateButton");
+    if (!button) return;
+    const mint = String(document.getElementById("liqMint")?.value || "").trim();
+    const token = Number(document.getElementById("liqTokenAmount")?.value || 0);
+    const sol = Number(document.getElementById("liqSolAmount")?.value || 0);
+    button.disabled = !(mint && Number.isFinite(token) && token > 0 && Number.isFinite(sol) && sol > 0);
+  }
+
   async function checkExistingPool() {
     const mint = document.getElementById("liqMint")?.value.trim();
     const el = document.getElementById("liqExisting");
@@ -511,9 +520,11 @@
     const mint = document.getElementById("liqMint");
     const tokenAmount = document.getElementById("liqTokenAmount");
     const solAmount = document.getElementById("liqSolAmount");
-    [tokenAmount, solAmount].forEach(el => el?.addEventListener("input", updatePrice));
+    [tokenAmount, solAmount].forEach(el => el?.addEventListener("input", () => { updatePrice(); updateLiquidityButtonState(); }));
+    mint?.addEventListener("input", updateLiquidityButtonState);
     mint?.addEventListener("change", checkExistingPool);
     mint?.addEventListener("blur", checkExistingPool);
+    updateLiquidityButtonState();
     document.getElementById("liqCreateButton")?.addEventListener("click", async () => {
       const p = provider();
       if (!p) { setStatus("Connect Phantom first."); return; }
