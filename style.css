@@ -3487,9 +3487,35 @@ body{background:#151714!important}
 .trading-bot-intro p{
   max-width:760px;
   margin:0;
+  color:#f0f0e9;
+  font-size:18px;
+  line-height:1.7;
+}
+.trading-bot-intro p,
+.trading-bot-card .trading-bot-head p,
+.trading-bot-card .bot-strategy small,
+.trading-bot-card .bot-safety-box p,
+.trading-bot-card #botStatusMessage,
+.trading-bot-card .bot-history-empty{
   color:#deded6;
-  font-size:17px;
+}
+.trading-bot-card .trading-bot-head p{
+  font-size:15px;
   line-height:1.65;
+}
+.trading-bot-card .bot-strategy small{
+  font-size:11px;
+  line-height:1.55;
+}
+.trading-bot-card .bot-safety-box p{
+  color:#d0d0c8;
+  font-size:12px;
+  line-height:1.65;
+}
+.trading-bot-card #botStatusMessage{
+  color:#d0d0c8;
+  font-size:12px;
+  line-height:1.6;
 }
 .trading-bot-card{
   width:100%;
