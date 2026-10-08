@@ -3893,3 +3893,7 @@ body{background:#151714!important}
   border-color:#3e3e37;
   background:#171714;
 }
+
+/* Action button disabled states */
+.create-token-button:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
+.distribute-action:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
