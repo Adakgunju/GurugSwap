@@ -207,9 +207,20 @@
 
   document.getElementById("botStartButton")?.addEventListener("click", async () => {
     const button = document.getElementById("botStartButton");
-    const enabled = Number(button?.dataset.enabled || "0") === 1 ? 0 : 1;
+    const currentEnabled = Number(button?.dataset.enabled || "0");
+    const enabled = currentEnabled === 1 ? 0 : 1;
     try {
-      const data = await saveBackendSettings(enabled);
+      let data;
+      if (enabled === 0) {
+        const response = await fetch("https://gurug-trading-bot.pcaticom.workers.dev/trade?action=stop", {
+          method: "POST",
+          cache: "no-store"
+        });
+        data = await response.json();
+        if (!response.ok || !data?.ok) throw new Error(data?.error || "Could not stop bot.");
+      } else {
+        data = await saveBackendSettings(1);
+      }
       statusCard?.classList.remove("error");
       statusLabel.textContent = enabled ? "ACTIVE" : "STOPPED";
       statusMeta.textContent = String(data.strategy || "DCA") + " / " + String(data.side || "BUY");
