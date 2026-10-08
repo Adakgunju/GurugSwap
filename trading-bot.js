@@ -27,7 +27,7 @@
 
   try {
     const saved = localStorage.getItem(storageKey);
-    if (saved && ["dca","target","advanced"].includes(saved)) setStrategy(saved);
+    if (saved && ["dca","target"].includes(saved)) setStrategy(saved);
     else setStrategy("dca");
   } catch {
     setStrategy("dca");
@@ -277,7 +277,7 @@
         const el = document.getElementById(id);
         if (el && config[key] !== undefined) el.value = config[key];
       });
-      if (config.strategy) setStrategy(config.strategy);
+      if (config.strategy && ["dca","target"].includes(config.strategy)) setStrategy(config.strategy);
     }
   } catch {}
 })();
