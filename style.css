@@ -3911,19 +3911,48 @@ body{background:#151714!important}
   }
 }
 
-/* === SINGLE-SECTION KICKER -> TITLE SPACING ===
-   Reduce only the gap below each small section label and above its main title.
-   Keep title-to-description and section/card spacing unchanged.
+/* === GLOBAL SECTION HEADING RHYTHM ===
+   One shared spacing system for all main-menu sections:
+   kicker → title = 5px; title → description = 14px; description has no extra margin.
+   This intentionally overrides older menu-specific spacing declarations only.
 */
-.workspace-main.single-section-view > #create-token .create-token-kicker,
-.workspace-main.single-section-view > #distributeTokens .distribute-kicker,
-.workspace-main.single-section-view > #liquidity .liquidity-kicker,
-.workspace-main.single-section-view > #swap .swap-intro-kicker,
-.workspace-main.single-section-view > #multi-airdrop .platform-section-kicker,
-.workspace-main.single-section-view > #token-burn .platform-section-kicker,
-.workspace-main.single-section-view > #token-mint .platform-section-kicker,
-.workspace-main.single-section-view > #authority-manager .platform-section-kicker,
-.workspace-main.single-section-view > #partner-ads .platform-section-kicker,
-.workspace-main.single-section-view > #about .about-kicker{
-  margin-bottom:5px !important;
+.workspace-main > #create-token .create-token-kicker,
+.workspace-main > #distributeTokens .distribute-kicker,
+.workspace-main > #liquidity .liquidity-kicker,
+.workspace-main > #swap .swap-intro-kicker,
+.workspace-main > #multi-airdrop .platform-section-kicker,
+.workspace-main > #token-burn .platform-section-kicker,
+.workspace-main > #token-mint .platform-section-kicker,
+.workspace-main > #authority-manager .platform-section-kicker,
+.workspace-main > #token-metadata .token-metadata-kicker,
+.workspace-main > #partner-ads .platform-section-kicker,
+.workspace-main > #about .about-kicker{
+  display:block!important;
+  margin-bottom:5px!important;
+}
+.workspace-main > #create-token .create-token-title,
+.workspace-main > #distributeTokens .distribute-title,
+.workspace-main > #liquidity .liquidity-title,
+.workspace-main > #swap .swap-intro-inner h2,
+.workspace-main > #multi-airdrop .platform-placeholder-head h2,
+.workspace-main > #token-burn .platform-placeholder-head h2,
+.workspace-main > #token-mint .platform-placeholder-head h2,
+.workspace-main > #authority-manager .platform-placeholder-head h2,
+.workspace-main > #token-metadata .platform-placeholder-head h2,
+.workspace-main > #partner-ads h2,
+.workspace-main > #about .big-type{
+  margin-top:0!important;
+  margin-bottom:14px!important;
+}
+.workspace-main > #create-token .create-token-copy,
+.workspace-main > #distributeTokens .distribute-lead,
+.workspace-main > #liquidity .liquidity-sub,
+.workspace-main > #swap .swap-intro-inner p,
+.workspace-main > #multi-airdrop .platform-placeholder-head p,
+.workspace-main > #token-burn .platform-placeholder-head p,
+.workspace-main > #token-mint .platform-placeholder-head p,
+.workspace-main > #authority-manager .platform-placeholder-head p,
+.workspace-main > #token-metadata .platform-placeholder-head p,
+.workspace-main > #partner-ads .partner-ads-heading p{
+  margin-top:0!important;
 }
