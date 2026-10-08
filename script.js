@@ -235,9 +235,7 @@ function updateSwapButtonState() {
   const hasAmount = Number.isFinite(amount) && amount > 0;
   const hasWallet = !!getPhantomProvider()?.publicKey;
 
-  swapButton.textContent = hasWallet
-    ? "SWAP"
-    : "CONNECT WALLET";
+  swapButton.textContent = "SWAP";
 
   // Do not block the existing swap flow just because a public RPC is temporarily
   // unavailable. When a balance is available, enforce the insufficient-balance check.
