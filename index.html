@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#090909">
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
-  <link rel="stylesheet" href="style.css?v=60">
+  <link rel="stylesheet" href="style.css?v=61">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -598,8 +598,6 @@
 
     <script>
       // Single-section platform navigation.
-      // Resolve section elements at click time because several platform tools
-      // create their sections dynamically.
       (() => {
         const menuTargets = [
           "create-token","distributeTokens","liquidity","swap",
@@ -609,24 +607,17 @@
 
         function showSection(targetId, updateHash = true) {
           const main = document.querySelector(".workspace-main");
-          if (!main) return;
-
           const target = document.getElementById(targetId);
-          if (!target) {
-            console.warn("Gurug navigation target not found:", targetId);
-            return;
-          }
+          if (!main || !target) return false;
 
           main.classList.add("single-section-view");
 
           main.querySelectorAll(":scope > section").forEach(section => {
-            const active = section === target;
+            const active = section.id === targetId;
+            const companion = targetId === "swap" && section.id === "token-info";
             section.classList.toggle("single-section-active", active);
-            section.classList.toggle(
-              "single-section-companion",
-              targetId === "swap" && section.id === "token-info"
-            );
-            section.setAttribute("aria-hidden", active || (targetId === "swap" && section.id === "token-info") ? "false" : "true");
+            section.classList.toggle("single-section-companion", companion);
+            section.setAttribute("aria-hidden", active || companion ? "false" : "true");
           });
 
           document.querySelectorAll(".workspace-nav, #mobileMenu a").forEach(link => {
@@ -638,11 +629,6 @@
 
           if (updateHash) history.replaceState(null, "", "#" + targetId);
 
-          const topbar = document.querySelector(".topbar");
-          const offset = (topbar?.offsetHeight || 76) + 10;
-          const y = target.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({top: Math.max(0, y), behavior:"smooth"});
-
           const menu = document.getElementById("mobileMenu");
           const menuBtn = document.getElementById("mobileMenuBtn");
           if (menu && !menu.hidden) {
@@ -650,29 +636,54 @@
             menuBtn?.setAttribute("aria-expanded", "false");
             if (menuBtn) menuBtn.textContent = "MENU";
           }
+
+          const topbar = document.querySelector(".topbar");
+          const offset = (topbar?.offsetHeight || 76) + 10;
+          const y = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({top: Math.max(0, y), behavior:"smooth"});
+          return true;
         }
 
-        window.gurugNavigate = showSection;
-
-        document.addEventListener("click", event => {
-          const link = event.target.closest(".workspace-nav, #mobileMenu a");
-          if (!link) return;
-          const href = link.getAttribute("href") || "";
-          if (!href.startsWith("#")) return;
-          const targetId = href.slice(1);
+        window.gurugNavigate = function(targetId) {
           if (!menuTargets.includes(targetId)) return;
-          event.preventDefault();
-          event.stopPropagation();
-          showSection(targetId, true);
-        }, true);
+          if (showSection(targetId, true)) return;
+          setTimeout(() => showSection(targetId, true), 100);
+          setTimeout(() => showSection(targetId, true), 500);
+        };
 
-        function initialTarget() {
-          const hash = window.location.hash.replace(/^#/, "");
-          return menuTargets.includes(hash) && document.getElementById(hash) ? hash : "swap";
+        function bindNavigation() {
+          document.querySelectorAll(".workspace-nav, #mobileMenu a").forEach(link => {
+            if (link.dataset.gurugNavBound) return;
+            link.dataset.gurugNavBound = "1";
+            link.addEventListener("click", event => {
+              const href = link.getAttribute("href") || "";
+              if (!href.startsWith("#")) return;
+              const targetId = href.slice(1);
+              if (!menuTargets.includes(targetId)) return;
+              event.preventDefault();
+              event.stopPropagation();
+              window.gurugNavigate(targetId);
+            });
+          });
         }
 
-        window.addEventListener("hashchange", () => showSection(initialTarget(), false));
-        showSection(initialTarget(), false);
+        function initNavigation() {
+          bindNavigation();
+          const hash = window.location.hash.replace(/^#/, "");
+          const targetId = menuTargets.includes(hash) ? hash : "swap";
+          window.gurugNavigate(targetId);
+        }
+
+        window.addEventListener("hashchange", () => {
+          const hash = window.location.hash.replace(/^#/, "");
+          if (menuTargets.includes(hash)) window.gurugNavigate(hash);
+        });
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initNavigation, {once:true});
+        } else {
+          initNavigation();
+        }
       })();
     </script>
 </body>
