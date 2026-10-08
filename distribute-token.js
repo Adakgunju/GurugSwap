@@ -110,7 +110,7 @@
               <div class="distribute-stat"><span>NETWORK COST</span><strong id="distributeCost">CALCULATED AT SIGNING</strong></div>
             </div>
 
-            <button id="distributeSend" class="distribute-action" type="button">DISTRIBUTE TOKENS</button>
+            <button id="distributeSend" class="distribute-action" type="button" disabled>DISTRIBUTE TOKENS</button>
             <div id="distributeStatus" class="distribute-status">Connect Phantom, enter a token mint and add the recipient wallets.</div>
             <div id="distributeResults" class="distribute-results"></div>
           </div>
@@ -426,3 +426,6 @@
     bind();
   }
 })();
+
+/* Keep distribution action visibly disabled until all required inputs are valid. */
+.distribute-action:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
