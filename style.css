@@ -3735,6 +3735,23 @@ body{background:#151714!important}
   text-align:center;
   font-size:11px;
 }
+.bot-history-row{
+  display:grid;
+  grid-template-columns:.8fr 1.5fr 1.2fr 1fr;
+  gap:8px;
+  padding:10px 15px;
+  border-top:1px solid #292923;
+  color:#cfcfc7;
+  font-size:10px;
+  letter-spacing:.04em;
+}
+.bot-history-row span:first-child{
+  font-weight:800;
+}
+.bot-history-row span:last-child{
+  text-align:right;
+  color:#88887f;
+}
 .trading-bot-foot{
   display:flex;
   justify-content:space-between;
