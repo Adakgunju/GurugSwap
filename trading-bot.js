@@ -118,6 +118,8 @@
 
   function bytesToBase58(bytes) {
     const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    if (!bytes?.length) return "";
+
     let digits = [0];
     for (const byte of bytes) {
       let carry = byte;
@@ -131,11 +133,14 @@
         carry = Math.floor(carry / 58);
       }
     }
-    for (const byte of bytes) {
-      if (byte !== 0) break;
-      digits.push(0);
+
+    let leadingZeros = 0;
+    while (leadingZeros < bytes.length && bytes[leadingZeros] === 0) {
+      leadingZeros++;
     }
-    return digits.reverse().map(i => alphabet[i]).join("");
+
+    return "1".repeat(leadingZeros) +
+      digits.reverse().map(i => alphabet[i]).join("");
   }
 
   async function getWalletSignature() {
