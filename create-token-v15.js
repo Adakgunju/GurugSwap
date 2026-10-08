@@ -1222,6 +1222,27 @@
     return {mintAddress, metadataUri, signature: result?.signature || null};
   }
 
+  function updateCreateTokenButtonState() {
+    const button = document.getElementById("createTokenButton");
+    if (!button) return;
+    const name = String(document.getElementById("createTokenName")?.value || "").trim();
+    const symbol = normalizeSymbol(document.getElementById("createTokenSymbol")?.value);
+    const supply = String(document.getElementById("createTokenSupply")?.value || "").trim();
+    const decimals = Number(document.getElementById("createTokenDecimals")?.value);
+    const logo = document.getElementById("createTokenLogo")?.files?.[0];
+    let supplyOk = false;
+    try { parseSupply(supply, decimals); supplyOk = true; } catch {}
+    const ready =
+      !!name &&
+      /^[A-Z0-9]{1,6}$/.test(symbol) &&
+      Number.isInteger(decimals) && decimals >= 0 && decimals <= 9 &&
+      supplyOk &&
+      !!logo &&
+      /^image\/(png|jpeg|webp)$/.test(logo?.type || "") &&
+      Number(logo?.size || 0) <= 2 * 1024 * 1024;
+    button.disabled = !ready;
+  }
+
   function bind() {
     addStyle();
     addSection();
@@ -1231,6 +1252,12 @@
     const button = document.getElementById("createTokenButton");
     if (!button || button.dataset.bound) return;
     button.dataset.bound = "1";
+
+    ["createTokenName","createTokenSymbol","createTokenSupply","createTokenDecimals","createTokenLogo"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", updateCreateTokenButtonState);
+      document.getElementById(id)?.addEventListener("change", updateCreateTokenButtonState);
+    });
+    updateCreateTokenButtonState();
 
     button.addEventListener("click", async () => {
       button.disabled = true;
