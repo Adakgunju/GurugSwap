@@ -721,6 +721,7 @@
         }
 
         function getInitialSection() {
+          refreshSections();
           const hash = window.location.hash.replace(/^#/, "");
           return sections.has(hash) ? hash : "swap";
         }
@@ -730,8 +731,6 @@
           const href = link.getAttribute("href") || "";
           if (!href.startsWith("#")) return;
           const targetId = href.slice(1);
-          if (!sections.has(targetId)) return;
-
           link.addEventListener("click", event => {
             event.preventDefault();
             setActiveMenu(targetId, true);
