@@ -10,7 +10,7 @@
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
   const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
   const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
-  const settingsUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=settings";
+  const settingsUrl = "https://gurug-trading-bot.pcaticom.workers.dev/trade?action=settings";
 
   function setStrategy(strategy) {
     strategyButtons.forEach(button => {
