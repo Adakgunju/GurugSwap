@@ -3911,14 +3911,19 @@ body{background:#151714!important}
   }
 }
 
-/* === MOBILE KICKER -> TITLE GAP: RESTORE TIGHT SPACING ===
-   Narrow only the space between the small subtitle/kicker and the main title.
-   No card position, horizontal margin, or title-to-description spacing changes.
+/* === SINGLE-SECTION KICKER -> TITLE SPACING ===
+   Reduce only the gap below each small section label and above its main title.
+   Keep title-to-description and section/card spacing unchanged.
 */
-@media(max-width:850px){
-  .workspace-main.single-section-view .platform-section-kicker,
-  .workspace-main.single-section-view .swap-intro-kicker,
-  .workspace-main.single-section-view .about-kicker{
-    margin-bottom:6px !important;
-  }
+.workspace-main.single-section-view > #create-token .create-token-kicker,
+.workspace-main.single-section-view > #distributeTokens .distribute-kicker,
+.workspace-main.single-section-view > #liquidity .liquidity-kicker,
+.workspace-main.single-section-view > #swap .swap-intro-kicker,
+.workspace-main.single-section-view > #multi-airdrop .platform-section-kicker,
+.workspace-main.single-section-view > #token-burn .platform-section-kicker,
+.workspace-main.single-section-view > #token-mint .platform-section-kicker,
+.workspace-main.single-section-view > #authority-manager .platform-section-kicker,
+.workspace-main.single-section-view > #partner-ads .platform-section-kicker,
+.workspace-main.single-section-view > #about .about-kicker{
+  margin-bottom:5px !important;
 }
