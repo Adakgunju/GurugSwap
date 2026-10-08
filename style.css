@@ -3873,3 +3873,23 @@ body{background:#151714!important}
     min-width:0 !important;
   }
 }
+
+/* Advanced strategy is intentionally disabled until implemented. */
+.bot-strategy:disabled,
+.bot-strategy[data-strategy="advanced"]{
+  cursor:not-allowed;
+}
+.bot-strategy:disabled,
+.bot-strategy[data-strategy="advanced"]:not(.active){
+  border-color:#3e3e37;
+  background:#171714;
+}
+.bot-strategy:disabled:hover,
+.bot-strategy[data-strategy="advanced"]:hover{
+  border-color:#3e3e37;
+  background:#171714;
+}
+.bot-strategy[data-strategy="advanced"].active{
+  border-color:#3e3e37;
+  background:#171714;
+}
