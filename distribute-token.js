@@ -140,6 +140,19 @@
     el.textContent = message;
   }
 
+  function updateDistributeButtonState() {
+    const button = document.getElementById("distributeSend");
+    if (!button) return;
+    const mint = String(document.getElementById("distributeMint")?.value || "").trim();
+    const rows = [...document.querySelectorAll("#distributeRows .distribute-row")];
+    const readyRows = rows.length > 0 && rows.every(row => {
+      const address = String(row.querySelector(".distribute-address")?.value || "").trim();
+      const amount = Number(row.querySelector(".distribute-amount")?.value || 0);
+      return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address) && Number.isFinite(amount) && amount > 0;
+    });
+    button.disabled = !(mint && readyRows);
+  }
+
   function addRecipientRow(address = "", amount = "") {
     const rows = document.getElementById("distributeRows");
     if (!rows) return;
@@ -160,7 +173,7 @@
       }
       updateSummary();
     });
-    row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateSummary));
+    row.querySelectorAll("input").forEach(input => input.addEventListener("input", () => { updateSummary(); updateDistributeButtonState(); }));
     rows.appendChild(row);
     updateSummary();
   }
@@ -366,8 +379,13 @@
     document.body.dataset.distributeBound = "1";
 
     addRecipientRow();
+    updateDistributeButtonState();
 
-    document.getElementById("distributeAdd")?.addEventListener("click", () => addRecipientRow());
+    document.getElementById("distributeAdd")?.addEventListener("click", () => {
+      addRecipientRow();
+      updateDistributeButtonState();
+    });
+    document.getElementById("distributeMint")?.addEventListener("input", updateDistributeButtonState);
     document.getElementById("distributeSend")?.addEventListener("click", async () => {
       const button = document.getElementById("distributeSend");
       if (button) button.disabled = true;
