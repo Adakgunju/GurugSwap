@@ -150,7 +150,7 @@
     }
     const publicKey = provider.publicKey.toBase58();
     const timestamp = Date.now();
-    const message = "Gurug Bot Settings:\\n" + timestamp;
+    const message = "Gurug Bot Settings:\n" + timestamp;
     const result = await provider.signMessage(new TextEncoder().encode(message), "utf8");
     return {
       publicKey,
