@@ -3914,32 +3914,34 @@ body{background:#151714!important}
   }
 }
 
-/* Mobile burn/mint: use the same section spacing rhythm as the corrected swap page. */
+/* Mobile burn/mint: match the corrected swap kicker-to-title gap.
+   Scope to the active single-section view so older component rules cannot override it.
+   Preserve the existing description-to-tool-card gap. */
 @media(max-width:850px){
-  .workspace-main>#token-burn,
-  .workspace-main>#token-mint{
+  .workspace-main.single-section-view > #token-burn.single-section-active,
+  .workspace-main.single-section-view > #token-mint.single-section-active{
     margin-top:0!important;
     padding-top:0!important;
   }
-  .workspace-main>#token-burn .platform-placeholder-head,
-  .workspace-main>#token-mint .platform-placeholder-head{
+  .workspace-main.single-section-view > #token-burn.single-section-active .platform-placeholder-head,
+  .workspace-main.single-section-view > #token-mint.single-section-active .platform-placeholder-head{
     margin-top:0!important;
     margin-bottom:22px!important;
   }
-  .workspace-main>#token-burn .platform-section-kicker,
-  .workspace-main>#token-mint .platform-section-kicker{
+  .workspace-main.single-section-view > #token-burn.single-section-active .platform-section-kicker,
+  .workspace-main.single-section-view > #token-mint.single-section-active .platform-section-kicker{
     display:block!important;
-    margin-top:0!important;
-    margin-bottom:5px!important;
+    margin:0 0 5px!important;
+    padding:0!important;
+    line-height:1.2!important;
   }
-  .workspace-main>#token-burn .platform-placeholder-head h2,
-  .workspace-main>#token-mint .platform-placeholder-head h2{
-    margin-top:0!important;
-    margin-bottom:14px!important;
+  .workspace-main.single-section-view > #token-burn.single-section-active .platform-placeholder-head h2,
+  .workspace-main.single-section-view > #token-mint.single-section-active .platform-placeholder-head h2{
+    margin:0 0 14px!important;
   }
-  .workspace-main>#token-burn .platform-placeholder-head p,
-  .workspace-main>#token-mint .platform-placeholder-head p{
-    margin-top:0!important;
+  .workspace-main.single-section-view > #token-burn.single-section-active .platform-placeholder-head p,
+  .workspace-main.single-section-view > #token-mint.single-section-active .platform-placeholder-head p{
+    margin:0!important;
   }
 }
 
