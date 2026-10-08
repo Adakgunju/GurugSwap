@@ -10,6 +10,7 @@
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
   const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
   const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
+  const settingsUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=settings";
 
   function setStrategy(strategy) {
     strategyButtons.forEach(button => {
@@ -45,8 +46,9 @@
         statusMeta.textContent = `${String(data.strategy || "DCA").toUpperCase()} / ${String(data.side || "BUY").toUpperCase()}`;
         statusMessage.textContent = `Backend connected. Wallet ${data.wallet_matches ? "verified" : "mismatch"} · Balance ${Number(data.sol_balance || 0).toFixed(4)} SOL · Price ${data.market_price_usd == null ? "—" : "$" + Number(data.market_price_usd).toFixed(6)}.`;
         if (startButton) {
-          startButton.disabled = true;
-          startButton.textContent = Number(data.enabled) === 1 ? "BOT RUNNING" : "START REQUIRES BACKEND CONTROL";
+          startButton.disabled = false;
+          startButton.dataset.enabled = Number(data.enabled) === 1 ? "1" : "0";
+          startButton.textContent = Number(data.enabled) === 1 ? "STOP BOT" : "START BOT";
         }
       }
     } catch {
@@ -114,10 +116,43 @@
     refreshHistory();
   }, 30000);
 
-  saveButton?.addEventListener("click", () => {
-    const strategy = strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca";
-    const payload = {
-      strategy,
+  function bytesToBase58(bytes) {
+    const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    let digits = [0];
+    for (const byte of bytes) {
+      let carry = byte;
+      for (let i = 0; i < digits.length; i++) {
+        const x = digits[i] * 256 + carry;
+        digits[i] = x % 58;
+        carry = Math.floor(x / 58);
+      }
+      while (carry) {
+        digits.push(carry % 58);
+        carry = Math.floor(carry / 58);
+      }
+    }
+    for (const byte of bytes) {
+      if (byte !== 0) break;
+      digits.push(0);
+    }
+    return digits.reverse().map(i => alphabet[i]).join("");
+  }
+
+  async function getWalletSignature() {
+    const provider = window.solana;
+    if (!provider?.publicKey || !provider?.signMessage) {
+      throw new Error("Connect the bot wallet in Phantom first.");
+    }
+    const publicKey = provider.publicKey.toBase58();
+    const timestamp = Date.now();
+    const message = "Gurug Bot Settings:\\n" + timestamp;
+    const result = await provider.signMessage(new TextEncoder().encode(message), "utf8");
+    return { publicKey, timestamp, signature: bytesToBase58(result.signature) };
+  }
+
+  function collectSettings() {
+    return {
+      strategy: strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca",
       tokenMint: document.getElementById("botTokenMint")?.value.trim() || "",
       side: document.getElementById("botSide")?.value || "buy",
       tradeAmount: document.getElementById("botTradeAmount")?.value || "",
@@ -128,16 +163,53 @@
       takeProfit: document.getElementById("botTakeProfit")?.value || "",
       maxSpend: document.getElementById("botMaxSpend")?.value || ""
     };
+  }
+
+  async function saveBackendSettings(enabled) {
+    const payload = collectSettings();
+    const auth = await getWalletSignature();
+    const response = await fetch(settingsUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, enabled, ...auth })
+    });
+    const data = await response.json();
+    if (!response.ok || !data?.ok) throw new Error(data?.error || "Could not save bot settings.");
+    return data;
+  }
+
+  saveButton?.addEventListener("click", async () => {
     try {
-      localStorage.setItem("gurugSwap.tradingBotConfig", JSON.stringify(payload));
+      const enabled = Number(document.getElementById("botStartButton")?.dataset.enabled || "0");
+      const data = await saveBackendSettings(enabled);
+      try { localStorage.setItem("gurugSwap.tradingBotConfig", JSON.stringify(collectSettings())); } catch {}
       statusCard?.classList.remove("error");
       statusLabel.textContent = "SAVED";
-      statusMeta.textContent = "LOCAL CONFIG";
-      statusMessage.textContent = "Strategy saved locally. Cloudflare bot backend is connected; live settings are controlled by the backend.";
-    } catch {
+      statusMeta.textContent = String(data.strategy || "DCA") + " / " + String(data.side || "BUY");
+      statusMessage.textContent = enabled ? "Bot settings saved to the live Cloudflare backend." : "Bot settings saved. Bot is currently stopped.";
+      refreshBackendStatus();
+      refreshDecision();
+    } catch (error) {
       statusCard?.classList.add("error");
       statusLabel.textContent = "SAVE FAILED";
-      statusMessage.textContent = "Could not save the strategy locally.";
+      statusMessage.textContent = error?.message || "Could not save bot settings.";
+    }
+  });
+
+  document.getElementById("botStartButton")?.addEventListener("click", async () => {
+    const button = document.getElementById("botStartButton");
+    const enabled = Number(button?.dataset.enabled || "0") === 1 ? 0 : 1;
+    try {
+      const data = await saveBackendSettings(enabled);
+      statusCard?.classList.remove("error");
+      statusLabel.textContent = enabled ? "ACTIVE" : "STOPPED";
+      statusMeta.textContent = String(data.strategy || "DCA") + " / " + String(data.side || "BUY");
+      statusMessage.textContent = enabled ? "Bot started on the live Cloudflare backend." : "Bot stopped.";
+      refreshBackendStatus();
+    } catch (error) {
+      statusCard?.classList.add("error");
+      statusLabel.textContent = "ACTION FAILED";
+      statusMessage.textContent = error?.message || "Could not change bot state.";
     }
   });
 
