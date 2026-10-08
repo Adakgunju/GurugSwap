@@ -246,7 +246,7 @@ function updateSwapButtonState() {
     walletTokenBalance !== null &&
     amount > walletTokenBalance;
 
-  swapButton.disabled = insufficient;
+  swapButton.disabled = !hasAmount || insufficient;
 
   if (insufficient) {
     setSwapStatus(
