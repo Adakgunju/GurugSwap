@@ -3914,6 +3914,35 @@ body{background:#151714!important}
   }
 }
 
+/* Mobile burn/mint: use the same section spacing rhythm as the corrected swap page. */
+@media(max-width:850px){
+  .workspace-main>#token-burn,
+  .workspace-main>#token-mint{
+    margin-top:0!important;
+    padding-top:0!important;
+  }
+  .workspace-main>#token-burn .platform-placeholder-head,
+  .workspace-main>#token-mint .platform-placeholder-head{
+    margin-top:0!important;
+    margin-bottom:22px!important;
+  }
+  .workspace-main>#token-burn .platform-section-kicker,
+  .workspace-main>#token-mint .platform-section-kicker{
+    display:block!important;
+    margin-top:0!important;
+    margin-bottom:5px!important;
+  }
+  .workspace-main>#token-burn .platform-placeholder-head h2,
+  .workspace-main>#token-mint .platform-placeholder-head h2{
+    margin-top:0!important;
+    margin-bottom:14px!important;
+  }
+  .workspace-main>#token-burn .platform-placeholder-head p,
+  .workspace-main>#token-mint .platform-placeholder-head p{
+    margin-top:0!important;
+  }
+}
+
 /* === GLOBAL SECTION HEADING RHYTHM ===
    One shared spacing system for all main-menu sections:
    kicker → title = 5px; title → description = 14px; description has no extra margin.
