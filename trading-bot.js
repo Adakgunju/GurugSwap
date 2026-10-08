@@ -169,7 +169,7 @@
     const isSell = side === "sell";
 
     if (tradeAmountLabel) {
-      tradeAmountLabel.textContent = isSell ? "TRADE AMOUNT (GURUG)" : "TRADE AMOUNT (SOL)";
+      tradeAmountLabel.textContent = isSell ? "TRADE AMOUNT (TOKEN)" : "TRADE AMOUNT (SOL)";
     }
     if (tradeAmountInput) {
       tradeAmountInput.step = isSell ? "1" : "0.001";
