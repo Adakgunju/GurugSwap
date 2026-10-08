@@ -353,7 +353,7 @@
             <div class="create-token-cost-row"><span>GurugSwap service fee</span><strong>0.50 SOL</strong></div>
             <div class="create-token-warning"><b>Service fee:</b> 0.50 SOL is paid to GurugSwap. Solana network and storage transaction fees are separate and paid through your wallet.</div>
           </div>
-          <button id="createTokenButton" class="create-token-button" type="button">CREATE TOKEN</button>
+          <button id="createTokenButton" class="create-token-button" type="button" disabled>CREATE TOKEN</button>
           <div id="createTokenStatus" class="create-token-status">Connect your Phantom wallet, enter the token details, then create the token.</div>
 
           <div id="createTokenResult" class="create-token-result" hidden>
@@ -1289,3 +1289,6 @@
     bind();
   }
 })();
+
+/* Action buttons stay visibly disabled until every required field is ready. */
+.create-token-button:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
