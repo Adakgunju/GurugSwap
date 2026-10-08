@@ -9,6 +9,7 @@
   const storageKey = "gurugSwap.tradingBotStrategy";
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
   const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
+  const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
 
   function setStrategy(strategy) {
     strategyButtons.forEach(button => {
@@ -54,6 +55,42 @@
     }
   }
 
+  async function refreshHistory() {
+    try {
+      const response = await fetch(historyUrl, { cache: "no-store" });
+      const data = await response.json();
+      const history = document.querySelector(".bot-history");
+      if (!data?.ok || !history) return;
+
+      const rows = Array.isArray(data.trades) ? data.trades : [];
+      const empty = history.querySelector(".bot-history-empty");
+      if (empty) empty.remove();
+
+      history.querySelectorAll(".bot-history-row").forEach(el => el.remove());
+
+      if (!rows.length) {
+        const el = document.createElement("div");
+        el.className = "bot-history-empty";
+        el.textContent = "No automated trades yet.";
+        history.appendChild(el);
+        return;
+      }
+
+      rows.forEach(trade => {
+        const row = document.createElement("div");
+        row.className = "bot-history-row";
+        const side = String(trade.side || "").toUpperCase();
+        const status = String(trade.status || "").toUpperCase();
+        const amount = side === "SELL"
+          ? Number(trade.amount_token || 0).toFixed(6) + " GURUG"
+          : Number(trade.amount_sol || 0).toFixed(4) + " SOL";
+        const price = trade.price_usd == null ? "—" : "$" + Number(trade.price_usd).toFixed(6);
+        row.innerHTML = "<span>" + side + "</span><span>" + amount + "</span><span>" + price + "</span><span>" + status + "</span>";
+        history.appendChild(row);
+      });
+    } catch {}
+  }
+
   async function refreshDecision() {
     try {
       const response = await fetch(decisionUrl, { cache: "no-store" });
@@ -70,9 +107,11 @@
 
   refreshBackendStatus();
   refreshDecision();
+  refreshHistory();
   setInterval(() => {
     refreshBackendStatus();
     refreshDecision();
+    refreshHistory();
   }, 30000);
 
   saveButton?.addEventListener("click", () => {
