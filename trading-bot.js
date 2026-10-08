@@ -161,9 +161,21 @@
 
   function syncSideFields() {
     const side = document.getElementById("botSide")?.value || "buy";
+    const tradeAmountLabel = document.querySelector('label[for="botTradeAmount"] small') ||
+      document.getElementById("botTradeAmount")?.closest(".bot-field")?.querySelector("small");
+    const tradeAmountInput = document.getElementById("botTradeAmount");
     const field = document.getElementById("botMaxSpend")?.closest(".bot-field");
     const input = document.getElementById("botMaxSpend");
     const isSell = side === "sell";
+
+    if (tradeAmountLabel) {
+      tradeAmountLabel.textContent = isSell ? "TRADE AMOUNT (GURUG)" : "TRADE AMOUNT (SOL)";
+    }
+    if (tradeAmountInput) {
+      tradeAmountInput.step = isSell ? "1" : "0.001";
+      tradeAmountInput.placeholder = isSell ? "100" : "0.10";
+    }
+
     if (input) {
       input.disabled = isSell;
       input.setAttribute("aria-disabled", isSell ? "true" : "false");
