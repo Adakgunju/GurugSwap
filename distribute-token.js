@@ -427,5 +427,3 @@
   }
 })();
 
-/* Keep distribution action visibly disabled until all required inputs are valid. */
-.distribute-action:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
