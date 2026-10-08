@@ -2346,6 +2346,49 @@ body{background:#151714!important}
 @media(max-width:850px){.workspace-main>#token-burn .platform-placeholder-head{margin-bottom:22px!important}.token-burn-card{padding:20px!important;border-radius:16px!important}.token-burn-fields{grid-template-columns:1fr!important}}
 @media(max-width:520px){.workspace-main>#token-burn .platform-placeholder-head{margin-bottom:20px!important}.token-burn-card{padding:16px!important;border-radius:14px!important}.token-burn-head{font-size:9px!important}.token-burn-fields input{min-height:52px!important}.token-burn-button{min-height:54px!important}.token-burn-foot{flex-direction:column!important;gap:7px!important}}
 
+
+/* --- TOKEN AUTHORITY READABILITY --- */
+.workspace-main>#authority-manager .platform-placeholder-head p{
+  color:#e0e0d8!important;
+  font-size:17px!important;
+  line-height:1.65!important;
+}
+.workspace-main>#authority-manager .token-authority-head{
+  color:#f5f5ef!important;
+  font-size:11px!important;
+}
+.workspace-main>#authority-manager .token-authority-live{
+  color:#d0d0c8!important;
+}
+.workspace-main>#authority-manager .token-authority-lookup small,
+.workspace-main>#authority-manager .authority-new small,
+.workspace-main>#authority-manager .authority-current small,
+.workspace-main>#authority-manager .authority-modal-box label small{
+  color:#c8c8c0!important;
+  font-size:10px!important;
+}
+.workspace-main>#authority-manager .token-authority-note,
+.workspace-main>#authority-manager .authority-note,
+.workspace-main>#authority-manager .authority-current p,
+.workspace-main>#authority-manager .authority-modal-box p{
+  color:#d0d0c8!important;
+  font-size:13px!important;
+  line-height:1.65!important;
+}
+.workspace-main>#authority-manager .authority-current strong,
+.workspace-main>#authority-manager .authority-current b{
+  color:#f0f0ea!important;
+  font-size:14px!important;
+}
+@media(max-width:850px){
+  .workspace-main>#authority-manager .platform-placeholder-head p{font-size:15px!important;}
+  .workspace-main>#authority-manager .token-authority-head{font-size:10px!important;}
+  .workspace-main>#authority-manager .token-authority-lookup small,
+  .workspace-main>#authority-manager .authority-new small,
+  .workspace-main>#authority-manager .authority-current small,
+  .workspace-main>#authority-manager .authority-modal-box label small{font-size:9px!important;}
+}
+
 /* === TOKEN AUTHORITY MANAGER === */
 .workspace-main>#authority-manager{
   width:100%!important;
