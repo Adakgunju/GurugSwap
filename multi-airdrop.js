@@ -75,6 +75,17 @@
     return String(document.getElementById("multiAirdropAmount")?.value || "").trim();
   }
 
+  function updateSendButtonState() {
+    const button = document.getElementById("multiAirdropSend");
+    if (!button) return;
+    const hasMint = getMintText().length > 0;
+    const hasRecipients = recipientAddresses.some(address => String(address || "").trim().length > 0);
+    const amountText = getAirdropAmount().replace(/,/g, "");
+    const amount = Number(amountText);
+    const hasAmount = amountText.length > 0 && Number.isFinite(amount) && amount > 0;
+    button.disabled = !(hasMint && hasRecipients && hasAmount);
+  }
+
   function updateLineNumbers() {
     const input = document.getElementById("multiAirdropAddresses");
     const gutter = document.getElementById("multiAirdropLineNumbers");
@@ -105,6 +116,7 @@
       ? total.toLocaleString("en-US", { maximumFractionDigits: decimals == null ? 9 : decimals })
       : "0";
     if (txEl) txEl.textContent = txCount == null ? "—" : String(txCount);
+    updateSendButtonState();
   }
 
   // The input is always a real token quantity (e.g. 0.01 GSWAP).
@@ -445,8 +457,8 @@
       .multi-airdrop-stat{padding:13px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:#1b1d19}
       .multi-airdrop-stat span{display:block;color:#8f9087;font-size:9px;letter-spacing:.12em;margin-bottom:5px}
       .multi-airdrop-stat strong{color:#fff;font-size:14px}
-      .multi-airdrop-action{width:100%;margin-top:14px;min-height:54px;border:0;border-radius:10px;background:#ffe500;color:#0a0b09;font-weight:900;letter-spacing:.1em;cursor:pointer}
-      .multi-airdrop-action:disabled{opacity:.45;cursor:not-allowed}
+      .multi-airdrop-action{width:100%;margin-top:14px;min-height:54px;border:0;border-radius:10px;background:#ffe500;color:#0a0b09;font-weight:900;letter-spacing:.1em;cursor:pointer;transition:background .18s,opacity .18s}
+      .multi-airdrop-action:disabled{background:#35362f;color:#898a80;opacity:1;cursor:not-allowed}
       .multi-airdrop-status{margin-top:12px;padding:13px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:#10110e;color:#c9cac3;font-size:11px;line-height:1.5}
       .multi-airdrop-status.active{border-color:rgba(255,229,0,.35)}.multi-airdrop-status.success{border-color:rgba(255,229,0,.5);color:#fff}.multi-airdrop-status.error{border-color:rgba(255,120,120,.4);color:#ffb4b4}
       .multi-airdrop-results{display:grid;gap:8px;margin-top:12px}
@@ -603,6 +615,7 @@
     `;
 
     renderRecipients();
+    updateSendButtonState();
 
     document.getElementById("multiAirdropAddresses")?.addEventListener("input", event => {
       recipientAddresses = event.target.value.split(/[,\s]+/).map(v => v.trim()).filter(Boolean);
@@ -616,7 +629,10 @@
       if (gutter) gutter.scrollTop = event.target.scrollTop;
     });
 
-    document.getElementById("multiAirdropMint")?.addEventListener("input", () => scheduleCostEstimate());
+    document.getElementById("multiAirdropMint")?.addEventListener("input", () => {
+      updateSendButtonState();
+      scheduleCostEstimate();
+    });
     document.getElementById("multiAirdropAmount")?.addEventListener("input", () => {
       updateSummary();
       scheduleCostEstimate();
