@@ -458,7 +458,7 @@
       .multi-airdrop-stat span{display:block;color:#8f9087;font-size:9px;letter-spacing:.12em;margin-bottom:5px}
       .multi-airdrop-stat strong{color:#fff;font-size:14px}
       .multi-airdrop-action{width:100%;margin-top:14px;min-height:54px;border:0;border-radius:10px;background:#ffe500;color:#0a0b09;font-weight:900;letter-spacing:.1em;cursor:pointer;transition:background .18s,opacity .18s}
-      .multi-airdrop-action:disabled{background:#35362f;color:#898a80;opacity:1;cursor:not-allowed}
+      .multi-airdrop-action:disabled{background:#ffe500;color:#0a0b09;opacity:.42;filter:grayscale(.35);cursor:not-allowed}
       .multi-airdrop-status{margin-top:12px;padding:13px;border:1px solid rgba(255,255,255,.11);border-radius:10px;background:#10110e;color:#c9cac3;font-size:11px;line-height:1.5}
       .multi-airdrop-status.active{border-color:rgba(255,229,0,.35)}.multi-airdrop-status.success{border-color:rgba(255,229,0,.5);color:#fff}.multi-airdrop-status.error{border-color:rgba(255,120,120,.4);color:#ffb4b4}
       .multi-airdrop-results{display:grid;gap:8px;margin-top:12px}
