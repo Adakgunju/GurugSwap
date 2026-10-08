@@ -667,13 +667,20 @@
           "trading-bot",
         ];
 
-        const sections = new Map(
+        const sections = new Map();
+
+        function refreshSections() {
+          sections.clear();
           menuTargets
             .map(id => [id, document.getElementById(id)])
             .filter(([, el]) => !!el)
-        );
+            .forEach(([id, el]) => sections.set(id, el));
+        }
+
+        refreshSections();
 
         function setActiveMenu(targetId, updateHash = true) {
+          refreshSections();
           if (!sections.has(targetId)) targetId = "swap";
           main.classList.add("single-section-view");
 
