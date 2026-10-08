@@ -152,7 +152,11 @@
     const timestamp = Date.now();
     const message = "Gurug Bot Settings:\\n" + timestamp;
     const result = await provider.signMessage(new TextEncoder().encode(message), "utf8");
-    return { publicKey, timestamp, signature: bytesToBase58(result.signature) };
+    return {
+      publicKey,
+      timestamp,
+      signatureBytes: Array.from(result.signature || [])
+    };
   }
 
   function collectSettings() {
