@@ -1290,5 +1290,3 @@
   }
 })();
 
-/* Action buttons stay visibly disabled until every required field is ready. */
-.create-token-button:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
