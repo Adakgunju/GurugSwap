@@ -8,6 +8,7 @@
   const statusMessage = document.getElementById("botStatusMessage");
   const storageKey = "gurugSwap.tradingBotStrategy";
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
+  const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
 
   function setStrategy(strategy) {
     strategyButtons.forEach(button => {
@@ -53,8 +54,26 @@
     }
   }
 
+  async function refreshDecision() {
+    try {
+      const response = await fetch(decisionUrl, { cache: "no-store" });
+      const data = await response.json();
+      if (!data?.ok) return;
+      const tp = data.take_profit_usd == null ? "—" : "$" + Number(data.take_profit_usd).toFixed(6);
+      const sl = data.stop_loss_usd == null ? "—" : "$" + Number(data.stop_loss_usd).toFixed(6);
+      const balance = Number(data.token_balance || 0);
+      const exit = data.exit_triggered ? " · EXIT " + String(data.exit_reason || "").replace("_"," ").toUpperCase() : "";
+      const decisionLine = document.getElementById("botDecisionStatus");
+      if (decisionLine) decisionLine.textContent = "TP " + tp + " · SL " + sl + " · Token balance " + balance.toFixed(6) + exit;
+    } catch {}
+  }
+
   refreshBackendStatus();
-  setInterval(refreshBackendStatus, 30000);
+  refreshDecision();
+  setInterval(() => {
+    refreshBackendStatus();
+    refreshDecision();
+  }, 30000);
 
   saveButton?.addEventListener("click", () => {
     const strategy = strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca";
@@ -75,7 +94,7 @@
       statusCard?.classList.remove("error");
       statusLabel.textContent = "SAVED";
       statusMeta.textContent = "LOCAL CONFIG";
-      statusMessage.textContent = "Strategy saved in this browser. Live 24/7 execution will be enabled after the Supabase backend is connected.";
+      statusMessage.textContent = "Strategy saved locally. Cloudflare bot backend is connected; live settings are controlled by the backend.";
     } catch {
       statusCard?.classList.add("error");
       statusLabel.textContent = "SAVE FAILED";
