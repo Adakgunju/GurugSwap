@@ -222,10 +222,14 @@
         data = await saveBackendSettings(1);
       }
       statusCard?.classList.remove("error");
+      if (button) {
+        button.dataset.enabled = enabled ? "1" : "0";
+        button.textContent = enabled ? "STOP BOT" : "START BOT";
+      }
       statusLabel.textContent = enabled ? "ACTIVE" : "STOPPED";
       statusMeta.textContent = String(data.strategy || "DCA") + " / " + String(data.side || "BUY");
       statusMessage.textContent = enabled ? "Bot started on the live Cloudflare backend." : "Bot stopped.";
-      refreshBackendStatus();
+      await refreshBackendStatus();
     } catch (error) {
       statusCard?.classList.add("error");
       statusLabel.textContent = "ACTION FAILED";
