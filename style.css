@@ -3910,3 +3910,18 @@ body{background:#151714!important}
     line-height:1.5!important;
   }
 }
+
+/* Mobile single-section view: pull the active tool closer to the platform header. */
+@media(max-width:850px){
+  .workspace-shell{
+    margin-top:-118px!important;
+  }
+  .workspace-main.single-section-view{
+    padding-top:18px!important;
+  }
+}
+@media(max-width:520px){
+  .workspace-shell{
+    margin-top:-118px!important;
+  }
+}
