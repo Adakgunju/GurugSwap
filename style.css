@@ -3897,3 +3897,16 @@ body{background:#151714!important}
 /* Action button disabled states */
 .create-token-button:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
 .distribute-action:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
+
+/* Tighten mobile swap intro-to-card spacing. */
+@media(max-width:850px){
+  .workspace-main>#swap .swap-intro-inner{
+    margin-bottom:8px!important;
+  }
+  .workspace-main>#swap .swap-intro-inner h2{
+    margin-bottom:8px!important;
+  }
+  .workspace-main>#swap .swap-intro-inner p{
+    line-height:1.5!important;
+  }
+}
