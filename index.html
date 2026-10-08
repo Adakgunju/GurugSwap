@@ -598,118 +598,82 @@
 
     <script>
       // Single-section platform navigation.
-      // Only the selected menu section is visible; all existing feature scripts,
-      // DOM IDs and transaction logic remain untouched.
-      function initSingleSectionView() {
-        const main = document.querySelector(".workspace-main");
-        if (!main) return;
-
+      // Resolve section elements at click time because several platform tools
+      // create their sections dynamically.
+      (() => {
         const menuTargets = [
-          "create-token",
-          "distributeTokens",
-          "liquidity",
-          "swap",
-          "multi-airdrop",
-          "links",
-          "partner-ads",
-          "token-burn",
-          "token-mint",
-          "authority-manager",
-          "trading-bot",
+          "create-token","distributeTokens","liquidity","swap",
+          "multi-airdrop","token-burn","token-mint","authority-manager",
+          "trading-bot","links"
         ];
 
-        const sections = new Map();
+        function showSection(targetId, updateHash = true) {
+          const main = document.querySelector(".workspace-main");
+          if (!main) return;
 
-        function refreshSections() {
-          sections.clear();
-          menuTargets
-            .map(id => [id, document.getElementById(id)])
-            .filter(([, el]) => !!el)
-            .forEach(([id, el]) => sections.set(id, el));
-        }
+          const target = document.getElementById(targetId);
+          if (!target) {
+            console.warn("Gurug navigation target not found:", targetId);
+            return;
+          }
 
-        refreshSections();
-
-        function setActiveMenu(targetId, updateHash = true) {
-          refreshSections();
-          if (!sections.has(targetId)) targetId = "swap";
           main.classList.add("single-section-view");
 
-          sections.forEach((section, id) => {
-            section.classList.toggle("single-section-active", id === targetId);
-            section.setAttribute("aria-hidden", id === targetId ? "false" : "true");
+          main.querySelectorAll(":scope > section").forEach(section => {
+            const active = section === target;
+            section.classList.toggle("single-section-active", active);
+            section.classList.toggle(
+              "single-section-companion",
+              targetId === "swap" && section.id === "token-info"
+            );
+            section.setAttribute("aria-hidden", active || (targetId === "swap" && section.id === "token-info") ? "false" : "true");
           });
 
-          // TOKEN INFO belongs to the TOKEN SWAP workspace, but is not a separate menu item.
-          const tokenInfo = document.getElementById("token-info");
-          if (tokenInfo) {
-            const showTokenInfo = targetId === "swap";
-            tokenInfo.classList.toggle("single-section-companion", showTokenInfo);
-            tokenInfo.setAttribute("aria-hidden", showTokenInfo ? "false" : "true");
-          }
-
-          if (updateHash) {
-            const nextHash = "#" + targetId;
-            if (window.location.hash !== nextHash) {
-              history.replaceState(null, "", nextHash);
-            }
-          }
-
-          // Keep the active workspace at the top so mobile users never have to
-          // scroll through unrelated tools before using the selected feature.
-          const topbar = document.querySelector(".topbar");
-          const offset = (topbar?.offsetHeight || 76) + 10;
-          const y = main.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
-
-          document.querySelectorAll(".workspace-nav, .desktop-nav a, #mobileMenu a").forEach(link => {
-            const href = link.getAttribute("href");
-            const active = href === "#" + targetId;
+          document.querySelectorAll(".workspace-nav, #mobileMenu a").forEach(link => {
+            const active = link.getAttribute("href") === "#" + targetId;
             link.classList.toggle("active", active);
             if (active) link.setAttribute("aria-current", "page");
             else link.removeAttribute("aria-current");
           });
+
+          if (updateHash) history.replaceState(null, "", "#" + targetId);
+
+          const topbar = document.querySelector(".topbar");
+          const offset = (topbar?.offsetHeight || 76) + 10;
+          const y = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({top: Math.max(0, y), behavior:"smooth"});
+
+          const menu = document.getElementById("mobileMenu");
+          const menuBtn = document.getElementById("mobileMenuBtn");
+          if (menu && !menu.hidden) {
+            menu.hidden = true;
+            menuBtn?.setAttribute("aria-expanded", "false");
+            if (menuBtn) menuBtn.textContent = "MENU";
+          }
         }
 
-        function getInitialSection() {
-          refreshSections();
-          const hash = window.location.hash.replace(/^#/, "");
-          return sections.has(hash) ? hash : "swap";
-        }
+        window.gurugNavigate = showSection;
 
-        // Bind once. Prevent normal anchor scrolling and switch the workspace instead.
-        document.querySelectorAll(".workspace-nav, .desktop-nav a, #mobileMenu a").forEach(link => {
+        document.addEventListener("click", event => {
+          const link = event.target.closest(".workspace-nav, #mobileMenu a");
+          if (!link) return;
           const href = link.getAttribute("href") || "";
           if (!href.startsWith("#")) return;
           const targetId = href.slice(1);
-          link.addEventListener("click", event => {
-            event.preventDefault();
-            setActiveMenu(targetId, true);
+          if (!menuTargets.includes(targetId)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          showSection(targetId, true);
+        }, true);
 
-            const mobileMenu = document.getElementById("mobileMenu");
-            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-            if (mobileMenu && !mobileMenu.hidden) {
-              mobileMenu.hidden = true;
-              if (mobileMenuBtn) {
-                mobileMenuBtn.setAttribute("aria-expanded", "false");
-                mobileMenuBtn.textContent = "MENU";
-              }
-            }
-          });
-        });
+        function initialTarget() {
+          const hash = window.location.hash.replace(/^#/, "");
+          return menuTargets.includes(hash) && document.getElementById(hash) ? hash : "swap";
+        }
 
-        window.addEventListener("hashchange", () => {
-          setActiveMenu(getInitialSection(), false);
-        });
-
-        setActiveMenu(getInitialSection(), false);
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initSingleSectionView, {once:true});
-      } else {
-        initSingleSectionView();
-      }
+        window.addEventListener("hashchange", () => showSection(initialTarget(), false));
+        showSection(initialTarget(), false);
+      })();
     </script>
 </body>
 </html>
