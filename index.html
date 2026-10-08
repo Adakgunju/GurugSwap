@@ -236,12 +236,12 @@
 
         <div class="bot-strategy-grid" role="tablist" aria-label="Trading strategy">
           <button class="bot-strategy active" type="button" data-strategy="dca">
-            <span>01</span><strong>DCA</strong><small>Buy or sell at a fixed interval.</small>
+            <span>01</span><strong>DCA</strong><small>Buy at a fixed interval.</small>
           </button>
           <button class="bot-strategy" type="button" data-strategy="target">
             <span>02</span><strong>TARGET PRICE</strong><small>Trade when your target price is reached.</small>
           </button>
-          <button class="bot-strategy" type="button" data-strategy="advanced">
+          <button class="bot-strategy" type="button" data-strategy="advanced" disabled>
             <span>03</span><strong>ADVANCED</strong><small>Combine limits, stops and profit targets.</small>
           </button>
         </div>
@@ -284,12 +284,12 @@
           </label>
 
           <label class="bot-field bot-advanced-field">
-            <small>STOP LOSS (%)</small>
+            <small>STOP LOSS (USD)</small>
             <input id="botStopLoss" type="number" min="0" step="0.1" placeholder="5">
           </label>
 
           <label class="bot-field bot-advanced-field">
-            <small>TAKE PROFIT (%)</small>
+            <small>TAKE PROFIT (USD)</small>
             <input id="botTakeProfit" type="number" min="0" step="0.1" placeholder="10">
           </label>
 
@@ -311,11 +311,11 @@
 
         <div id="botStatusCard" class="bot-status-card">
           <div class="bot-status-top"><span class="bot-status-dot"></span><strong id="botStatusLabel">READY</strong><span id="botStatusMeta">No active bot</span></div>
-          <div id="botStatusMessage">Configure your strategy above. Live execution will be enabled after the Supabase runner is connected.</div>
+          <div id="botStatusMessage">Configure your strategy above. Live execution is controlled by the Gurug Cloudflare bot backend.</div>
         </div>
 
         <div class="bot-history">
-          <div class="bot-history-head"><strong>TRADE HISTORY</strong><span>ON-CHAIN RECORDS</span></div>
+          <div class="bot-history-head"><strong>TRADE HISTORY</strong><span>LIVE BACKEND RECORDS</span></div>
           <div class="bot-history-empty">No automated trades yet.</div>
         </div>
 
@@ -402,7 +402,7 @@
   <script src="token-burn.js?v=17"></script>
   <script src="token-authority.js?v=4"></script>
   <script src="token-mint.js?v=23"></script>
-  <script src="trading-bot.js?v=1"></script>
+  <script src="trading-bot.js?v=2"></script>
   <script>
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
