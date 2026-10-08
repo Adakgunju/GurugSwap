@@ -8,10 +8,6 @@
 .links-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-top:28px}h2{font-family:'Syne',sans-serif;font-size:clamp(55px,7vw,105px);line-height:.82;letter-spacing:-.075em;margin:0 0 25px}.links-heading h2{margin:0}.links-heading p{color:#c9c9c4;font-size:14px;margin:0 0 8px}.link-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:42px}.link-card{min-height:165px;border:1px solid #303030;border-radius:15px;background:#111;padding:22px;display:flex;flex-direction:column;justify-content:space-between;transition:.25s;position:relative;overflow:hidden}.link-card:hover{transform:translateY(-5px);border-color:#888;box-shadow:0 18px 40px rgba(0,0,0,.25)}.link-card.featured{background:var(--yellow);color:#080808;border-color:var(--yellow)}.link-card span{font-size:8px;letter-spacing:.18em;opacity:.85}.link-card strong{font-family:'Syne';font-size:25px;letter-spacing:-.04em;position:relative;z-index:2}.link-card em{font-style:normal;align-self:flex-end;font-size:18px;position:relative;z-index:2}
 .about-inner{display:grid;grid-template-columns:1fr 1fr;gap:8vw;margin-top:45px}.big-type{font-family:'Syne';font-size:clamp(50px,7vw,105px);line-height:.82;letter-spacing:-.075em}.about-copy{color:#c9c9c4;font-size:18px;line-height:1.65;max-width:500px}.about-line{height:1px;background:#444;width:70px;margin-bottom:28px}.about-meta{display:flex;gap:24px;margin-top:35px;color:#999;font-size:8px;letter-spacing:.15em}.about-meta b{color:#d8d8d2;margin-left:5px}footer{border-top:1px solid #333;padding:28px 8vw;display:flex;justify-content:space-between;color:#999;font-size:8px;letter-spacing:.16em}
 @media(max-width:850px){nav{display:none}.hero{grid-template-columns:1fr;padding-top:70px}.hero-art{height:470px;order:-1}.gurug-frame{width:min(390px,78vw)}.about-inner{display:flex!important;flex-direction:column!important;grid-template-columns:none!important;gap:42px;width:100%}.about-copy{width:100%;max-width:none}.big-type{width:100%}.link-grid{grid-template-columns:1fr 1fr}.links-heading{display:block}.links-heading p{margin-top:20px}}
-@media(max-width:850px){
-  .bot-actions button{min-height:54px;font-size:16px;}
-  .bot-primary{min-width:0;width:100%;}
-}
 @media(max-width:520px){.topbar{height:74px;padding:0 14px}.brand{font-size:15px;gap:8px}.brand img{width:36px;height:36px}.wallet-btn{font-size:10px;min-width:0;padding:12px 13px;min-height:44px;letter-spacing:.07em}.hero,.swap-section,.links-section,.about{padding-left:18px;padding-right:18px}.hero{padding-top:48px}.hero-art{height:340px}.gurug-frame{width:min(310px,78vw)}h1{font-size:60px}.lead{font-size:15px}.hero-actions{margin:24px 0;max-width:none}.primary-btn{font-size:16px;min-height:54px}.contract{align-items:flex-start;flex-direction:column}.contract button{width:100%}.swap-section,.links-section,.about{padding-top:72px;padding-bottom:72px}.swap-layout{margin-top:22px}.swap-card{width:100%;padding:16px;border-radius:18px}.swap-card:before{inset:7px}.card-head{font-size:9px;margin-bottom:13px}.token-box{padding:16px 14px;border-radius:12px}.token-box small{font-size:10px;margin-bottom:6px}.swap-input{width:145px;font-size:26px}.token-box strong{font-size:26px}.token{font-size:11px}.sol-logo{width:23px;height:23px}.sol-logo i{width:19px;height:3px}.gurug-token img{width:27px;height:27px}.swap-meta{font-size:10px}.card-foot{font-size:7px;letter-spacing:.1em}.section-label{font-size:11px}.links-heading{margin-top:20px}.links-heading h2{font-size:54px;line-height:.86}.links-heading p{font-size:13px;line-height:1.5;margin-top:16px}.link-grid{gap:9px;margin-top:28px}.link-card{min-height:135px;padding:18px;border-radius:13px}.link-card strong{font-size:22px}.about-inner{margin-top:28px;gap:34px}.big-type{font-size:clamp(48px,16vw,72px);line-height:.84}.about-copy{font-size:16px;line-height:1.65}.about-copy p{margin:0 0 22px}.about-line{margin-bottom:22px;width:52px}.about-meta{gap:12px 20px;margin-top:25px}.about-meta span{font-size:7px}footer{padding:20px 18px;gap:9px;flex-direction:column}}
 .universe-feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.universe-feature{min-height:190px;background:var(--yellow);color:#080808;border:1px solid var(--yellow);border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:.25s}.universe-feature:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(255,229,0,.12)}.universe-feature span{font-size:8px;letter-spacing:.18em;opacity:.72}.universe-feature strong{font-family:'Syne';font-size:clamp(27px,3vw,42px);letter-spacing:-.055em;position:relative;z-index:2}.universe-feature p{font-size:9px;font-weight:800;letter-spacing:.14em;margin:0;opacity:.68}.universe-feature em{font-style:normal;position:absolute;right:22px;bottom:20px;font-size:22px;font-weight:700}
 @media(max-width:850px){.universe-feature-grid{grid-template-columns:1fr 1fr}}
@@ -3860,4 +3856,20 @@ body{background:#151714!important}
   .trading-bot-intro h2{font-size:31px}
   .trading-bot-head h3{font-size:24px}
   .trading-bot-head p{font-size:13px}
+}
+
+/* Trading bot mobile controls: match the main platform button scale. */
+@media(max-width:850px){
+  .trading-bot-card .bot-actions button{
+    min-height:56px !important;
+    height:56px !important;
+    font-size:16px !important;
+    font-weight:900 !important;
+    letter-spacing:.10em !important;
+    padding:0 20px !important;
+  }
+  .trading-bot-card .bot-primary{
+    width:100% !important;
+    min-width:0 !important;
+  }
 }
