@@ -159,6 +159,21 @@
     };
   }
 
+  function syncSideFields() {
+    const side = document.getElementById("botSide")?.value || "buy";
+    const field = document.getElementById("botMaxSpend")?.closest(".bot-field");
+    const input = document.getElementById("botMaxSpend");
+    const isSell = side === "sell";
+    if (input) {
+      input.disabled = isSell;
+      input.setAttribute("aria-disabled", isSell ? "true" : "false");
+    }
+    if (field) field.classList.toggle("is-disabled", isSell);
+  }
+
+  document.getElementById("botSide")?.addEventListener("change", syncSideFields);
+  syncSideFields();
+
   function collectSettings() {
     return {
       strategy: strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca",
