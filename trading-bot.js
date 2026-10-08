@@ -7,6 +7,7 @@
   const statusMeta = document.getElementById("botStatusMeta");
   const statusMessage = document.getElementById("botStatusMessage");
   const storageKey = "gurugSwap.tradingBotStrategy";
+  const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
 
   function setStrategy(strategy) {
     strategyButtons.forEach(button => {
@@ -28,6 +29,32 @@
   } catch {
     setStrategy("dca");
   }
+
+  async function refreshBackendStatus() {
+    try {
+      const response = await fetch(backendUrl, { cache: "no-store" });
+      const data = await response.json();
+      const backendStatus = document.getElementById("botBackendStatus");
+      const startButton = document.getElementById("botStartButton");
+      if (data?.ok) {
+        backendStatus.textContent = Number(data.enabled) === 1 ? "BACKEND ONLINE / ACTIVE" : "BACKEND ONLINE / STOPPED";
+        statusCard?.classList.remove("error");
+        statusLabel.textContent = Number(data.enabled) === 1 ? "ACTIVE" : "STOPPED";
+        statusMeta.textContent = `${String(data.strategy || "DCA").toUpperCase()} / ${String(data.side || "BUY").toUpperCase()}`;
+        statusMessage.textContent = `Backend connected. Wallet ${data.wallet_matches ? "verified" : "mismatch"} · Balance ${Number(data.sol_balance || 0).toFixed(4)} SOL · Price ${data.market_price_usd == null ? "—" : "$" + Number(data.market_price_usd).toFixed(6)}.`;
+        if (startButton) {
+          startButton.disabled = true;
+          startButton.textContent = Number(data.enabled) === 1 ? "BOT RUNNING" : "START REQUIRES BACKEND CONTROL";
+        }
+      }
+    } catch {
+      const backendStatus = document.getElementById("botBackendStatus");
+      if (backendStatus) backendStatus.textContent = "BACKEND OFFLINE";
+    }
+  }
+
+  refreshBackendStatus();
+  setInterval(refreshBackendStatus, 30000);
 
   saveButton?.addEventListener("click", () => {
     const strategy = strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca";
