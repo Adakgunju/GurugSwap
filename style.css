@@ -3911,17 +3911,17 @@ body{background:#151714!important}
   }
 }
 
-/* Mobile single-section view: pull the active tool closer to the platform header. */
+/* Mobile single-section view: keep a compact, clean gap below the platform header. */
 @media(max-width:850px){
   .workspace-shell{
-    margin-top:-118px!important;
+    margin-top:18px!important;
   }
   .workspace-main.single-section-view{
-    padding-top:18px!important;
+    padding-top:0!important;
   }
 }
 @media(max-width:520px){
   .workspace-shell{
-    margin-top:-118px!important;
+    margin-top:14px!important;
   }
 }
