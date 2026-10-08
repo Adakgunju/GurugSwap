@@ -3898,13 +3898,16 @@ body{background:#151714!important}
 .create-token-button:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
 .distribute-action:disabled{opacity:.42!important;filter:grayscale(.35);cursor:not-allowed!important;}
 
-/* Tighten mobile swap intro-to-card spacing. */
+/* Mobile swap: reduce excess space above the kicker without squeezing the card up under the description. */
 @media(max-width:850px){
+  .workspace-main>#swap{
+    margin-top:0!important;
+  }
   .workspace-main>#swap .swap-intro-inner{
-    margin-bottom:8px!important;
+    margin-bottom:22px!important;
   }
   .workspace-main>#swap .swap-intro-inner h2{
-    margin-bottom:8px!important;
+    margin-bottom:14px!important;
   }
   .workspace-main>#swap .swap-intro-inner p{
     line-height:1.5!important;
