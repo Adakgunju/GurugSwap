@@ -3911,4 +3911,14 @@ body{background:#151714!important}
   }
 }
 
-
+/* === MOBILE KICKER -> TITLE GAP: RESTORE TIGHT SPACING ===
+   Narrow only the space between the small subtitle/kicker and the main title.
+   No card position, horizontal margin, or title-to-description spacing changes.
+*/
+@media(max-width:850px){
+  .workspace-main.single-section-view .platform-section-kicker,
+  .workspace-main.single-section-view .swap-intro-kicker,
+  .workspace-main.single-section-view .about-kicker{
+    margin-bottom:6px !important;
+  }
+}
