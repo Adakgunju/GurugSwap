@@ -48,7 +48,7 @@
         if (startButton) {
           startButton.disabled = false;
           startButton.dataset.enabled = Number(data.enabled) === 1 ? "1" : "0";
-          startButton.textContent = Number(data.enabled) === 1 ? "STOP BOT" : "CONNECT";
+          startButton.textContent = Number(data.enabled) === 1 ? "STOP BOT" : "START BOT";
         }
       }
     } catch {
@@ -224,7 +224,7 @@
       statusCard?.classList.remove("error");
       if (button) {
         button.dataset.enabled = enabled ? "1" : "0";
-        button.textContent = enabled ? "STOP BOT" : "CONNECT";
+        button.textContent = enabled ? "STOP BOT" : "START BOT";
       }
       statusLabel.textContent = enabled ? "ACTIVE" : "STOPPED";
       statusMeta.textContent = String(data.strategy || "DCA") + " / " + String(data.side || "BUY");
