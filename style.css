@@ -3962,10 +3962,19 @@ body{background:#151714!important}
   }
 }
 
-/* === LIQUIDITY: tighten only the kicker-to-title gap === */
+/* === LIQUIDITY: tighten kicker/title and description/card gaps on mobile === */
 @media(max-width:850px){
   .workspace-main > #liquidity .liquidity-kicker{
     margin-bottom:0!important;
+  }
+  .workspace-main > #liquidity .liquidity-heading{
+    margin-bottom:10px!important;
+  }
+  .workspace-main > #liquidity .liquidity-sub{
+    margin-bottom:0!important;
+  }
+  .workspace-main > #liquidity .liquidity-grid{
+    row-gap:10px!important;
   }
 }
 
