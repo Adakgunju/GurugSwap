@@ -3932,7 +3932,7 @@ body{background:#151714!important}
   .workspace-main.single-section-view > #token-burn.single-section-active .platform-section-kicker,
   .workspace-main.single-section-view > #token-mint.single-section-active .platform-section-kicker{
     display:block!important;
-    margin:0!important;
+    margin:8px 0 0!important;
     padding:0!important;
     line-height:1.2!important;
   }
