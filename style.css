@@ -1684,10 +1684,11 @@ body{background:#11130f!important}.workspace-sidebar{background:rgba(19,21,16,.9
 }
 
 
-/* === MOBILE GURUG NETWORK: tighten space around the heading === */
+/* === MOBILE GURUG NETWORK: reduce the large gap above its kicker === */
 @media(max-width:850px){
   .workspace-main>#links{
-    padding-top:20px!important;
+    margin-top:-70px!important;
+    padding-top:0!important;
   }
   .workspace-main>#links .links-heading{
     margin-top:0!important;
