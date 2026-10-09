@@ -4023,3 +4023,23 @@ body{background:#151714!important}
 .workspace-main > #partner-ads .partner-ads-heading p{
   margin-top:0!important;
 }
+
+
+/* FINAL MOBILE LIQUIDITY SPACING: override older section-specific margins. */
+@media(max-width:850px){
+  .workspace-main.single-section-view > #liquidity.gurug-liquidity .liquidity-heading{
+    margin:0 0 10px!important;
+  }
+  .workspace-main.single-section-view > #liquidity.gurug-liquidity .liquidity-kicker{
+    margin-bottom:0!important;
+  }
+  .workspace-main.single-section-view > #liquidity.gurug-liquidity .liquidity-title{
+    margin-bottom:14px!important;
+  }
+  .workspace-main.single-section-view > #liquidity.gurug-liquidity .liquidity-sub{
+    margin-bottom:0!important;
+  }
+  .workspace-main.single-section-view > #liquidity.gurug-liquidity .liquidity-grid{
+    row-gap:10px!important;
+  }
+}
