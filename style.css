@@ -3763,8 +3763,8 @@ body{background:#151714!important}
 }
 .bot-primary:disabled{
   border-color:#4a4a42;
-  background:#171714;
-  color:#77776f;
+  background:#8f8a45;
+  color:#171714;
   cursor:not-allowed;
 }
 .bot-status-card{
