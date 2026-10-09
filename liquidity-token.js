@@ -37,6 +37,7 @@
       .liq-note{border-top:1px solid rgba(255,255,255,.1);margin-top:22px;padding-top:18px;color:#9e9e9e;font-size:12px;line-height:1.55}
       .liq-link{color:#ffe500;text-decoration:none}
       @media(max-width:760px){#liquidity.gurug-liquidity{padding:44px 14px 24px}.liquidity-grid{grid-template-columns:1fr}.liquidity-card,.liquidity-help{padding:22px}.liquidity-title{font-size:29px}.liq-row{grid-template-columns:1fr}.liq-pair{grid-template-columns:1fr}.liq-input{font-size:17px}}
+      @media(max-width:760px){#liquidity.gurug-liquidity .liquidity-card{padding-top:12px!important}#liquidity.gurug-liquidity .liquidity-card>.liq-label:first-child{margin-top:0!important}}
 
       /* Keep 03 heading separate while preserving the two-column function boxes. */
       #liquidity.gurug-liquidity .liquidity-grid{
