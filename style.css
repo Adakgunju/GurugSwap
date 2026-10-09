@@ -3962,6 +3962,13 @@ body{background:#151714!important}
   }
 }
 
+/* === LIQUIDITY: tighten only the kicker-to-title gap === */
+@media(max-width:850px){
+  .workspace-main > #liquidity .liquidity-kicker{
+    margin-bottom:0!important;
+  }
+}
+
 /* === GLOBAL SECTION HEADING RHYTHM ===
    One shared spacing system for all main-menu sections:
    kicker → title = 5px; title → description = 14px; description has no extra margin.
