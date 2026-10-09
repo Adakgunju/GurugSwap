@@ -12,6 +12,39 @@
   const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
   const settingsUrl = "https://gurug-trading-bot.pcaticom.workers.dev/trade?action=settings";
 
+  function currentStrategy() {
+    return strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca";
+  }
+
+  function updateStartButtonState() {
+    const button = document.getElementById("botStartButton");
+    if (!button) return;
+
+    // Keep STOP BOT available whenever the backend says the bot is running.
+    if (button.dataset.enabled === "1") {
+      button.disabled = false;
+      return;
+    }
+
+    const strategy = currentStrategy();
+    const mint = document.getElementById("botTokenMint")?.value.trim() || "";
+    const amount = Number(document.getElementById("botTradeAmount")?.value);
+    const maxTrades = Number(document.getElementById("botMaxTrades")?.value);
+    const maxSpend = Number(document.getElementById("botMaxSpend")?.value);
+    const targetPrice = Number(document.getElementById("botTargetPrice")?.value);
+    const side = document.getElementById("botSide")?.value || "buy";
+    const interval = document.getElementById("botInterval")?.value || "";
+
+    const ready = Boolean(mint) &&
+      Number.isFinite(amount) && amount > 0 &&
+      Number.isFinite(maxTrades) && maxTrades > 0 &&
+      Boolean(interval) &&
+      (side === "sell" || (Number.isFinite(maxSpend) && maxSpend > 0)) &&
+      (strategy !== "target" || (Number.isFinite(targetPrice) && targetPrice > 0));
+
+    button.disabled = !ready;
+  }
+
   function setStrategy(strategy) {
     strategyButtons.forEach(button => {
       button.classList.toggle("active", button.dataset.strategy === strategy);
@@ -19,6 +52,7 @@
     card?.classList.remove("strategy-dca","strategy-target","strategy-advanced");
     card?.classList.add("strategy-" + strategy);
     try { localStorage.setItem(storageKey, strategy); } catch {}
+    updateStartButtonState();
   }
 
   strategyButtons.forEach(button => {
@@ -46,9 +80,9 @@
         statusMeta.textContent = `${String(data.strategy || "DCA").toUpperCase()} / ${String(data.side || "BUY").toUpperCase()}`;
         statusMessage.textContent = `Backend connected. Wallet ${data.wallet_matches ? "verified" : "mismatch"} · Balance ${Number(data.sol_balance || 0).toFixed(4)} SOL · Price ${data.market_price_usd == null ? "—" : "$" + Number(data.market_price_usd).toFixed(6)}.`;
         if (startButton) {
-          startButton.disabled = false;
           startButton.dataset.enabled = Number(data.enabled) === 1 ? "1" : "0";
           startButton.textContent = Number(data.enabled) === 1 ? "STOP BOT" : "START BOT";
+          updateStartButtonState();
         }
       }
     } catch {
@@ -183,8 +217,17 @@
     if (field) field.classList.toggle("is-disabled", isSell);
   }
 
-  document.getElementById("botSide")?.addEventListener("change", syncSideFields);
+  document.getElementById("botSide")?.addEventListener("change", () => {
+    syncSideFields();
+    updateStartButtonState();
+  });
+  ["botTokenMint","botTradeAmount","botInterval","botMaxTrades","botTargetPrice","botMaxSpend"].forEach(id => {
+    const field = document.getElementById(id);
+    field?.addEventListener("input", updateStartButtonState);
+    field?.addEventListener("change", updateStartButtonState);
+  });
   syncSideFields();
+  updateStartButtonState();
 
   function collectSettings() {
     return {
