@@ -3928,10 +3928,11 @@ body{background:#151714!important}
     margin-top:0!important;
     margin-bottom:22px!important;
   }
+  /* Match the corrected Swap kicker/title spacing exactly. */
   .workspace-main.single-section-view > #token-burn.single-section-active .platform-section-kicker,
   .workspace-main.single-section-view > #token-mint.single-section-active .platform-section-kicker{
     display:block!important;
-    margin:0 0 5px!important;
+    margin:0!important;
     padding:0!important;
     line-height:1.2!important;
   }
