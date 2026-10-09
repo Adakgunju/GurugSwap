@@ -3767,6 +3767,12 @@ body{background:#151714!important}
   color:#171714;
   cursor:not-allowed;
 }
+.bot-secondary:disabled{
+  border-color:#8f8a45;
+  background:#8f8a45;
+  color:#171714;
+  cursor:not-allowed;
+}
 .bot-status-card{
   margin-top:16px;
   padding:14px 15px;
