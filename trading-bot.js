@@ -18,31 +18,33 @@
 
   function updateStartButtonState() {
     const button = document.getElementById("botStartButton");
-    if (!button) return;
+    const ready = (() => {
+      const strategy = currentStrategy();
+      const mint = document.getElementById("botTokenMint")?.value.trim() || "";
+      const amount = Number(document.getElementById("botTradeAmount")?.value);
+      const maxTrades = Number(document.getElementById("botMaxTrades")?.value);
+      const maxSpend = Number(document.getElementById("botMaxSpend")?.value);
+      const targetPrice = Number(document.getElementById("botTargetPrice")?.value);
+      const side = document.getElementById("botSide")?.value || "buy";
+      const interval = document.getElementById("botInterval")?.value || "";
+
+      return Boolean(mint) &&
+        Number.isFinite(amount) && amount > 0 &&
+        Number.isFinite(maxTrades) && maxTrades > 0 &&
+        Boolean(interval) &&
+        (side === "sell" || (Number.isFinite(maxSpend) && maxSpend > 0)) &&
+        (strategy !== "target" || (Number.isFinite(targetPrice) && targetPrice > 0));
+    })();
+
+    const save = document.getElementById("botSaveButton");
+    if (save) save.disabled = !ready;
 
     // Keep STOP BOT available whenever the backend says the bot is running.
-    if (button.dataset.enabled === "1") {
+    if (button && button.dataset.enabled === "1") {
       button.disabled = false;
       return;
     }
-
-    const strategy = currentStrategy();
-    const mint = document.getElementById("botTokenMint")?.value.trim() || "";
-    const amount = Number(document.getElementById("botTradeAmount")?.value);
-    const maxTrades = Number(document.getElementById("botMaxTrades")?.value);
-    const maxSpend = Number(document.getElementById("botMaxSpend")?.value);
-    const targetPrice = Number(document.getElementById("botTargetPrice")?.value);
-    const side = document.getElementById("botSide")?.value || "buy";
-    const interval = document.getElementById("botInterval")?.value || "";
-
-    const ready = Boolean(mint) &&
-      Number.isFinite(amount) && amount > 0 &&
-      Number.isFinite(maxTrades) && maxTrades > 0 &&
-      Boolean(interval) &&
-      (side === "sell" || (Number.isFinite(maxSpend) && maxSpend > 0)) &&
-      (strategy !== "target" || (Number.isFinite(targetPrice) && targetPrice > 0));
-
-    button.disabled = !ready;
+    if (button) button.disabled = !ready;
   }
 
   function setStrategy(strategy) {
