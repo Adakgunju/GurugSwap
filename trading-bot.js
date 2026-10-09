@@ -323,4 +323,5 @@
       if (config.strategy && ["dca","target"].includes(config.strategy)) setStrategy(config.strategy);
     }
   } catch {}
+  updateStartButtonState();
 })();
