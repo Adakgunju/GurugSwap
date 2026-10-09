@@ -3762,8 +3762,8 @@ body{background:#151714!important}
   letter-spacing:.1em;
 }
 .bot-primary:disabled{
-  border-color:#3f3f38;
-  background:#282822;
+  border-color:#4a4a42;
+  background:#171714;
   color:#77776f;
   cursor:not-allowed;
 }
