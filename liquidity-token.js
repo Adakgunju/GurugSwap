@@ -139,7 +139,7 @@
 
           <div class="liq-row">
             <div><label class="liq-label" for="liqPrice">INITIAL PRICE (SOL)</label><input id="liqPrice" class="liq-input" inputmode="decimal" type="number" min="0" step="any" placeholder="Calculated from deposits"></div>
-            <div><label class="liq-label" for="liqFee">FEE TIER</label><select id="liqFee" class="liq-input"><option value="0.25">0.25%</option><option value="0.01">0.01%</option><option value="1">1.00%</option></select></div>
+            <div><label class="liq-label" for="liqFee">FEE TIER</label><select id="liqFee" class="liq-input"><option value="0.25">0.25%</option><option value="0.5">0.50%</option><option value="1">1.00%</option></select></div>
           </div>
 
           <div class="liq-summary">
