@@ -109,6 +109,10 @@
 
   const mintInput = document.getElementById("authorityMint");
   const checkButton = document.getElementById("authorityCheck");
+  const updateCheckButtonState = () => {
+    checkButton.disabled = !isAddress(mintInput.value.trim());
+  };
+  mintInput.addEventListener("input", updateCheckButtonState);
   const status = document.getElementById("authorityStatus");
   const statusLabel = document.getElementById("authorityStatusLabel");
   const statusMessage = document.getElementById("authorityStatusMessage");
@@ -324,7 +328,7 @@
       updateAllRows();
       setStatus("CHECK FAILED", error?.message || "Could not read the token mint.", "error");
     } finally {
-      checkButton.disabled = false;
+      updateCheckButtonState();
     }
   }
 
