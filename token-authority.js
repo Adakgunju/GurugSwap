@@ -113,6 +113,7 @@
     checkButton.disabled = !isAddress(mintInput.value.trim());
   };
   mintInput.addEventListener("input", updateCheckButtonState);
+  updateCheckButtonState();
   const status = document.getElementById("authorityStatus");
   const statusLabel = document.getElementById("authorityStatusLabel");
   const statusMessage = document.getElementById("authorityStatusMessage");
