@@ -5480,3 +5480,33 @@ body{
 #authorityModal{background:rgba(2,5,16,.82)!important;backdrop-filter:blur(10px)!important}
 #authorityModal>div{background:linear-gradient(145deg,#171d3b,#090e20)!important;color:#fff!important;border:1px solid rgba(115,126,255,.5)!important;box-shadow:0 25px 80px rgba(0,0,0,.65),0 0 36px rgba(95,65,255,.2)!important}
 @media(max-width:850px){.topbar{background:rgba(8,11,25,.96)!important}}
+
+
+/* === DETAIL PASS: remove the centered circular Gurug badge and tighten visual polish === */
+/* The center mascot is a decorative logo, not a control; remove the whole floating unit
+   so no empty orbit rings or detached caption remain. */
+.landing-stage .landing-mascot{display:none!important}
+.landing-stage .mascot-orbit,.landing-stage .mascot-caption{display:none!important}
+/* Give the swap panel a deliberate focal point after removing the center badge. */
+.landing-stage .swap-card,.landing-stage .swap-panel,.landing-stage .swap-widget{
+ position:relative!important;z-index:2!important;
+ border:1px solid rgba(0,229,255,.42)!important;
+ box-shadow:0 22px 70px rgba(0,0,0,.48),0 0 34px rgba(91,58,255,.16)!important;
+}
+/* High-contrast utility colors: keep every form readable on the dark canvas. */
+.landing-stage .token-input,.landing-stage input,.landing-stage select,
+.token-info-card input,.token-info-card select,.trading-bot-card input,.trading-bot-card select{
+ color:#fff!important;background:#080d1d!important;border-color:rgba(0,229,255,.38)!important;
+}
+.landing-stage button,.token-info-card button,.trading-bot-card button{
+ transition:filter .18s ease,transform .18s ease,box-shadow .18s ease!important;
+}
+.landing-stage button:hover,.token-info-card button:hover,.trading-bot-card button:hover{
+ filter:brightness(1.12) saturate(1.15)!important;
+}
+.landing-stage .swap-status-message,.token-info-card .token-info-stats>div,
+.trading-bot-card .bot-strategy{
+ background:linear-gradient(145deg,#151b38,#0a1022)!important;
+ border-color:rgba(93,119,255,.35)!important;color:#e9edff!important;
+}
+.landing-stage .swap-status-message a,.token-info-card a,.trading-bot-card a{color:#00e5ff!important}
