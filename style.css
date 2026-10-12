@@ -8948,3 +8948,27 @@ body .topbar>.brand .accent{
     padding-right: 10px !important;
   }
 }
+
+
+/* MOBILE SWAP: remove only the decorative outer card shell.
+   Keep the swap controls, token boxes, labels, slippage, and buttons intact. */
+@media (max-width: 600px) {
+  body .workspace-main > #swap .swap-layout {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+  }
+  body .workspace-main > #swap .swap-card {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 14px 12px 12px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+  }
+}
