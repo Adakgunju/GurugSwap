@@ -1330,13 +1330,7 @@ let tokenInfoRequestId = 0;
 let activeTokenInfoMint = null;
 
 async function updateTokenInfo(token) {
-  // The lower market card is intentionally Gurug-only; it must not follow the swap TO-token selector.
-  token = {
-    symbol: "GURUG",
-    name: "Gurug",
-    mint: "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5",
-    icon: "https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"
-  };
+  // Reflect the currently selected TO token; the default selection is GURUG.
   activeTokenInfoMint = token.mint;
   const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
