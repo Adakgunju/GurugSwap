@@ -1368,8 +1368,16 @@ async function updateTokenInfo(token) {
   chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
 
   try {
-    const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
-    const json = await res.json();
+    let json;
+    if (String(token.symbol || "").toUpperCase() === "GURUG") {
+      // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
+      const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz", {cache:"no-store"});
+      const pairData = await pairRes.json();
+      json = {pairs: pairData?.pair ? [pairData.pair] : []};
+    } else {
+      const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
+      json = await res.json();
+    }
     if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint || toToken.mint !== token.mint) return;
     const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
     const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
@@ -1438,7 +1446,7 @@ async function updateGurugMarketTicker() {
   if (!priceEl || !changeEl) return;
 
   try {
-    const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/88a3L9i5KHddtUEPJ1crt8yp8RJNoWrgb7sSGGoU1qqe", {
+    const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz", {
       cache: "no-store"
     });
     const json = await res.json();
