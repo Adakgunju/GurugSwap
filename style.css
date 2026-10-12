@@ -6071,3 +6071,43 @@ body .topbar .brand .accent{
 @media(max-width:560px){
   body .topbar .brand>span{font-size:16px!important}
 }
+
+
+/* === WORDMARK: upright regular type, solid white === */
+body .topbar>.brand{
+  transform:none!important;
+  font-style:normal!important;
+}
+body .topbar>.brand:hover{
+  transform:none!important;
+  filter:none!important;
+}
+body .topbar>.brand>span{
+  transform:none!important;
+  font-family:'Syne','Outfit','Space Grotesk',sans-serif!important;
+  font-style:normal!important;
+  font-weight:800!important;
+  letter-spacing:-.045em!important;
+  color:#fff!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  text-shadow:none!important;
+}
+body .topbar>.brand .accent{
+  font-style:normal!important;
+  color:#fff!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  letter-spacing:-.045em!important;
+}
+body .topbar>.brand .accent:after{
+  display:none!important;
+}
+body .topbar>.brand>img{
+  transform:none!important;
+}
+body .topbar>.brand:hover>img{
+  transform:none!important;
+}
