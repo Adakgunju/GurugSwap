@@ -5079,3 +5079,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   .multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,
   .token-metadata-card,.token-mint-card{border-radius:18px!important}
 }
+
+
+/* === TOOL WINDOW COLOR PASS 2: stronger section identity, contrast and hierarchy === */
+:root{--tool-ink:#25203b;--tool-muted:#625b78;--tool-border:#e4dcfb;--tool-violet:#7550f5;--tool-rose:#f45d9a;--tool-teal:#159f91}
+#create-token .create-token-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(255,194,73,.20),transparent 38%),linear-gradient(145deg,#fffdf7,#fff)!important}
+#distribute .distribute-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(61,206,190,.17),transparent 40%),linear-gradient(145deg,#f5fffd,#fff)!important}
+#liquidity.gurug-liquidity .liquidity-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(81,154,255,.17),transparent 40%),linear-gradient(145deg,#f5faff,#fff)!important}
+#multi-airdrop .multi-airdrop-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(255,105,168,.17),transparent 40%),linear-gradient(145deg,#fff7fb,#fff)!important}
+#token-burn .token-burn-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(255,130,84,.16),transparent 40%),linear-gradient(145deg,#fff8f3,#fff)!important}
+#authority-manager .token-authority-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(57,192,218,.16),transparent 40%),linear-gradient(145deg,#f4fcff,#fff)!important}
+#tokenMetadataApp .token-metadata-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(160,117,255,.17),transparent 40%),linear-gradient(145deg,#faf7ff,#fff)!important}
+#token-mint .token-mint-card{background-image:radial-gradient(ellipse at 100% 0%,rgba(91,213,145,.17),transparent 40%),linear-gradient(145deg,#f5fff8,#fff)!important}
+#create-token .create-token-card:before{background:linear-gradient(90deg,#ffc94b,#ff9d58,#ff6f9f)!important}
+#distribute .distribute-card:before{background:linear-gradient(90deg,#35cbb8,#4d9eff,#7c69ff)!important}
+#liquidity.gurug-liquidity .liquidity-card:before{background:linear-gradient(90deg,#45a7ff,#6d7bff,#a16bff)!important}
+#multi-airdrop .multi-airdrop-card:before{background:linear-gradient(90deg,#ff76a9,#c66bff,#8a75ff)!important}
+#token-burn .token-burn-card:before{background:linear-gradient(90deg,#ffb34f,#ff765e,#ff6399)!important}
+#authority-manager .token-authority-card:before{background:linear-gradient(90deg,#3bc9dc,#568bff,#8a71ff)!important}
+#tokenMetadataApp .token-metadata-card:before{background:linear-gradient(90deg,#b179ff,#8c72ff,#f16cae)!important}
+#token-mint .token-mint-card:before{background:linear-gradient(90deg,#42d6a0,#38bfc5,#6e83ff)!important}
+#create-token .create-token-card,#distribute .distribute-card,#liquidity.gurug-liquidity .liquidity-card,#multi-airdrop .multi-airdrop-card,#token-burn .token-burn-card,#authority-manager .token-authority-card,#tokenMetadataApp .token-metadata-card,#token-mint .token-mint-card{border:1px solid #e6defa!important;box-shadow:0 18px 48px rgba(67,44,125,.10),0 3px 10px rgba(67,44,125,.04)!important}
+.create-token-options,.create-token-check,.token-mint-check,.token-mint-meta-box,.create-token-cost-row,.create-token-cost-total,.distribute-summary,.multi-airdrop-summary,.multi-airdrop-stat,.liq-box,.liq-summary,.token-metadata-current,.token-metadata-details,.token-burn-status,.token-mint-status,.create-token-result,.distribute-results,.multi-airdrop-results,.token-metadata-note,.token-authority-note{background:#fff!important;border:1px solid #e7e0f7!important;box-shadow:0 4px 14px rgba(65,43,124,.035)!important}
+.create-token-cost-total{background:linear-gradient(105deg,#fff2c4,#ffe2ef)!important;border-color:#ffd6a4!important}
+.distribute-summary{background:linear-gradient(135deg,#e4fff8,#f2f7ff)!important;border-color:#bcefe5!important}
+.multi-airdrop-summary{background:linear-gradient(135deg,#ffeaf3,#f2eaff)!important;border-color:#f6cde0!important}
+.liq-summary{background:linear-gradient(135deg,#e4f2ff,#f0eaff)!important;border-color:#c9dcff!important}
+.token-metadata-current,.token-metadata-details{background:linear-gradient(135deg,#f0eaff,#fff)!important}
+.token-burn-status{background:linear-gradient(135deg,#fff0e5,#fff6f8)!important}
+.token-mint-status{background:linear-gradient(135deg,#e3fff0,#e9f8ff)!important}
+.authority-row{border-color:#dcd3f6!important}
+.authority-row[data-type="freeze"]{border-color:#c9eaf3!important}
+#create-token label,#distribute label,#liquidity.gurug-liquidity label,#multi-airdrop label,#token-burn label,#authority-manager label,#tokenMetadataApp label,#token-mint label{color:#554b70!important}
+.create-token-copy,.create-token-note,.create-token-field small,.create-token-warning,.distribute-lead,.distribute-note,.liquidity-sub,.liq-note,.liq-status,.multi-airdrop-hint,.multi-airdrop-help-step,.token-metadata-note,.token-metadata-current-copy small,.token-burn-balance,.token-mint-card p{color:#625b78!important}
+.create-token-field input:disabled,.token-mint-field input:disabled,.distribute-input:disabled,.distribute-row input:disabled,.liq-input:disabled,.multi-airdrop-input:disabled,.token-burn-fields input:disabled,.token-authority-lookup input:disabled,.authority-new input:disabled,.token-metadata-lookup input:disabled{background:#f1eef8!important;color:#817991!important;opacity:1!important}
+.create-token-field input:focus,.token-mint-field input:focus,.distribute-input:focus,.distribute-row input:focus,.liq-input:focus,.multi-airdrop-input:focus,.multi-airdrop-addresses:focus,.multi-airdrop-amount:focus,.token-burn-fields input:focus,.token-authority-lookup input:focus,.authority-new input:focus,.token-metadata-lookup input:focus{background:#fff!important;border-color:#8564f7!important;box-shadow:0 0 0 4px rgba(117,80,245,.14)!important;outline:none!important}
+.create-token-button,.distribute-action,.liq-action,.multi-airdrop-action,.token-mint-button,.token-burn-button,.token-authority-lookup .connect,.token-metadata-lookup .connect,#tokenMetadataApp .connect{background:linear-gradient(105deg,#7048f5 0%,#a04fe8 38%,#ed579f 72%,#ff9d4a 100%)!important;letter-spacing:.01em!important;font-weight:850!important}
+.create-token-button:focus-visible,.distribute-action:focus-visible,.liq-action:focus-visible,.multi-airdrop-action:focus-visible,.token-mint-button:focus-visible,.token-burn-button:focus-visible{outline:3px solid rgba(117,80,245,.35)!important;outline-offset:3px!important}
+.create-token-result,.distribute-result,.multi-airdrop-result{overflow-wrap:anywhere!important;word-break:break-word!important}
+.create-token-result code,.distribute-result code,.multi-airdrop-result code,.token-metadata-card code,.authority-current code{font-size:.9em!important;line-height:1.55!important}
+@media(max-width:600px){.create-token-card,.distribute-card,.liquidity-card,.multi-airdrop-card,.token-burn-card,.token-authority-card,.token-metadata-card,.token-mint-card{padding:18px 15px!important;box-shadow:0 12px 30px rgba(67,44,125,.09)!important}}
