@@ -4333,3 +4333,274 @@ body:before{opacity:.2!important;z-index:0!important;background-image:radial-gra
 @media(max-width:1240px){.workspace-shell{width:calc(100% - 40px)!important}.landing-stage{grid-template-columns:minmax(260px,.9fr) minmax(380px,1.1fr)!important;gap:24px!important}.landing-mascot{grid-column:1/-1!important;min-height:270px!important;margin-top:0!important}.landing-mascot img{width:235px!important}.orbit-one{width:270px!important}.orbit-two{width:300px!important}.mascot-caption{right:calc(50% - 180px)!important;bottom:0!important}.landing-feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:850px){.topbar{height:66px!important;padding:0 16px!important;gap:10px!important}.topbar .desktop-nav{display:none!important}.brand{font-size:17px!important;gap:7px!important}.brand img{width:35px!important;height:35px!important}.top-wallet{min-width:0!important;padding:10px 13px!important;font-size:10px!important}.market-ticker{display:none!important}.workspace-shell{width:calc(100% - 24px)!important;margin:12px auto 50px!important}.workspace-main>.swap-section{padding:10px 0 8px!important}.landing-stage{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:20px!important;min-height:0!important}.landing-copy{padding:14px 5px 0!important}.landing-copy h2{font-size:clamp(42px,10vw,60px)!important;margin:18px 0 13px!important}.landing-copy>p{font-size:14px!important}.landing-cta{margin:20px 0!important}.landing-stats{gap:7px!important}.landing-stats>div{gap:5px!important;align-items:flex-start!important}.stat-symbol{flex-basis:28px!important;width:28px!important;height:28px!important;font-size:18px!important;border-radius:9px!important}.landing-stats strong{font-size:10px!important}.landing-stats em{font-size:8px!important}.workspace-main .swap-layout{width:100%!important}.workspace-main .swap-card{max-width:540px!important;padding:17px!important}.landing-mascot{order:3!important;min-height:230px!important;margin:0!important}.landing-mascot img{width:210px!important}.orbit-one{width:245px!important}.orbit-two{width:270px!important}.mascot-caption{right:calc(50% - 155px)!important;font-size:9px!important}.landing-feature-grid{grid-template-columns:1fr!important;gap:10px!important;margin:15px 0 22px!important}.landing-feature{min-height:84px!important;padding:14px!important}.workspace-main>section:not(.swap-section){padding:20px 14px!important;border-radius:18px!important}}
 @media(max-width:420px){.landing-primary,.landing-secondary{min-height:47px!important;padding:0 16px!important;font-size:12px!important}.workspace-main .token-box{padding:15px 12px!important}.workspace-main .swap-input{font-size:25px!important}.landing-stats{grid-template-columns:1fr 1fr!important}.landing-stats>div:last-child{display:none!important}}
+
+
+/* GurugSwap visual polish: richer color, iconography and depth.
+   Presentation-only overrides; swap controls, IDs and application logic remain untouched. */
+:root {
+  --gs-ink: #171719;
+  --gs-gold: #ffd928;
+  --gs-orange: #ff9f43;
+  --gs-violet: #8b5cf6;
+  --gs-blue: #43b8ff;
+  --gs-mint: #42d6b0;
+}
+body {
+  background:
+    radial-gradient(ellipse at 8% 12%, rgba(255,216,40,.36), transparent 28%),
+    radial-gradient(ellipse at 91% 18%, rgba(255,151,71,.22), transparent 25%),
+    radial-gradient(ellipse at 75% 70%, rgba(133,91,246,.10), transparent 31%),
+    linear-gradient(135deg,#fffdf4 0%,#fff9df 46%,#fffdf8 100%) !important;
+  background-attachment: fixed !important;
+}
+.topbar {
+  background: rgba(255,255,255,.86) !important;
+  border-bottom: 1px solid rgba(170,130,0,.13) !important;
+  box-shadow: 0 8px 32px rgba(74,57,0,.055) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+}
+.brand img {
+  filter: drop-shadow(0 5px 10px rgba(240,185,0,.22)) !important;
+}
+.top-wallet,.landing-primary {
+  background: linear-gradient(115deg,#ffe52e 0%,#ffc928 55%,#ffad35 100%) !important;
+  box-shadow: 0 10px 24px rgba(241,177,0,.23), inset 0 1px rgba(255,255,255,.6) !important;
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease !important;
+}
+.top-wallet:hover,.landing-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 14px 30px rgba(241,177,0,.30) !important;
+  filter: saturate(1.12) !important;
+}
+.landing-stage {
+  position: relative !important;
+  isolation: isolate !important;
+}
+.landing-stage:before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  inset: 12px -18px 0 !important;
+  border-radius: 36px !important;
+  background:
+    radial-gradient(circle at 12% 14%,rgba(255,222,56,.22),transparent 26%),
+    radial-gradient(circle at 85% 34%,rgba(255,155,64,.15),transparent 28%),
+    linear-gradient(125deg,rgba(255,255,255,.58),rgba(255,249,218,.36)) !important;
+  border: 1px solid rgba(255,255,255,.8) !important;
+}
+.landing-kicker {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 9px 13px !important;
+  border: 1px solid rgba(229,177,0,.25) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(100deg,rgba(255,235,99,.52),rgba(255,255,255,.8)) !important;
+  box-shadow: 0 6px 18px rgba(170,130,0,.06) !important;
+  letter-spacing: .12em !important;
+}
+.landing-kicker .solana-mini {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 25px !important;
+  height: 25px !important;
+  border-radius: 8px !important;
+  background: linear-gradient(145deg,#f7d52d,#ffab3e) !important;
+  color: #382b00 !important;
+  font-size: 18px !important;
+  box-shadow: 0 4px 10px rgba(242,177,0,.2) !important;
+}
+.landing-copy h2 {
+  letter-spacing: -.065em !important;
+  line-height: .99 !important;
+  text-wrap: balance !important;
+}
+.landing-copy h2 .section-title-accent {
+  background: linear-gradient(100deg,#e9b900 0%,#ff8d35 52%,#f06d9e 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter: drop-shadow(0 5px 15px rgba(255,177,34,.12)) !important;
+}
+.landing-copy>p {
+  max-width: 490px !important;
+  line-height: 1.85 !important;
+}
+.landing-secondary {
+  border: 1px solid rgba(143,110,0,.2) !important;
+  background: rgba(255,255,255,.75) !important;
+  box-shadow: 0 8px 22px rgba(70,55,0,.055) !important;
+  transition: transform .2s ease, background .2s ease !important;
+}
+.landing-secondary:hover { transform: translateY(-2px) !important; background:#fff !important; }
+.landing-stats>div {
+  padding: 12px 10px !important;
+  border: 1px solid rgba(193,157,22,.12) !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.58) !important;
+  box-shadow: 0 8px 20px rgba(90,70,0,.035) !important;
+}
+.stat-symbol {
+  display: inline-grid !important;
+  place-items: center !important;
+  color: #24200c !important;
+  background: linear-gradient(145deg,#fff18b,#ffc93d) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.9),0 6px 14px rgba(233,174,0,.18) !important;
+}
+.landing-stats>div:nth-child(2) .stat-symbol {
+  background: linear-gradient(145deg,#c7f5ff,#7cd7ff) !important;
+}
+.landing-stats>div:nth-child(3) .stat-symbol {
+  background: linear-gradient(145deg,#e6d5ff,#bba1ff) !important;
+}
+.swap-layout { position: relative !important; z-index: 1 !important; }
+.workspace-main .swap-card {
+  position: relative !important;
+  overflow: visible !important;
+  border: 1px solid rgba(255,255,255,.96) !important;
+  background: linear-gradient(155deg,rgba(255,255,255,.98),rgba(255,253,242,.96)) !important;
+  box-shadow: 0 28px 75px rgba(82,65,0,.13),0 4px 16px rgba(82,65,0,.055),inset 0 1px white !important;
+}
+.workspace-main .swap-card:before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  inset: -2px !important;
+  border-radius: inherit !important;
+  padding: 2px !important;
+  background: linear-gradient(140deg,rgba(255,222,51,.85),rgba(255,255,255,.9) 35%,rgba(255,157,72,.45) 72%,rgba(143,100,255,.25)) !important;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  pointer-events: none !important;
+}
+.workspace-main .card-head {
+  letter-spacing: .13em !important;
+}
+.workspace-main .live-dot {
+  padding: 7px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(67,214,176,.12) !important;
+  color: #138968 !important;
+  letter-spacing: .08em !important;
+}
+.workspace-main .token-box {
+  border: 1px solid rgba(174,145,28,.14) !important;
+  background: linear-gradient(135deg,#fffef8,#fff9e8) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.95),0 6px 18px rgba(90,70,0,.035) !important;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease !important;
+}
+.workspace-main .token-box:focus-within {
+  border-color: rgba(234,185,0,.65) !important;
+  box-shadow: 0 0 0 4px rgba(255,214,41,.12),0 8px 22px rgba(90,70,0,.05) !important;
+}
+.workspace-main .token-select {
+  border: 1px solid rgba(176,139,0,.16) !important;
+  background: #fff !important;
+  box-shadow: 0 4px 12px rgba(80,60,0,.06) !important;
+  transition: transform .18s ease,box-shadow .18s ease !important;
+}
+.workspace-main .token-select:hover { transform: translateY(-1px) !important; box-shadow: 0 7px 16px rgba(80,60,0,.1) !important; }
+.workspace-main .sol-token .sol-logo {
+  filter: drop-shadow(0 3px 6px rgba(0,190,160,.2)) !important;
+}
+.workspace-main .gurug-token img {
+  filter: drop-shadow(0 3px 7px rgba(255,194,0,.25)) !important;
+}
+.workspace-main .arrow {
+  border: 4px solid #fffdf5 !important;
+  background: linear-gradient(140deg,#ffe75a,#ffbd3b) !important;
+  box-shadow: 0 5px 15px rgba(231,174,0,.24) !important;
+  transition: transform .2s ease !important;
+}
+.workspace-main .arrow:hover { transform: rotate(180deg) scale(1.06) !important; }
+.workspace-main #swapButton {
+  background: linear-gradient(105deg,#ffe32d 0%,#ffc629 56%,#ffad38 100%) !important;
+  color: #211b05 !important;
+  box-shadow: 0 10px 22px rgba(234,176,0,.2),inset 0 1px rgba(255,255,255,.6) !important;
+  transition: transform .2s ease,box-shadow .2s ease,filter .2s ease !important;
+}
+.workspace-main #swapButton:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 14px 28px rgba(234,176,0,.28) !important;
+  filter: saturate(1.12) !important;
+}
+.landing-mascot {
+  isolation: isolate !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(255,229,65,.55),rgba(255,218,37,.18) 35%,transparent 69%) !important;
+}
+.landing-mascot:before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  width: 75% !important;
+  aspect-ratio: 1 !important;
+  border-radius: 50% !important;
+  background: conic-gradient(from 15deg,rgba(255,213,37,.0),rgba(255,176,54,.3),rgba(255,230,86,.0),rgba(142,103,255,.16),rgba(255,213,37,.0)) !important;
+  filter: blur(9px) !important;
+  animation: gurugAura 14s linear infinite !important;
+}
+.landing-mascot img {
+  filter: drop-shadow(0 24px 26px rgba(181,131,0,.22)) !important;
+  animation: gurugFloat 5.5s ease-in-out infinite !important;
+}
+.orbit-one { border-color: rgba(247,190,0,.44) !important; box-shadow: 0 0 35px rgba(255,213,37,.12) !important; }
+.orbit-two { border-color: rgba(255,159,67,.28) !important; }
+.mascot-caption {
+  border: 1px solid rgba(255,255,255,.95) !important;
+  background: rgba(255,255,255,.84) !important;
+  box-shadow: 0 12px 32px rgba(80,60,0,.11) !important;
+  backdrop-filter: blur(15px) !important;
+}
+@keyframes gurugFloat { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-9px) rotate(1deg)} }
+@keyframes gurugAura { to { transform: rotate(360deg); } }
+.landing-feature {
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,.92) !important;
+  background: rgba(255,255,255,.78) !important;
+  box-shadow: 0 12px 30px rgba(76,58,0,.055),inset 0 1px rgba(255,255,255,.9) !important;
+  backdrop-filter: blur(12px) !important;
+  transition: transform .22s ease,box-shadow .22s ease,border-color .22s ease !important;
+}
+.landing-feature:before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important; top: 14px !important; bottom: 14px !important;
+  width: 4px !important;
+  border-radius: 0 4px 4px 0 !important;
+  background: var(--feature-accent,#ffd52b) !important;
+}
+.landing-feature:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 18px 36px rgba(76,58,0,.10) !important;
+  border-color: rgba(255,213,43,.7) !important;
+}
+.feature-swap { --feature-accent:#f4c800; }
+.feature-liquidity { --feature-accent:#27c7b3; }
+.feature-create { --feature-accent:#9a78ff; }
+.feature-tools { --feature-accent:#ff9b4b; }
+.landing-feature .feature-icon {
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 48px !important;
+  width: 48px !important; height: 48px !important;
+  border-radius: 15px !important;
+  border: 1px solid rgba(255,255,255,.8) !important;
+  color: #29240b !important;
+  background: linear-gradient(145deg,#fff2a0,#ffd443) !important;
+  box-shadow: inset 0 1px rgba(255,255,255,.85),0 7px 15px rgba(180,136,0,.12) !important;
+  font-size: 25px !important;
+}
+.feature-liquidity .feature-icon { background:linear-gradient(145deg,#c8fff0,#5cddc3)!important; }
+.feature-create .feature-icon { background:linear-gradient(145deg,#e7dcff,#b7a0ff)!important; }
+.feature-tools .feature-icon { background:linear-gradient(145deg,#ffe0c1,#ffb06b)!important; }
+.landing-feature>span:nth-child(2) strong { letter-spacing:-.025em !important; }
+.landing-feature> b { color:var(--feature-accent,#d5a900)!important; transition:transform .2s ease!important; }
+.landing-feature:hover>b { transform:translateX(4px)!important; }
+@media (prefers-reduced-motion: reduce) {
+  .landing-mascot img,.landing-mascot:before { animation:none!important; }
+  .top-wallet,.landing-primary,.landing-secondary,.landing-feature,.workspace-main #swapButton { transition:none!important; }
+}
