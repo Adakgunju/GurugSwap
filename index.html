@@ -590,6 +590,10 @@
       .workspace-main.single-section-view > #token-info.single-section-companion{
         display:block!important;
       }
+      /* Token Info is a Swap-only companion; never leak it into other tool pages. */
+      .workspace-main.single-section-view > #token-info:not(.single-section-companion){
+        display:none!important;
+      }
       .workspace-main.single-section-view > #swap.single-section-active{
         margin-bottom:28px!important;
       }
@@ -668,6 +672,9 @@
             section.classList.toggle("single-section-active", active);
             section.classList.toggle("single-section-companion", companion);
             section.setAttribute("aria-hidden", active || companion ? "false" : "true");
+            // Enforce the one-page view inline as well, so older/conflicting CSS
+            // cannot leave Token Info visible when another tool is selected.
+            section.style.setProperty("display", active || companion ? "block" : "none", "important");
           });
 
           document.querySelectorAll(".workspace-nav, #mobileMenu a").forEach(link => {
