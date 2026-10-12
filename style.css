@@ -9370,3 +9370,62 @@ body .topbar>.brand .accent{
     border-radius: 18px !important;
   }
 }
+
+
+/* MOBILE HEADER OVERLAP FIX — keep the wordmark, wallet button and menu in separate space. */
+@media (max-width: 560px) {
+  body .topbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  body .topbar > .brand {
+    display: flex !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    gap: 5px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+  body .topbar > .brand > svg.brand-mark {
+    flex: 0 0 25px !important;
+    width: 25px !important;
+    height: 25px !important;
+  }
+  body .topbar > .brand > span {
+    min-width: 0 !important;
+    font-size: clamp(10px, 3.1vw, 14px) !important;
+    letter-spacing: -0.055em !important;
+    white-space: nowrap !important;
+  }
+  body .topbar > .top-actions {
+    display: flex !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  body .topbar .top-wallet {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 112px !important;
+    min-height: 34px !important;
+    padding: 0 7px !important;
+    font-size: 8px !important;
+    letter-spacing: 0 !important;
+    white-space: nowrap !important;
+  }
+  body .topbar .mobile-menu-btn {
+    flex: 0 0 auto !important;
+    min-width: 66px !important;
+    min-height: 34px !important;
+    padding: 0 8px !important;
+    font-size: 9px !important;
+  }
+}
