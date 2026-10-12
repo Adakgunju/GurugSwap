@@ -8777,3 +8777,76 @@ body .topbar>.brand .accent{
     box-sizing: border-box !important;
   }
 }
+
+
+/* SITE-WIDE MOBILE WIDTH NORMALIZATION — applies to every workspace tool */
+@media (max-width: 850px) {
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+  .workspace-shell {
+    display: block !important;
+    width: calc(100% - 8px) !important;
+    max-width: none !important;
+    margin: 8px 4px 28px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main,
+  .workspace-main.single-section-view {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 8px 0 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main > section,
+  .workspace-main > section.single-section-active,
+  .workspace-main > .swap-section,
+  .workspace-main > .token-info-section,
+  .workspace-main > #token-info,
+  .workspace-main > #liquidity,
+  .workspace-main > #links,
+  .workspace-main > section:not(.swap-section) {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main > section:not(.swap-section) {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .workspace-main > .swap-section {
+    padding: 8px 4px 12px !important;
+    margin: 0 0 12px !important;
+  }
+  .workspace-main .swap-layout {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+  }
+  .workspace-main .swap-card,
+  .workspace-main .token-info-card,
+  .workspace-main #liquidity.gurug-liquidity {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main .swap-card {
+    padding: 14px 12px !important;
+  }
+  .workspace-main > #token-info.single-section-companion {
+    margin-top: 10px !important;
+  }
+}
