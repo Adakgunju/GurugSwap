@@ -8717,3 +8717,63 @@ body .topbar>.brand .accent{
     margin-top: 12px !important;
   }
 }
+
+
+/* MOBILE EDGE-TO-EDGE FIX — remove nested gutters around tool forms */
+@media (max-width: 600px) {
+  .workspace-shell {
+    width: calc(100% - 8px) !important;
+    max-width: none !important;
+    margin: 8px 4px 28px !important;
+  }
+  .workspace-main,
+  .workspace-main.single-section-view {
+    width: 100% !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  body .workspace-main > #liquidity.gurug-liquidity {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 20px 4px 28px !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-heading,
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-grid {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-grid {
+    gap: 12px !important;
+  }
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-card,
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-help {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 15px 12px !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #liquidity.gurug-liquidity .liq-box {
+    padding: 12px !important;
+  }
+  /* Other tool pages use the same edge-to-edge mobile container. */
+  body .workspace-main > #create-token,
+  body .workspace-main > #distribute,
+  body .workspace-main > #distributeTokens,
+  body .workspace-main > #multi-airdrop,
+  body .workspace-main > #token-burn,
+  body .workspace-main > #authority-manager,
+  body .workspace-main > #tokenMetadataApp,
+  body .workspace-main > #token-mint {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
