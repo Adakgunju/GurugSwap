@@ -8551,3 +8551,51 @@ body .workspace-main .swap-card .token-list .token-empty{
 @media(prefers-reduced-motion:reduce){
  body .workspace-main .swap-card .token-list .token-option{transition:none!important}
 }
+
+
+/* HEADER BRAND — premium wordmark, no oversized yellow mascot */
+body .topbar>.brand{
+  gap:11px!important;
+  color:#f7f9ff!important;
+  text-decoration:none!important;
+}
+body .topbar>.brand>img.brand-logo{
+  display:none!important;
+}
+body .topbar>.brand::before{
+  content:"G"!important;
+  display:grid!important;place-items:center!important;flex:0 0 34px!important;
+  width:34px!important;height:34px!important;box-sizing:border-box!important;
+  border:1px solid rgba(91,222,244,.58)!important;border-radius:10px!important;
+  background:linear-gradient(145deg,rgba(58,215,239,.16),rgba(122,80,255,.2))!important;
+  box-shadow:0 0 22px rgba(73,184,255,.12),inset 0 1px rgba(255,255,255,.08)!important;
+  color:#f5f8ff!important;
+  font-family:'Orbitron','Syne','Outfit',sans-serif!important;
+  font-size:20px!important;font-weight:800!important;line-height:1!important;
+}
+body .topbar>.brand>span{
+  color:#f6f8ff!important;
+  font-family:'Orbitron','Syne','Outfit',sans-serif!important;
+  font-size:18px!important;font-weight:800!important;letter-spacing:-.035em!important;
+  line-height:1!important;white-space:nowrap!important;
+  text-shadow:0 1px 12px rgba(81,153,255,.08)!important;
+}
+body .topbar>.brand .accent{
+  margin-left:3px!important;
+  background:linear-gradient(100deg,#5ce5f3 0%,#8292ff 52%,#d47cff 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;color:transparent!important;
+}
+body .topbar>.brand:hover::before{
+  border-color:rgba(111,226,255,.85)!important;
+  box-shadow:0 0 25px rgba(73,184,255,.2),inset 0 1px rgba(255,255,255,.12)!important;
+}
+@media(max-width:900px){
+ body .topbar>.brand::before{flex-basis:31px!important;width:31px!important;height:31px!important;font-size:18px!important}
+ body .topbar>.brand>span{font-size:17px!important}
+}
+@media(max-width:560px){
+ body .topbar>.brand{gap:8px!important}
+ body .topbar>.brand::before{flex-basis:28px!important;width:28px!important;height:28px!important;border-radius:8px!important;font-size:16px!important}
+ body .topbar>.brand>span{font-size:15px!important;letter-spacing:-.04em!important}
+}
