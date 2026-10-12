@@ -8648,3 +8648,72 @@ body .topbar>.brand .accent{
 }
 @media(max-width:900px){body .topbar>.brand>svg.brand-mark{flex-basis:32px!important;width:32px!important;height:32px!important}}
 @media(max-width:560px){body .topbar>.brand>svg.brand-mark{flex-basis:29px!important;width:29px!important;height:29px!important}}
+
+
+/* MOBILE WORKSPACE WIDTH FIX — let feature panels use nearly the full viewport */
+@media (max-width: 600px) {
+  html, body { width: 100%; max-width: 100%; overflow-x: clip; }
+  .workspace-shell {
+    display: block !important;
+    width: calc(100% - 8px) !important;
+    max-width: none !important;
+    margin: 8px 4px 28px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .workspace-main.single-section-view { padding-top: 8px !important; }
+  .workspace-main > section,
+  .workspace-main > .swap-section,
+  .workspace-main > .token-info-section,
+  .workspace-main > #token-info,
+  .workspace-main > #liquidity,
+  .workspace-main > #links {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main > .swap-section {
+    padding: 10px 6px 12px !important;
+  }
+  .workspace-main .swap-layout {
+    width: 100% !important;
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+  }
+  .workspace-main .swap-card {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    padding: 14px 12px !important;
+    margin: 0 !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main .token-box {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px 10px !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main .swap-input {
+    width: min(48vw, 180px) !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    font-size: clamp(21px, 6.3vw, 27px) !important;
+  }
+  .workspace-main .token { flex-shrink: 0 !important; gap: 5px !important; }
+  .workspace-main > #token-info.single-section-companion {
+    margin-top: 12px !important;
+  }
+}
