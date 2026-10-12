@@ -9329,3 +9329,44 @@ body .topbar>.brand .accent{
     border-radius: 18px !important;
   }
 }
+
+
+/* CREATE TOKEN MOBILE SPACING — use screen width efficiently and preserve the form card. */
+@media (max-width: 850px) {
+  body .workspace-main > #create-token {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 18px !important;
+    padding: 12px 4px 20px !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main > #create-token .create-token-shell {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 12px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #create-token .create-token-head {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 16px !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #create-token .create-token-card,
+  body .workspace-main > #create-token .create-token-help {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 14px 12px !important;
+    box-sizing: border-box !important;
+    border-radius: 18px !important;
+  }
+}
