@@ -9234,3 +9234,57 @@ body .topbar>.brand .accent{
     box-shadow: 0 10px 28px rgba(0,0,0,.2) !important;
   }
 }
+
+
+/* MULTI AIRDROP MOBILE SPACING — reduce outer gutters while preserving tool-card borders. */
+@media (max-width: 850px) {
+  body .workspace-main > #multi-airdrop.platform-placeholder-section {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 18px !important;
+    padding: 12px 4px 20px !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main > #multi-airdrop .platform-placeholder-head {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 16px !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main > #multi-airdrop #multiAirdropApp {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #multi-airdrop #multiAirdropApp .multi-airdrop-shell {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  body .workspace-main > #multi-airdrop #multiAirdropApp .multi-airdrop-card,
+  body .workspace-main > #multi-airdrop #multiAirdropApp .multi-airdrop-help {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 14px 12px !important;
+    box-sizing: border-box !important;
+    border-radius: 18px !important;
+  }
+}
