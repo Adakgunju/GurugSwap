@@ -8164,3 +8164,52 @@ body .workspace-main>#authority-manager .token-authority-foot{
  body .workspace-main>#authority-manager .authority-actions{grid-template-columns:minmax(0,1fr)!important}
  body .workspace-main>#authority-manager .token-authority-foot{font-size:8px!important;letter-spacing:.05em!important}
 }
+
+
+/* TOKEN AUTHORITY — final cleanup for inherited label/input styles */
+body .workspace-main>#authority-manager .authority-new{
+  display:block!important;position:relative!important;min-width:0!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;color:#344867!important;
+}
+body .workspace-main>#authority-manager .authority-new::before,
+body .workspace-main>#authority-manager .authority-new::after{content:none!important;display:none!important}
+body .workspace-main>#authority-manager .authority-new small{
+  position:relative!important;display:block!important;width:100%!important;margin:0 0 8px!important;padding:0!important;
+  background:transparent!important;border:0!important;box-shadow:none!important;color:#3d5276!important;
+  font-size:10px!important;line-height:1.5!important;font-weight:900!important;letter-spacing:.1em!important;text-shadow:none!important;
+}
+body .workspace-main>#authority-manager .authority-new input{
+  position:relative!important;display:block!important;width:100%!important;min-width:0!important;min-height:51px!important;
+  margin:0!important;padding:12px 14px!important;box-sizing:border-box!important;border:1px solid #c5d4eb!important;
+  border-radius:11px!important;background:#fff!important;color:#17223d!important;opacity:1!important;
+  font:500 14px/1.4 'Space Grotesk',sans-serif!important;box-shadow:inset 0 1px 3px rgba(24,50,90,.05)!important;
+}
+body .workspace-main>#authority-manager .authority-new input:disabled{
+  background:#eaf0fa!important;color:#5c6d8a!important;opacity:1!important;border-color:#d1dced!important;
+  cursor:not-allowed!important;-webkit-text-fill-color:#5c6d8a!important;
+}
+body .workspace-main>#authority-manager .authority-new input:disabled::placeholder{
+  color:#7888a5!important;opacity:1!important;-webkit-text-fill-color:#7888a5!important;
+}
+body .workspace-main>#authority-manager .authority-row{
+  background:#fbfdff!important;border-color:#cbd9eb!important;box-shadow:0 8px 22px rgba(34,61,107,.07)!important;
+}
+body .workspace-main>#authority-manager .authority-row[data-type="freeze"]{
+  background:#f2faff!important;border-color:#c1ddeb!important;
+}
+body .workspace-main>#authority-manager .authority-current small{color:#405779!important;font-size:10px!important;letter-spacing:.1em!important}
+body .workspace-main>#authority-manager .authority-state{background:#e7eef9!important;color:#405474!important;border-color:#cbd8eb!important}
+body .workspace-main>#authority-manager .authority-state.active{background:#d6f8ef!important;color:#087660!important;border-color:#9de3d3!important}
+body .workspace-main>#authority-manager .authority-state.revoked{background:#e1f7e8!important;color:#216b43!important;border-color:#b9e6c9!important}
+body .workspace-main>#authority-manager .authority-actions button:disabled{opacity:1!important;filter:none!important;box-shadow:none!important}
+body .workspace-main>#authority-manager .authority-change:disabled{background:#e0e7fb!important;border-color:#cbd5f6!important;color:#6678b3!important}
+body .workspace-main>#authority-manager .authority-revoke:disabled{background:#f8edf1!important;border-color:#ead5dd!important;color:#b28b9a!important}
+body .workspace-main>#authority-manager .token-authority-status{background:#edf3ff!important;color:#354967!important;border-color:#c8d7ed!important}
+body .workspace-main>#authority-manager .token-authority-status-top{color:#243b60!important}
+body .workspace-main>#authority-manager #authorityStatusMessage{color:#405575!important}
+body .workspace-main>#authority-manager .token-authority-foot{color:#455b7b!important;border-top-color:#cfdaea!important}
+@media(max-width:560px){
+ body .workspace-main>#authority-manager .authority-new small{font-size:9px!important}
+ body .workspace-main>#authority-manager .authority-new input{font-size:14px!important}
+}
