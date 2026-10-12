@@ -9158,3 +9158,36 @@ body .topbar>.brand .accent{
     box-shadow: 0 10px 28px rgba(0,0,0,.2) !important;
   }
 }
+
+
+/* MOBILE TRADING BOT SPACING — use the viewport efficiently, preserve the bot card. */
+@media (max-width: 850px) {
+  body .workspace-main > #trading-bot.trading-bot-section {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 18px !important;
+    padding: 12px 4px 20px !important;
+    box-sizing: border-box !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main > #trading-bot .trading-bot-intro {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 16px !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #trading-bot .trading-bot-card {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 14px 12px !important;
+    box-sizing: border-box !important;
+    border: 1px solid rgba(111,133,205,.48) !important;
+    border-radius: 20px !important;
+    outline: 0 !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.2) !important;
+  }
+}
