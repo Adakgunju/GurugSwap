@@ -1330,7 +1330,13 @@ let tokenInfoRequestId = 0;
 let activeTokenInfoMint = null;
 
 async function updateTokenInfo(token) {
-  if (!token?.mint) return;
+  // The lower market card is intentionally Gurug-only; it must not follow the swap TO-token selector.
+  token = {
+    symbol: "GURUG",
+    name: "Gurug",
+    mint: "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5",
+    icon: "https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"
+  };
   activeTokenInfoMint = token.mint;
   const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
@@ -1378,7 +1384,7 @@ async function updateTokenInfo(token) {
       const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
       json = await res.json();
     }
-    if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint || toToken.mint !== token.mint) return;
+    if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint) return;
     const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
     const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
     const pair = solanaPairs.sort((a,b) =>
@@ -1450,7 +1456,12 @@ async function updateGurugMarketTicker() {
       cache: "no-store"
     });
     const json = await res.json();
-    const pair = Array.isArray(json?.pairs) ? json.pairs[0] : json?.pair;
+    const pairs = Array.isArray(json?.pairs) ? json.pairs : (json?.pair ? [json.pair] : []);
+    const pair = pairs.find(p =>
+      p?.chainId === "solana" &&
+      String(p?.baseToken?.address || "").toLowerCase() === "g8zuwl2mz8dj16brfdjpco7657kju3y5ncrgz6jtpbm5"
+    ) || pairs.find(p => p?.chainId === "solana" && String(p?.pairAddress || "").toLowerCase() === "8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz");
+    if (!pair) throw new Error("GURUG market pair was not returned by DexScreener");
     const price = Number(pair?.priceUsd);
     const change = Number(pair?.priceChange?.h24);
 
