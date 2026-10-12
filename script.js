@@ -1373,7 +1373,7 @@ async function updateTokenInfo(token) {
       // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
       const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz", {cache:"no-store"});
       const pairData = await pairRes.json();
-      json = {pairs: pairData?.pair ? [pairData.pair] : []};
+      json = {pairs: Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : [])};
     } else {
       const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
       json = await res.json();
@@ -1450,7 +1450,7 @@ async function updateGurugMarketTicker() {
       cache: "no-store"
     });
     const json = await res.json();
-    const pair = json?.pair;
+    const pair = Array.isArray(json?.pairs) ? json.pairs[0] : json?.pair;
     const price = Number(pair?.priceUsd);
     const change = Number(pair?.priceChange?.h24);
 
