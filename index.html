@@ -622,6 +622,31 @@
     </style>
 
     <script>
+      // Close the BUILD dropdown as soon as a destination is selected.
+      (() => {
+        const buildMenu = document.querySelector(".topbar .build-menu");
+        if (!buildMenu) return;
+
+        buildMenu.querySelectorAll(".build-menu-panel a").forEach(link => {
+          link.addEventListener("click", () => {
+            buildMenu.open = false;
+          });
+        });
+
+        // Also dismiss the dropdown when clicking anywhere outside it or pressing Escape.
+        document.addEventListener("click", event => {
+          if (buildMenu.open && !buildMenu.contains(event.target)) {
+            buildMenu.open = false;
+          }
+        });
+        document.addEventListener("keydown", event => {
+          if (event.key === "Escape" && buildMenu.open) {
+            buildMenu.open = false;
+            buildMenu.querySelector("summary")?.focus();
+          }
+        });
+      })();
+
       // Single-section platform navigation.
       (() => {
         const menuTargets = [
