@@ -9008,3 +9008,35 @@ body .topbar>.brand .accent{
     box-shadow: 0 24px 65px rgba(0,0,0,.52),0 0 0 1px rgba(136,72,255,.2),0 0 30px rgba(94,58,255,.18) !important;
   }
 }
+
+
+/* MOBILE SWAP CARD BORDER CLEANUP: one thin outline, rounded corners, no nested frame. */
+@media (max-width: 850px) {
+  body .workspace-main .landing-stage .swap-card,
+  body .landing-stage .swap-card,
+  body .workspace-main .swap-card {
+    border: 1px solid rgba(112, 126, 255, .58) !important;
+    border-radius: 22px !important;
+    outline: 0 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .22) !important;
+    overflow: hidden !important;
+  }
+  body .workspace-main .landing-stage .swap-card::before,
+  body .landing-stage .swap-card::before,
+  body .workspace-main .swap-card::before {
+    content: none !important;
+    display: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main .landing-stage .swap-card::after,
+  body .landing-stage .swap-card::after,
+  body .workspace-main .swap-card::after {
+    content: none !important;
+    display: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+}
