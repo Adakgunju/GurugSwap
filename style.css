@@ -8213,3 +8213,115 @@ body .workspace-main>#authority-manager .token-authority-foot{color:#455b7b!impo
  body .workspace-main>#authority-manager .authority-new small{font-size:9px!important}
  body .workspace-main>#authority-manager .authority-new input{font-size:14px!important}
 }
+
+
+/* TOKEN AUTHORITY — align with the shared GurugSwap dark neon palette */
+body .workspace-main>#authority-manager.token-authority-section{
+  background:radial-gradient(ellipse at 5% 12%,rgba(0,220,245,.09),transparent 36%),radial-gradient(ellipse at 96% 0%,rgba(213,58,187,.10),transparent 38%)!important;
+}
+body .workspace-main>#authority-manager .platform-placeholder-head h2{color:#f5f7ff!important}
+body .workspace-main>#authority-manager .platform-placeholder-head p{color:#bdc9e5!important}
+body .workspace-main>#authority-manager .token-authority-card{
+  border:1px solid rgba(112,132,205,.36)!important;border-radius:22px!important;
+  background:radial-gradient(ellipse at 100% 0%,rgba(114,68,255,.12),transparent 42%),linear-gradient(145deg,#121a30 0%,#0b1122 72%,#151027 100%)!important;
+  color:#f4f7ff!important;box-shadow:0 20px 52px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.04)!important;
+}
+body .workspace-main>#authority-manager .token-authority-head{
+  color:#dce5ff!important;border-bottom-color:rgba(142,159,216,.2)!important;
+}
+body .workspace-main>#authority-manager .token-authority-live{
+  background:rgba(27,210,190,.12)!important;border-color:rgba(69,226,212,.32)!important;color:#69eee2!important;
+}
+body .workspace-main>#authority-manager .token-authority-lookup small,
+body .workspace-main>#authority-manager .authority-new small,
+body .workspace-main>#authority-manager .authority-current small,
+body .workspace-main>#authority-manager .authority-modal-box label small{
+  color:#b7c5e7!important;
+}
+body .workspace-main>#authority-manager .token-authority-lookup input,
+body .workspace-main>#authority-manager .authority-new input,
+body .workspace-main>#authority-manager .authority-modal-box input{
+  border-color:rgba(119,143,214,.34)!important;background:#080e1d!important;color:#f7f8ff!important;
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.22)!important;
+}
+body .workspace-main>#authority-manager .token-authority-lookup input::placeholder,
+body .workspace-main>#authority-manager .authority-new input::placeholder,
+body .workspace-main>#authority-manager .authority-modal-box input::placeholder{
+  color:#8190b4!important;opacity:1!important;
+}
+body .workspace-main>#authority-manager .token-authority-lookup input:focus,
+body .workspace-main>#authority-manager .authority-new input:focus,
+body .workspace-main>#authority-manager .authority-modal-box input:focus{
+  border-color:#54e5f5!important;box-shadow:0 0 0 3px rgba(84,229,245,.12)!important;
+}
+body .workspace-main>#authority-manager .authority-new input:disabled{
+  background:#141d34!important;color:#8e9fc5!important;opacity:1!important;border-color:rgba(119,143,214,.24)!important;
+  -webkit-text-fill-color:#8e9fc5!important;
+}
+body .workspace-main>#authority-manager .authority-new input:disabled::placeholder{
+  color:#7585aa!important;opacity:1!important;-webkit-text-fill-color:#7585aa!important;
+}
+body .workspace-main>#authority-manager .token-authority-lookup .connect{
+  border-color:rgba(255,255,255,.15)!important;
+  background:linear-gradient(105deg,#3158df,#7843e8 55%,#d53cae)!important;color:#fff!important;
+  box-shadow:0 9px 22px rgba(94,67,224,.2)!important;
+}
+body .workspace-main>#authority-manager .token-authority-note{
+  background:linear-gradient(110deg,rgba(31,54,96,.78),rgba(35,29,73,.72))!important;
+  border-color:rgba(112,139,215,.28)!important;color:#c7d4f1!important;
+}
+body .workspace-main>#authority-manager .authority-row,
+body .workspace-main>#authority-manager .authority-row[data-type="freeze"]{
+  background:linear-gradient(145deg,#141d34 0%,#0e1629 100%)!important;
+  border-color:rgba(112,135,204,.32)!important;box-shadow:0 8px 24px rgba(0,0,0,.18)!important;
+}
+body .workspace-main>#authority-manager .authority-kicker{color:#58e5ef!important}
+body .workspace-main>#authority-manager .authority-row h3{color:#f3f6ff!important}
+body .workspace-main>#authority-manager .authority-state{
+  background:rgba(100,119,169,.16)!important;border-color:rgba(130,151,208,.3)!important;color:#c2cee9!important;
+}
+body .workspace-main>#authority-manager .authority-state.active{
+  background:rgba(36,199,157,.13)!important;border-color:rgba(68,227,182,.32)!important;color:#72efc6!important;
+}
+body .workspace-main>#authority-manager .authority-state.revoked{
+  background:rgba(36,199,157,.1)!important;border-color:rgba(68,227,182,.28)!important;color:#72efc6!important;
+}
+body .workspace-main>#authority-manager .authority-current{
+  background:linear-gradient(120deg,#0b1326,#131a33)!important;border-color:rgba(112,135,204,.3)!important;
+}
+body .workspace-main>#authority-manager .authority-current code{color:#e2eaff!important}
+body .workspace-main>#authority-manager .authority-change{
+  border-color:rgba(255,255,255,.13)!important;background:linear-gradient(105deg,#3158df,#7843e8)!important;color:#fff!important;
+}
+body .workspace-main>#authority-manager .authority-revoke{
+  border-color:rgba(245,105,154,.3)!important;background:rgba(124,35,79,.22)!important;color:#ff9abd!important;
+}
+body .workspace-main>#authority-manager .authority-revoke:hover:not(:disabled){
+  border-color:rgba(255,123,174,.6)!important;background:rgba(151,38,91,.34)!important;
+}
+body .workspace-main>#authority-manager .authority-actions button:disabled{opacity:.62!important}
+body .workspace-main>#authority-manager .authority-change:disabled{
+  background:#263252!important;border-color:rgba(112,135,204,.22)!important;color:#9baad0!important;
+}
+body .workspace-main>#authority-manager .authority-revoke:disabled{
+  background:#2a1d31!important;border-color:rgba(180,88,130,.22)!important;color:#bd8ba4!important;
+}
+body .workspace-main>#authority-manager .token-authority-status{
+  background:linear-gradient(110deg,rgba(24,43,77,.78),rgba(31,25,66,.8))!important;
+  border-color:rgba(112,135,204,.3)!important;color:#c9d6f1!important;
+}
+body .workspace-main>#authority-manager .token-authority-status-top{color:#eef3ff!important}
+body .workspace-main>#authority-manager #authorityStatusMessage{color:#c4d1ed!important}
+body .workspace-main>#authority-manager .token-authority-status.active{
+  background:linear-gradient(110deg,rgba(36,57,111,.72),rgba(48,35,99,.7))!important;border-color:rgba(114,132,255,.35)!important;
+}
+body .workspace-main>#authority-manager .token-authority-status.success{
+  background:linear-gradient(110deg,rgba(14,90,78,.55),rgba(22,48,76,.75))!important;color:#d8fff1!important;border-color:rgba(65,226,177,.3)!important;
+}
+body .workspace-main>#authority-manager .token-authority-status.error{
+  background:linear-gradient(110deg,rgba(106,35,54,.5),rgba(41,26,68,.65))!important;color:#ffdce2!important;border-color:rgba(255,112,132,.35)!important;
+}
+body .workspace-main>#authority-manager .token-authority-status a{color:#62e5f4!important}
+body .workspace-main>#authority-manager .token-authority-foot{
+  color:#a6b5d7!important;border-top-color:rgba(142,159,216,.2)!important;
+}
