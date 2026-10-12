@@ -9040,3 +9040,52 @@ body .topbar>.brand .accent{
     box-shadow: none !important;
   }
 }
+
+
+/* MOBILE SWAP: match token-info card's compact edge spacing and clean rounded outline. */
+@media (max-width: 850px) {
+  body .workspace-main #swap.swap-section {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+  body .workspace-main #swap .landing-stage {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  body .workspace-main #swap .swap-layout {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-content: stretch !important;
+  }
+  body .workspace-main #swap .swap-card,
+  body .landing-stage .swap-card {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 14px !important;
+    border: 1px solid rgba(105, 123, 255, .48) !important;
+    border-radius: 20px !important;
+    outline: none !important;
+    background: linear-gradient(150deg,#11192d 0%,#0a1020 100%) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.18) !important;
+    overflow: hidden !important;
+  }
+  body .workspace-main #swap .swap-card::before,
+  body .workspace-main #swap .swap-card::after,
+  body .landing-stage .swap-card::before,
+  body .landing-stage .swap-card::after {
+    content: none !important;
+    display: none !important;
+  }
+}
