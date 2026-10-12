@@ -8850,3 +8850,101 @@ body .topbar>.brand .accent{
     margin-top: 10px !important;
   }
 }
+
+
+/* FINAL MOBILE FULL-WIDTH PASS — normalize every tool page, not only Swap/Liquidity */
+@media (max-width: 850px) {
+  .workspace-shell {
+    width: calc(100% - 8px) !important;
+    max-width: none !important;
+    margin: 6px 4px 24px !important;
+    padding: 0 !important;
+  }
+  .workspace-main,
+  .workspace-main.single-section-view {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 6px 0 0 !important;
+  }
+  .workspace-main > section,
+  .workspace-main > section.single-section-active,
+  .workspace-main > section.single-section-companion,
+  .workspace-main > #token-info,
+  .workspace-main > #liquidity,
+  .workspace-main > #links {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  /* Strip the large nested gutters responsible for narrow-looking forms. */
+  .workspace-main > section:not(.swap-section),
+  .workspace-main > #liquidity.gurug-liquidity,
+  .workspace-main > #token-info,
+  .workspace-main > #links.links-section {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  .workspace-main > section:not(.swap-section) > *,
+  .workspace-main > #liquidity.gurug-liquidity > *,
+  .workspace-main > #token-info > *,
+  .workspace-main > #links.links-section > * {
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main .platform-placeholder-head,
+  .workspace-main .platform-placeholder-body,
+  .workspace-main .platform-form,
+  .workspace-main .platform-card,
+  .workspace-main .token-info-card,
+  .workspace-main .liquidity-heading,
+  .workspace-main .liquidity-grid,
+  .workspace-main .liquidity-card,
+  .workspace-main .liquidity-help,
+  .workspace-main .token-authority-card,
+  .workspace-main .metadata-card,
+  .workspace-main .burn-card,
+  .workspace-main .mint-card,
+  .workspace-main .distribute-card {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .workspace-main .liquidity-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+@media (max-width: 520px) {
+  .workspace-shell {
+    width: calc(100% - 4px) !important;
+    margin-left: 2px !important;
+    margin-right: 2px !important;
+  }
+  .workspace-main > section:not(.swap-section),
+  .workspace-main > #liquidity.gurug-liquidity,
+  .workspace-main > #token-info,
+  .workspace-main > #links.links-section {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    border-radius: 14px !important;
+  }
+  .workspace-main .platform-placeholder-head,
+  .workspace-main .platform-placeholder-body {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  .workspace-main .platform-form,
+  .workspace-main .platform-card,
+  .workspace-main .liquidity-card,
+  .workspace-main .liquidity-help {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
