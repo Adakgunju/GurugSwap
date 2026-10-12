@@ -358,7 +358,7 @@
     </div>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=44"></script>
+  <script src="script.js?v=45"></script>
   <script src="create-token-v15.js?v=27"></script>
   <script src="distribute-token.js?v=7"></script>
   <script src="multi-airdrop.js?v=9"></script>
@@ -442,11 +442,29 @@
               chartEl.href = "https://dexscreener.com/solana/" + GURUG_PAIR;
             }
 
-            const marketRes = await fetch(
-              "https://api.dexscreener.com/latest/dex/pairs/solana/" + GURUG_PAIR,
-              {cache:"no-store"}
-            );
-            market = await marketRes.json();
+            let pairData = null;
+            try {
+              const pairRes = await fetch(
+                "https://api.dexscreener.com/latest/dex/pairs/solana/" + GURUG_PAIR,
+                {cache:"no-store"}
+              );
+              if (pairRes.ok) pairData = await pairRes.json();
+            } catch (pairError) {
+              console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+            }
+            let gurugPairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+            if (!gurugPairs.some(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase())) {
+              const tokenRes = await fetch(
+                "https://api.dexscreener.com/latest/dex/tokens/" + GURUG_MINT,
+                {cache:"no-store"}
+              );
+              if (tokenRes.ok) {
+                const tokenData = await tokenRes.json();
+                gurugPairs = (Array.isArray(tokenData?.pairs) ? tokenData.pairs : [])
+                  .filter(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase());
+              }
+            }
+            market = {pairs: gurugPairs};
           } else {
             const res = await fetch(
               "https://lite-api.jup.ag/tokens/v2/search?query=" +
