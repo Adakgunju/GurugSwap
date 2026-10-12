@@ -82,8 +82,20 @@
         statusMeta.textContent = `${String(data.strategy || "DCA").toUpperCase()} / ${String(data.side || "BUY").toUpperCase()}`;
         statusMessage.textContent = `Backend connected. Wallet ${data.wallet_matches ? "verified" : "mismatch"} · Balance ${Number(data.sol_balance || 0).toFixed(4)} SOL · Price ${data.market_price_usd == null ? "—" : "$" + Number(data.market_price_usd).toFixed(6)}.`;
         if (startButton) {
-          startButton.dataset.enabled = Number(data.enabled) === 1 ? "1" : "0";
-          startButton.textContent = Number(data.enabled) === 1 ? "STOP BOT" : "START BOT";
+          // Treat the backend as the source of truth. Never show START while
+          // the backend reports enabled=1, because that could hide a live bot.
+          const backendEnabled = Number(data.enabled) === 1;
+          startButton.dataset.enabled = backendEnabled ? "1" : "0";
+          startButton.textContent = backendEnabled ? "STOP BOT" : "START BOT";
+          startButton.setAttribute(
+            "aria-label",
+            backendEnabled
+              ? "Stop trading bot; backend reports it is active"
+              : "Start trading bot"
+          );
+          if (backendEnabled) {
+            statusMessage.textContent = "The backend reports the bot is enabled. Verify the Cloudflare bot settings before trading.";
+          }
           updateStartButtonState();
         }
       }
