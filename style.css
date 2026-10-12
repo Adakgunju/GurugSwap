@@ -5974,3 +5974,79 @@ body .workspace-main.single-section-view>#token-info.single-section-companion{ma
  body .topbar .desktop-nav>a,body .topbar .desktop-nav .build-menu>summary{min-height:34px!important;padding:0 10px!important;font-size:10px!important}
  body footer{min-height:70px!important;flex-wrap:wrap!important;justify-content:center!important;text-align:center!important;gap:10px 20px!important;padding:18px 14px!important;font-size:9px!important;margin-top:36px!important}
 }
+
+
+/* === HEADER LAYOUT RECOVERY: keep brand, nav, and wallet in separate columns === */
+body .topbar{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;
+  align-items:center!important;
+  justify-content:initial!important;
+  column-gap:clamp(12px,2vw,30px)!important;
+  width:100%!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  overflow:visible!important;
+}
+body .topbar>.brand{
+  grid-column:1!important;
+  justify-self:start!important;
+  min-width:0!important;
+}
+body .topbar>.desktop-nav{
+  position:static!important;
+  inset:auto!important;
+  transform:none!important;
+  grid-column:2!important;
+  justify-self:center!important;
+  min-width:0!important;
+  width:max-content!important;
+  max-width:100%!important;
+  flex-wrap:nowrap!important;
+  gap:clamp(5px,1vw,14px)!important;
+}
+body .topbar>.top-actions{
+  grid-column:3!important;
+  justify-self:end!important;
+  min-width:0!important;
+  width:max-content!important;
+  max-width:100%!important;
+  flex-wrap:nowrap!important;
+}
+body .topbar .desktop-nav>a,
+body .topbar .desktop-nav>.build-menu>summary{
+  flex-shrink:0!important;
+  white-space:nowrap!important;
+  padding-left:clamp(8px,1vw,15px)!important;
+  padding-right:clamp(8px,1vw,15px)!important;
+}
+body .topbar .top-wallet{
+  flex:0 0 auto!important;
+  min-width:142px!important;
+  max-width:none!important;
+  white-space:nowrap!important;
+}
+@media(max-width:1100px) and (min-width:901px){
+  body .topbar{column-gap:10px!important;padding-left:20px!important;padding-right:20px!important}
+  body .topbar .brand>span{font-size:17px!important}
+  body .topbar .brand-logo{width:36px!important;height:36px!important}
+  body .topbar>.desktop-nav{gap:2px!important}
+  body .topbar .desktop-nav>a,
+  body .topbar .desktop-nav>.build-menu>summary{padding-left:7px!important;padding-right:7px!important;font-size:10px!important}
+  body .topbar .top-wallet{min-width:124px!important;padding-left:12px!important;padding-right:12px!important}
+}
+@media(max-width:900px){
+  body .topbar{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    column-gap:12px!important;
+    min-height:66px!important;
+    height:auto!important;
+    padding:8px 16px!important;
+  }
+  body .topbar>.brand{grid-column:1!important;grid-row:1!important}
+  body .topbar>.desktop-nav{display:none!important}
+  body .topbar>.top-actions{grid-column:2!important;grid-row:1!important;gap:8px!important}
+  body .topbar .market-ticker{display:none!important}
+  body .topbar .mobile-menu-btn{display:block!important;flex:0 0 auto!important}
+  body .topbar .top-wallet{min-width:0!important;max-width:180px!important;padding:0 12px!important;min-height:38px!important;font-size:9px!important}
+}
