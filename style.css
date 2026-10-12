@@ -9429,3 +9429,28 @@ body .topbar>.brand .accent{
     font-size: 9px !important;
   }
 }
+
+
+/* MOBILE HEADER REFINEMENT — slightly larger brand, clearer gap between actions. */
+@media (max-width: 560px) {
+  body .topbar {
+    column-gap: 10px !important;
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+  body .topbar > .brand {
+    gap: 6px !important;
+  }
+  body .topbar > .brand > svg.brand-mark {
+    flex-basis: 29px !important;
+    width: 29px !important;
+    height: 29px !important;
+  }
+  body .topbar > .brand > span {
+    font-size: clamp(12px, 3.5vw, 16px) !important;
+    letter-spacing: -0.055em !important;
+  }
+  body .topbar > .top-actions {
+    gap: 10px !important;
+  }
+}
