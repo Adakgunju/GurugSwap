@@ -5297,3 +5297,186 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 #authorityModal{background:rgba(2,5,16,.78)!important;backdrop-filter:blur(10px)!important}
 #authorityModal>div{background:linear-gradient(145deg,#141a36,#0a1023)!important;color:#f4f6ff!important;border:1px solid rgba(115,126,255,.45)!important;border-radius:20px!important;box-shadow:0 25px 80px rgba(0,0,0,.6),0 0 35px rgba(95,65,255,.15)!important}
 @media(max-width:760px){.create-token-card,.distribute-card,.distribute-help,.liquidity-card,.liquidity-help,.multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,.token-metadata-card,.token-mint-card{border-radius:17px!important}}
+
+
+/* === SATURATED BRAND COLOR PASS: eliminate washed-out pastel appearance === */
+:root{
+ --brand-ink:#ffffff;--brand-muted:#c0c9e7;--brand-violet:#713cff;
+ --brand-magenta:#ff20a8;--brand-cyan:#00e5ff;--brand-yellow:#ffd21f;
+}
+/* Global shell: stronger luminous color instead of a pale cream wash */
+body{
+ background:
+  radial-gradient(ellipse at 10% 8%,rgba(0,224,255,.17),transparent 27%),
+  radial-gradient(ellipse at 91% 10%,rgba(255,24,165,.18),transparent 30%),
+  radial-gradient(ellipse at 55% 74%,rgba(109,48,255,.14),transparent 34%),
+  #080b18!important;
+ color:#f6f7ff!important;
+}
+.topbar,.mobile-menu{
+ background:rgba(8,11,25,.94)!important;
+ border-color:rgba(88,111,255,.35)!important;
+ box-shadow:0 8px 30px rgba(0,0,0,.25)!important;
+ backdrop-filter:blur(18px)!important;
+}
+.topbar a,.desktop-nav a,.build-menu summary,.mobile-menu a{color:#f0f3ff!important}
+.desktop-nav a.active,.desktop-nav a:hover,.mobile-menu a:hover{
+ color:#fff!important;background:linear-gradient(110deg,#154dff,#792cff 55%,#f521a5)!important;
+ box-shadow:0 0 22px rgba(105,60,255,.35)!important;
+}
+.wallet-connect,.top-actions button,.connect-wallet,.hero-cta,.primary-button{
+ color:#fff!important;background:linear-gradient(105deg,#075dff,#7538ff 48%,#f51aa6)!important;
+ border:1px solid rgba(255,255,255,.22)!important;
+ box-shadow:0 8px 26px rgba(88,50,255,.35)!important;
+}
+/* Hero is intentionally dark and vivid; preserve readable white typography. */
+.landing-stage,.hero,.hero-section,.landing-hero{
+ background:
+  radial-gradient(ellipse at 77% 38%,rgba(255,24,166,.28),transparent 28%),
+  radial-gradient(ellipse at 18% 72%,rgba(0,220,255,.25),transparent 32%),
+  linear-gradient(115deg,#080d25 0%,#11113b 42%,#260b3d 72%,#100b20 100%)!important;
+ border-color:rgba(110,91,255,.35)!important;
+ color:#fff!important;
+}
+.landing-stage h1,.hero h1,.hero-section h1,.landing-hero h1,
+.landing-stage h2,.hero h2,.hero-section h2,.landing-hero h2{color:#fff!important}
+.landing-stage p,.hero p,.hero-section p,.landing-hero p{color:#c2cbed!important}
+.landing-stage h1 span,.hero h1 span,.hero-section h1 span,.landing-hero h1 span,
+.section-title-accent{
+ background:linear-gradient(95deg,#ffd21f 0%,#ff6a28 24%,#ff22a8 51%,#8a35ff 76%,#00e5ff 100%)!important;
+ -webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+}
+.landing-feature,.feature-card,.landing-feature-grid .landing-feature{
+ background:linear-gradient(145deg,rgba(21,28,62,.96),rgba(11,16,38,.98))!important;
+ border:1px solid rgba(100,121,255,.36)!important;color:#fff!important;
+ box-shadow:0 12px 30px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.05)!important;
+}
+.landing-feature:nth-child(3n+1){border-top:3px solid #00e5ff!important}
+.landing-feature:nth-child(3n+2){border-top:3px solid #ff20a8!important}
+.landing-feature:nth-child(3n){border-top:3px solid #ffd21f!important}
+.landing-feature h3,.feature-card h3{color:#fff!important}
+.landing-feature p,.feature-card p{color:#b9c5e8!important}
+/* Token info and trading dashboard: deep surfaces with crisp high-energy accents. */
+.token-info-card,.trading-bot-card,.token-info-stats>div,.bot-strategy,
+.links-section .link-card{
+ background:linear-gradient(145deg,#141a32,#090e20)!important;
+ border:1px solid rgba(96,119,255,.35)!important;
+ color:#f5f7ff!important;box-shadow:0 16px 42px rgba(0,0,0,.3)!important;
+}
+.token-info-card h2,.token-info-card h3,.trading-bot-card h2,.trading-bot-card h3,
+.bot-strategy h3,.links-section .link-card h3{color:#fff!important}
+.token-info-card p,.token-info-card span,.trading-bot-card p,.trading-bot-card label,
+.about-copy,.about-meta,footer{color:#b8c4e7!important}
+.token-info-stats>div:nth-child(4n+1){border-top:3px solid #00e5ff!important}
+.token-info-stats>div:nth-child(4n+2){border-top:3px solid #ff20a8!important}
+.token-info-stats>div:nth-child(4n+3){border-top:3px solid #ffd21f!important}
+.token-info-stats>div:nth-child(4n){border-top:3px solid #8a35ff!important}
+.bot-strategy.active{background:linear-gradient(120deg,#184fff,#752cff 58%,#ed20a4)!important;border-color:#b9a0ff!important;color:#fff!important}
+.links-section .link-card:nth-child(3n+1){background:linear-gradient(135deg,#071c46,#1239a6)!important}
+.links-section .link-card:nth-child(3n+2){background:linear-gradient(135deg,#3a073c,#a20b72)!important}
+.links-section .link-card:nth-child(3n){background:linear-gradient(135deg,#3c2300,#a94b00)!important}
+.links-section .link-card.featured{background:linear-gradient(110deg,#ffd21f,#ff6a28,#ff20a8)!important;color:#130d24!important}
+/* Feature windows should feel like a premium DEX, not pale form cards. */
+.create-token-card,.distribute-card,.distribute-help,.liquidity-card,.liquidity-help,
+.multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,
+.token-metadata-card,.token-mint-card{
+ background:
+  radial-gradient(ellipse at 100% 0%,rgba(142,44,255,.24),transparent 36%),
+  radial-gradient(ellipse at 0% 100%,rgba(0,207,255,.15),transparent 40%),
+  linear-gradient(145deg,#141a32 0%,#090e20 60%,#170c2b 100%)!important;
+ border:1px solid rgba(111,128,255,.44)!important;
+ box-shadow:0 24px 60px rgba(0,0,0,.42),0 0 24px rgba(97,54,255,.11)!important;
+ color:#f7f8ff!important;
+}
+.create-token-card:before,.distribute-card:before,.liquidity-card:before,
+.multi-airdrop-card:before,.token-burn-card:before,.token-authority-card:before,
+.token-metadata-card:before,.token-mint-card:before{
+ background:linear-gradient(90deg,#00e5ff,#214dff,#9637ff,#ff20a8,#ffd21f)!important;height:4px!important
+}
+.create-token-title,.liquidity-title,.token-mint-card h2,.token-mint-card h3,
+.distribute-title,.token-metadata-head h3,.token-burn-head,.token-authority-head,
+.authority-row h3,.authority-row-top h3,.liq-step strong,.liq-help h3{color:#fff!important}
+.create-token-kicker,.distribute-kicker,.liquidity-kicker,.token-mint-kicker,
+.create-token-cost-title,.token-metadata-kicker,.authority-kicker{color:#00e5ff!important}
+.create-token-copy,.distribute-lead,.liquidity-sub,.create-token-note,
+.create-token-field small,.create-token-warning,.create-token-help,.distribute-note,
+.liq-note,.liq-status,.multi-airdrop-help,.token-metadata-head p,
+.token-metadata-note,.token-burn-balance,.multi-airdrop-hint,
+.multi-airdrop-help-step,.token-metadata-current-copy small,.token-mint-card p{color:#b9c5e8!important}
+.create-token-field label,.token-mint-field label,.distribute-label,.liq-label,
+.multi-airdrop-label,.token-burn-fields label small,.token-authority-lookup label small,
+.authority-current small,.authority-new small,.token-metadata-lookup label small,
+#create-token label,#distributeTokens label,#liquidity label,#multi-airdrop label,
+#token-burn label,#authority-manager label,#token-mint label,#tokenMetadataApp label{color:#e0e6ff!important}
+.create-token-field input,.token-mint-field input,.distribute-input,.distribute-row input,
+.liq-input,.multi-airdrop-input,.multi-airdrop-addresses,.multi-airdrop-amount,
+.token-burn-fields input,.token-authority-lookup input,.authority-new input,
+.token-metadata-lookup input,.token-metadata-upload,.bot-field input,.bot-field select,.bot-field textarea{
+ background:#080d1d!important;color:#fff!important;border:1px solid rgba(103,130,255,.48)!important;
+ box-shadow:inset 0 2px 8px rgba(0,0,0,.32)!important
+}
+.create-token-field input::placeholder,.token-mint-field input::placeholder,
+.distribute-input::placeholder,.distribute-row input::placeholder,.liq-input::placeholder,
+.multi-airdrop-input::placeholder,.token-burn-fields input::placeholder,
+.token-authority-lookup input::placeholder,.authority-new input::placeholder,
+.token-metadata-lookup input::placeholder{color:#7785ac!important}
+.create-token-field input:focus,.token-mint-field input:focus,.distribute-input:focus,
+.distribute-row input:focus,.liq-input:focus,.multi-airdrop-input:focus,
+.multi-airdrop-addresses:focus,.multi-airdrop-amount:focus,.token-burn-fields input:focus,
+.token-authority-lookup input:focus,.authority-new input:focus,.token-metadata-lookup input:focus{
+ border-color:#00e5ff!important;box-shadow:0 0 0 3px rgba(0,229,255,.17),0 0 20px rgba(98,67,255,.18)!important
+}
+.create-token-options,.create-token-check,.token-mint-check,.token-mint-meta-box,
+.create-token-cost-row,.create-token-cost-total,.distribute-summary,.multi-airdrop-summary,
+.multi-airdrop-stat,.liq-box,.liq-summary,.token-metadata-current,.token-metadata-details,
+.token-burn-status,.token-mint-status,.create-token-result,.distribute-results,
+.multi-airdrop-results,.token-metadata-note,.token-authority-note,.authority-current,
+.authority-new,.authority-row{
+ color:#f4f6ff!important;background:linear-gradient(145deg,#1a2142,#0c1229)!important;
+ border:1px solid rgba(97,121,255,.35)!important;box-shadow:inset 0 1px rgba(255,255,255,.04)!important
+}
+.create-token-cost-row:nth-child(odd),.distribute-stat:nth-child(odd),
+.multi-airdrop-stat:nth-child(odd),.token-mint-meta-box:nth-child(odd){background:linear-gradient(100deg,rgba(0,220,255,.13),#141c38)!important}
+.create-token-cost-row:nth-child(even),.distribute-stat:nth-child(even),
+.multi-airdrop-stat:nth-child(even),.token-mint-meta-box:nth-child(even){background:linear-gradient(100deg,rgba(255,32,168,.14),#191633)!important}
+.create-token-cost-total{background:linear-gradient(100deg,#a96300,#ed287f,#6c35ff)!important;color:#fff!important;border-color:#ff78c8!important}
+.distribute-summary{background:linear-gradient(120deg,#064c60,#142d6c,#30205e)!important}
+.multi-airdrop-summary{background:linear-gradient(120deg,#4a0d46,#671a83,#18234e)!important}
+.liq-summary{background:linear-gradient(120deg,#063d79,#2434a1,#3c1b6d)!important}
+.token-metadata-current,.token-metadata-details{background:linear-gradient(120deg,#2c155b,#19214b)!important}
+.token-burn-status{background:linear-gradient(120deg,#63220d,#53113b,#1b173b)!important}
+.token-mint-status{background:linear-gradient(120deg,#075344,#064e78,#1c2862)!important}
+.create-token-cost-row strong,.create-token-cost-total strong,.distribute-stat strong,
+.multi-airdrop-stat strong,.liq-box strong,.liq-summary strong,.token-mint-meta-box strong,
+.token-metadata-current strong,.token-burn-balance strong,.authority-current code{color:#fff!important}
+.create-token-button,.distribute-action,.liq-action,.multi-airdrop-action,.token-mint-button,
+.token-burn-button,.token-authority-lookup .connect,.token-metadata-lookup .connect,#tokenMetadataApp .connect{
+ color:#fff!important;background:linear-gradient(105deg,#075dff 0%,#713cff 36%,#d91bdb 69%,#ff258d 100%)!important;
+ border:1px solid rgba(255,255,255,.2)!important;box-shadow:0 8px 28px rgba(104,50,255,.38),inset 0 1px rgba(255,255,255,.2)!important
+}
+.distribute-use-created,.distribute-add,.multi-airdrop-secondary,.token-burn-max{
+ color:#dce4ff!important;background:linear-gradient(110deg,#163e92,#422080)!important;border:1px solid rgba(107,137,255,.45)!important
+}
+.distribute-remove,.authority-revoke{background:linear-gradient(110deg,#7d123d,#4e174e)!important;color:#ffb6d5!important;border:1px solid #ff428f!important}
+.authority-change{color:#fff!important;background:linear-gradient(100deg,#075dff,#713cff,#d91bdb)!important}
+.authority-state{color:#e3dcff!important;background:#30215f!important;border:1px solid #7656df!important}
+.authority-row[data-type="freeze"]{background:linear-gradient(145deg,#073c56,#111c39)!important}
+.liq-box{background:linear-gradient(135deg,#0b3a67,#151d3e)!important}
+.liq-box:nth-child(2n){background:linear-gradient(135deg,#35155f,#151735)!important}
+.liq-num,.multi-airdrop-help-num,.distribute-help-num,.create-token-help-num{
+ color:#fff!important;background:linear-gradient(145deg,#00cfff,#3b45ff 52%,#ed1cba)!important;box-shadow:0 0 20px rgba(76,91,255,.35)!important
+}
+.liq-link,.create-token-result a,.distribute-result a,.multi-airdrop-result a,
+.token-mint-tx,.token-burn-status a,.token-authority-card a,.token-metadata-card a,
+.token-mint-status a,.create-token-result-links a{color:#00e5ff!important;font-weight:800!important}
+.create-token-result-address,.distribute-result,.multi-airdrop-result{
+ background:linear-gradient(120deg,#063f48,#18265c,#291345)!important;border:1px solid rgba(0,229,255,.38)!important;color:#fff!important
+}
+.create-token-result-address code,.distribute-result code,.multi-airdrop-result code,
+.token-metadata-card code,.authority-current code{color:#fff!important}
+.token-burn-head,.token-authority-head,.token-metadata-head{border-bottom:1px solid rgba(100,126,255,.34)!important}
+.token-burn-live,.token-authority-live,.token-metadata-network{color:#68ffe1!important;background:rgba(0,221,175,.13)!important;border-color:rgba(42,255,207,.35)!important}
+.token-burn-dot,.token-mint-dot{background:#00ffd0!important;box-shadow:0 0 13px rgba(0,255,208,.8)!important}
+#authorityModal{background:rgba(2,5,16,.82)!important;backdrop-filter:blur(10px)!important}
+#authorityModal>div{background:linear-gradient(145deg,#171d3b,#090e20)!important;color:#fff!important;border:1px solid rgba(115,126,255,.5)!important;box-shadow:0 25px 80px rgba(0,0,0,.65),0 0 36px rgba(95,65,255,.2)!important}
+@media(max-width:850px){.topbar{background:rgba(8,11,25,.96)!important}}
