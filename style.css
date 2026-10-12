@@ -6376,3 +6376,33 @@ body .workspace-main>#token-info .token-info-foot a:hover{text-decoration:underl
   body .workspace-main>#token-info .token-info-stats strong{font-size:17px!important}
   body .workspace-main>#token-info #tokenInfoMint{font-size:9px!important}
 }
+
+
+/* === RESTORE PREVIOUS WORDMARK LOOK: white, upright, wider geometric type === */
+body .topbar>.brand>span{
+  font-family:'Outfit','Space Grotesk',sans-serif!important;
+  font-size:21px!important;
+  font-weight:900!important;
+  font-style:normal!important;
+  letter-spacing:-.035em!important;
+  line-height:1!important;
+  transform:scaleX(1.08)!important;
+  transform-origin:left center!important;
+  color:#fff!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  text-shadow:none!important;
+}
+body .topbar>.brand .accent{
+  font-family:'Outfit','Space Grotesk',sans-serif!important;
+  font-weight:900!important;
+  font-style:normal!important;
+  letter-spacing:-.035em!important;
+  color:#fff!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+}
+@media(max-width:900px){body .topbar>.brand>span{font-size:18px!important}}
+@media(max-width:560px){body .topbar>.brand>span{font-size:16px!important;transform:none!important}}
