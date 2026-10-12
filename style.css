@@ -7944,3 +7944,99 @@ body .workspace-main>#token-burn.token-burn-section #tokenBurnApp .token-burn-fo
   body .workspace-main>#token-burn.token-burn-section #tokenBurnApp .token-burn-head{align-items:flex-start!important;flex-direction:column!important}
   body .workspace-main>#token-burn.token-burn-section #tokenBurnApp .token-burn-foot{font-size:8px!important;letter-spacing:.08em!important}
 }
+
+
+/* TRADING BOT — premium control panel, readable fields and status hierarchy */
+body .workspace-main>#trading-bot.trading-bot-section{
+  width:100%!important;box-sizing:border-box!important;
+  margin:0 0 42px!important;padding:34px clamp(20px,4vw,64px) 52px!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  background:radial-gradient(ellipse at 4% 12%,rgba(0,220,245,.08),transparent 35%),radial-gradient(ellipse at 96% 0%,rgba(213,58,187,.08),transparent 38%)!important;
+}
+body .workspace-main>#trading-bot .trading-bot-intro{max-width:1320px!important;margin:0 auto 26px!important}
+body .workspace-main>#trading-bot .platform-section-kicker{color:#54e7f5!important;font-size:11px!important;font-weight:900!important;letter-spacing:.16em!important}
+body .workspace-main>#trading-bot .trading-bot-intro h2{margin:10px 0 13px!important;color:#f7f8ff!important;font-size:clamp(32px,3.4vw,46px)!important;line-height:1.1!important;letter-spacing:-.045em!important}
+body .workspace-main>#trading-bot .trading-bot-intro .section-title-accent{background:linear-gradient(100deg,#58e8f3,#8874ff 55%,#f05ab8)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+body .workspace-main>#trading-bot .trading-bot-intro p{max-width:780px!important;margin:0!important;color:#c0cbea!important;font-size:14px!important;line-height:1.7!important}
+body .workspace-main>#trading-bot .trading-bot-card{
+  position:relative!important;width:100%!important;max-width:1320px!important;box-sizing:border-box!important;
+  margin:0 auto!important;padding:clamp(20px,2vw,30px)!important;
+  border:1px solid rgba(111,133,205,.34)!important;border-radius:22px!important;
+  background:radial-gradient(ellipse at 100% 0%,rgba(117,69,255,.13),transparent 40%),linear-gradient(145deg,#121a30 0%,#0b1122 72%,#151027 100%)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.04)!important;color:#f5f7ff!important;
+}
+body .workspace-main>#trading-bot .trading-bot-head{align-items:flex-start!important;gap:18px!important;margin-bottom:23px!important}
+body .workspace-main>#trading-bot .trading-bot-kicker{color:#7d8cff!important;font-size:10px!important;letter-spacing:.16em!important}
+body .workspace-main>#trading-bot .trading-bot-head h3{margin:8px 0!important;color:#f7f8ff!important;font-size:clamp(23px,2.2vw,30px)!important;line-height:1.2!important;letter-spacing:-.04em!important}
+body .workspace-main>#trading-bot .trading-bot-head h3 span{color:#54e7f5!important}
+body .workspace-main>#trading-bot .trading-bot-card .trading-bot-head p{margin:0!important;color:#b9c6e5!important;font-size:13px!important;line-height:1.65!important}
+body .workspace-main>#trading-bot .trading-bot-status-pill{display:flex!important;align-items:center!important;gap:8px!important;max-width:100%!important;padding:9px 12px!important;border:1px solid rgba(117,128,217,.4)!important;border-radius:999px!important;background:rgba(41,47,93,.4)!important;color:#d5ddfa!important;font-size:9px!important;line-height:1.4!important;letter-spacing:.08em!important;white-space:normal!important}
+body .workspace-main>#trading-bot .trading-bot-status-pill i{flex:0 0 7px!important;width:7px!important;height:7px!important;background:#54e7b1!important;box-shadow:0 0 10px rgba(84,231,177,.4)!important}
+body .workspace-main>#trading-bot .bot-strategy-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important;margin:0 0 22px!important}
+body .workspace-main>#trading-bot .bot-strategy{
+  display:block!important;min-width:0!important;min-height:112px!important;padding:16px!important;box-sizing:border-box!important;text-align:left!important;
+  border:1px solid rgba(112,135,204,.3)!important;border-radius:14px!important;
+  background:linear-gradient(145deg,#121a31,#0c1223)!important;color:#f5f7ff!important;box-shadow:none!important;
+}
+body .workspace-main>#trading-bot .bot-strategy:hover{border-color:rgba(89,219,244,.58)!important;background:linear-gradient(145deg,#182747,#11162b)!important}
+body .workspace-main>#trading-bot .bot-strategy.active{border-color:#625fff!important;background:linear-gradient(145deg,rgba(39,72,151,.5),rgba(78,42,133,.36))!important;box-shadow:inset 0 0 0 1px rgba(99,109,255,.15),0 8px 22px rgba(49,54,145,.14)!important}
+body .workspace-main>#trading-bot .bot-strategy span{margin:0 0 12px!important;color:#8495bb!important;font-size:9px!important}
+body .workspace-main>#trading-bot .bot-strategy.active span{color:#64e6f5!important}
+body .workspace-main>#trading-bot .bot-strategy strong{display:block!important;margin:0 0 7px!important;color:#f6f8ff!important;font-size:12px!important;line-height:1.4!important;font-weight:900!important;letter-spacing:.06em!important}
+body .workspace-main>#trading-bot .bot-strategy small{display:block!important;color:#b9c6e5!important;font-size:11px!important;line-height:1.55!important}
+body .workspace-main>#trading-bot .bot-strategy:disabled{opacity:.58!important;cursor:not-allowed!important}
+body .workspace-main>#trading-bot .bot-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:15px 13px!important}
+body .workspace-main>#trading-bot .bot-field{display:block!important;min-width:0!important}
+body .workspace-main>#trading-bot .bot-field-wide{grid-column:1/-1!important}
+body .workspace-main>#trading-bot .bot-field small{display:block!important;margin:0 0 8px!important;color:#c4d0ee!important;font-size:10px!important;line-height:1.4!important;font-weight:850!important;letter-spacing:.11em!important}
+body .workspace-main>#trading-bot .bot-field input,body .workspace-main>#trading-bot .bot-field select{
+  display:block!important;width:100%!important;min-width:0!important;min-height:51px!important;box-sizing:border-box!important;
+  padding:12px 14px!important;border:1px solid rgba(119,143,214,.35)!important;border-radius:11px!important;outline:0!important;
+  background:#080e1d!important;color:#f7f8ff!important;font:500 14px/1.4 'Space Grotesk',sans-serif!important;
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.2)!important;
+}
+body .workspace-main>#trading-bot .bot-field input::placeholder{color:#8291b4!important;opacity:1!important}
+body .workspace-main>#trading-bot .bot-field input:focus,body .workspace-main>#trading-bot .bot-field select:focus{border-color:#52dff1!important;box-shadow:0 0 0 3px rgba(82,223,241,.11)!important}
+body .workspace-main>#trading-bot .bot-field select option{background:#0b1223!important;color:#f7f8ff!important}
+body .workspace-main>#trading-bot .bot-safety-box{margin-top:19px!important;padding:15px 16px!important;border:1px solid rgba(237,190,83,.3)!important;border-radius:13px!important;background:linear-gradient(110deg,rgba(91,68,23,.25),rgba(32,31,56,.58))!important}
+body .workspace-main>#trading-bot .bot-safety-box>div{gap:10px!important;color:#f1dfb3!important;font-size:10px!important;line-height:1.5!important;letter-spacing:.06em!important}
+body .workspace-main>#trading-bot .bot-safety-box i{display:grid!important;place-items:center!important;flex:0 0 19px!important;width:19px!important;height:19px!important;border-radius:50%!important;background:#f0c45d!important;color:#1b1b24!important}
+body .workspace-main>#trading-bot .bot-safety-box p{margin:9px 0 0 29px!important;color:#c5cbe0!important;font-size:11px!important;line-height:1.65!important}
+body .workspace-main>#trading-bot .bot-actions{display:flex!important;justify-content:flex-end!important;flex-wrap:wrap!important;gap:10px!important;margin-top:18px!important}
+body .workspace-main>#trading-bot .bot-actions button{min-height:50px!important;padding:0 18px!important;border-radius:11px!important;font:900 10px/1.3 'Space Grotesk',sans-serif!important;letter-spacing:.08em!important;cursor:pointer!important}
+body .workspace-main>#trading-bot .bot-secondary{border:1px solid rgba(130,148,202,.38)!important;background:#111a30!important;color:#e0e7fb!important}
+body .workspace-main>#trading-bot .bot-primary{min-width:210px!important;min-height:52px!important;padding:0 22px!important;border:1px solid rgba(255,255,255,.14)!important;background:linear-gradient(105deg,#3158df,#7843e8 55%,#d53cae)!important;color:#fff!important;font-size:12px!important;letter-spacing:.08em!important;box-shadow:0 10px 24px rgba(94,67,224,.2)!important}
+body .workspace-main>#trading-bot .bot-primary:disabled,body .workspace-main>#trading-bot .bot-secondary:disabled{border-color:rgba(112,135,204,.22)!important;background:#26304a!important;color:#8997b8!important;opacity:.7!important;cursor:not-allowed!important;box-shadow:none!important}
+body .workspace-main>#trading-bot .bot-status-card{margin-top:16px!important;padding:15px!important;border:1px solid rgba(112,135,204,.3)!important;border-radius:13px!important;background:linear-gradient(110deg,rgba(24,43,77,.62),rgba(23,22,55,.68))!important}
+body .workspace-main>#trading-bot .bot-status-top{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:9px!important;color:#f5f7ff!important;font-size:10px!important;letter-spacing:.08em!important}
+body .workspace-main>#trading-bot .bot-status-dot{flex:0 0 7px!important;background:#60d8f0!important}
+body .workspace-main>#trading-bot .bot-status-card.success .bot-status-dot{background:#54e7b1!important}
+body .workspace-main>#trading-bot .bot-status-card.error .bot-status-dot{background:#ff7084!important}
+body .workspace-main>#trading-bot #botStatusMeta{margin-left:auto!important;color:#b4c3e6!important;font-weight:750!important}
+body .workspace-main>#trading-bot #botStatusMessage{margin-top:8px!important;color:#c5d2ef!important;font-size:12px!important;line-height:1.65!important;overflow-wrap:anywhere!important}
+body .workspace-main>#trading-bot .bot-history{margin-top:18px!important;border:1px solid rgba(112,135,204,.3)!important;border-radius:14px!important;overflow:hidden!important;background:#0c1325!important}
+body .workspace-main>#trading-bot .bot-history-head{display:flex!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:10px!important;padding:14px 15px!important;border-bottom:1px solid rgba(133,151,202,.2)!important}
+body .workspace-main>#trading-bot .bot-history-head strong{color:#eaf0ff!important;font-size:10px!important;letter-spacing:.1em!important}
+body .workspace-main>#trading-bot .bot-history-head span{color:#8d9fc7!important;font-size:9px!important;letter-spacing:.08em!important}
+body .workspace-main>#trading-bot .bot-history-empty{padding:24px 15px!important;color:#aab9da!important;text-align:center!important;font-size:12px!important}
+body .workspace-main>#trading-bot .bot-history-row{grid-template-columns:.8fr 1.5fr 1.2fr 1fr!important;gap:8px!important;padding:12px 15px!important;border-top:1px solid rgba(133,151,202,.14)!important;color:#cbd6ef!important;font-size:11px!important;letter-spacing:.02em!important}
+body .workspace-main>#trading-bot .bot-history-row span:first-child{color:#6fe4ef!important;font-weight:850!important}
+body .workspace-main>#trading-bot .bot-history-row span:last-child{color:#c4cde4!important;text-align:right!important}
+body .workspace-main>#trading-bot .trading-bot-foot{display:flex!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:12px 18px!important;margin-top:18px!important;padding-top:15px!important;border-top:1px solid rgba(157,171,215,.2)!important;color:#9eaccb!important;font-size:9px!important;line-height:1.4!important;letter-spacing:.1em!important;font-weight:850!important}
+@media(max-width:760px){
+ body .workspace-main>#trading-bot.trading-bot-section{padding:28px 20px 40px!important}
+ body .workspace-main>#trading-bot .trading-bot-head{flex-direction:column!important;align-items:flex-start!important}
+ body .workspace-main>#trading-bot .bot-strategy-grid{grid-template-columns:minmax(0,1fr)!important}
+ body .workspace-main>#trading-bot .bot-strategy{min-height:0!important}
+ body .workspace-main>#trading-bot .bot-form-grid{grid-template-columns:minmax(0,1fr)!important}
+ body .workspace-main>#trading-bot .bot-field-wide{grid-column:auto!important}
+ body .workspace-main>#trading-bot .bot-actions{display:grid!important;grid-template-columns:minmax(0,1fr)!important}
+ body .workspace-main>#trading-bot .bot-actions button,body .workspace-main>#trading-bot .bot-primary{width:100%!important;min-width:0!important}
+ body .workspace-main>#trading-bot #botStatusMeta{margin-left:0!important}
+}
+@media(max-width:560px){
+ body .workspace-main>#trading-bot.trading-bot-section{padding:24px 14px 32px!important}
+ body .workspace-main>#trading-bot .trading-bot-card{padding:17px!important;border-radius:16px!important}
+ body .workspace-main>#trading-bot .trading-bot-intro h2{font-size:31px!important}
+ body .workspace-main>#trading-bot .bot-history-row{grid-template-columns:.8fr 1.2fr 1fr 1fr!important;font-size:9px!important;padding:10px 9px!important}
+}
