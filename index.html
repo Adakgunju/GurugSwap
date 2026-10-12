@@ -404,7 +404,7 @@
       }
 
       async function loadVisibleTokenInfo(force = false) {
-        const symbol = "GURUG"; // Pin this card to Gurug regardless of the selected swap token.
+        const symbol = (toSymbolEl?.textContent || "GURUG").trim().toUpperCase();
         if (!symbol || (!force && symbol === lastSymbol)) return;
         lastSymbol = symbol;
 
@@ -498,7 +498,7 @@
             market = await marketRes.json();
           }
 
-          // Intentionally do not follow the swap selector: this card is Gurug-only.
+          // Keep the market card synchronized with the current TO-token selection.
 
           const pairs = Array.isArray(market?.pairs) ? market.pairs : [];
           const pair = pairs
