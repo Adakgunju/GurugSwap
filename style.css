@@ -8620,3 +8620,31 @@ body .topbar>.brand>span{
 @media(max-width:560px){
  body .topbar>.brand>svg.brand-mark{flex-basis:29px!important;width:29px!important;height:29px!important}
 }
+
+
+/* Header logo refinement: smooth enclosed G glyph and clean wordmark */
+body .topbar>.brand{
+  user-select:none!important;-webkit-user-select:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+body .topbar>.brand>svg.brand-mark{
+  flex:0 0 36px!important;width:36px!important;height:36px!important;
+  filter:drop-shadow(0 0 3px rgba(75,192,255,.09))!important;
+}
+body .topbar>.brand>span{
+  display:inline-flex!important;align-items:center!important;
+  padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+  color:#f6f8ff!important;-webkit-text-fill-color:#f6f8ff!important;
+  user-select:none!important;-webkit-user-select:none!important;
+  text-shadow:none!important;
+}
+body .topbar>.brand .accent{
+  margin-left:4px!important;
+  background:linear-gradient(100deg,#67e6f2 0%,#8796ff 56%,#cb83ff 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;color:transparent!important;
+  text-shadow:none!important;
+}
+@media(max-width:900px){body .topbar>.brand>svg.brand-mark{flex-basis:32px!important;width:32px!important;height:32px!important}}
+@media(max-width:560px){body .topbar>.brand>svg.brand-mark{flex-basis:29px!important;width:29px!important;height:29px!important}}
