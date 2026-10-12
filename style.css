@@ -9454,3 +9454,24 @@ body .topbar>.brand .accent{
     gap: 10px !important;
   }
 }
+
+
+/* MOBILE LANDING HERO SPACING — lift the Solana badge and keep a steady gap to the headline. */
+@media (max-width: 600px) {
+  body .workspace-main > #swap.swap-section {
+    padding-top: 0 !important;
+  }
+  body .workspace-main #swap .landing-stage {
+    padding-top: 0 !important;
+  }
+  body .workspace-main #swap .landing-copy {
+    padding-top: 0 !important;
+  }
+  body .workspace-main #swap .landing-kicker {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  body .workspace-main #swap .landing-copy h2 {
+    margin-top: 12px !important;
+  }
+}
