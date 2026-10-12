@@ -4861,3 +4861,221 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   .landing-mascot img,.landing-mascot:before{animation:none!important}
   *,*:before,*:after{scroll-behavior:auto!important;transition:none!important}
 }
+
+
+/* === FEATURE WINDOWS: move every tool off black panels into vivid, readable color === */
+:root{
+  --tool-ink:#28223f;--tool-muted:#706985;--tool-purple:#7955f5;
+  --tool-pink:#ff6da9;--tool-cyan:#35cbbb;--tool-gold:#ffc84c;
+}
+#create-token,.distribute-section,#liquidity.gurug-liquidity,#token-mint,
+#multi-airdrop,#token-burn,#authority-manager,#tokenMetadataApp{
+  color:var(--tool-ink)!important;
+}
+.create-token-card,.distribute-card,.distribute-help,.liquidity-card,.liquidity-help,
+.multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,
+.token-metadata-card,.token-mint-card{
+  color:var(--tool-ink)!important;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(255,113,176,.17),transparent 34%),
+    radial-gradient(ellipse at 0% 100%,rgba(54,207,193,.15),transparent 36%),
+    linear-gradient(145deg,rgba(255,255,255,.98),rgba(246,241,255,.96))!important;
+  border:1px solid rgba(255,255,255,.98)!important;
+  border-radius:24px!important;
+  box-shadow:0 25px 65px rgba(74,52,139,.12),inset 0 1px white!important;
+}
+.create-token-title,.liquidity-title,.token-mint-card h2,.token-mint-card h3,
+.distribute-title,.token-metadata-head h3,.token-burn-head,.token-authority-head{
+  color:#29213f!important;
+}
+.create-token-kicker,.distribute-kicker,.liquidity-kicker,.token-mint-kicker,
+.create-token-cost-title,.token-metadata-kicker{
+  color:#7955f5!important;
+}
+.create-token-copy,.distribute-lead,.liquidity-sub,.create-token-note,
+.create-token-field small,.create-token-warning,.create-token-help,
+.distribute-note,.liq-note,.liq-status,.multi-airdrop-help,
+.token-metadata-head p,.token-metadata-note,.token-burn-balance{
+  color:var(--tool-muted)!important;
+}
+.create-token-network,.token-mint-network,.token-burn-live,.token-authority-live,
+.token-metadata-network{
+  color:#7150d8!important;background:linear-gradient(100deg,#eee7ff,#ffe7f2)!important;
+  border:1px solid rgba(133,97,255,.18)!important;border-radius:999px!important;
+}
+.create-token-field label,.token-mint-field label,.distribute-label,.liq-label,
+.multi-airdrop-label,.token-burn-fields label small,.token-authority-lookup label small,
+.authority-current small,.authority-new small,.token-metadata-lookup label small{
+  color:#625a7c!important;
+}
+.create-token-field input,.token-mint-field input,.distribute-input,.distribute-row input,
+.liq-input,.multi-airdrop-input,.multi-airdrop-addresses,.multi-airdrop-amount,
+.token-burn-fields input,.token-authority-lookup input,.authority-new input,
+.token-metadata-lookup input,.token-metadata-upload{
+  color:#2d2645!important;background:rgba(255,255,255,.94)!important;
+  border:1px solid rgba(126,93,234,.22)!important;border-radius:12px!important;
+  box-shadow:inset 0 1px 2px rgba(73,50,131,.025)!important;
+}
+.create-token-field input::placeholder,.token-mint-field input::placeholder,
+.distribute-input::placeholder,.distribute-row input::placeholder,
+.liq-input::placeholder,.multi-airdrop-input::placeholder,
+.token-burn-fields input::placeholder,.token-authority-lookup input::placeholder,
+.authority-new input::placeholder,.token-metadata-lookup input::placeholder{
+  color:#aaa4bd!important;
+}
+.create-token-field input:focus,.token-mint-field input:focus,
+.distribute-input:focus,.distribute-row input:focus,.liq-input:focus,
+.multi-airdrop-input:focus,.multi-airdrop-addresses:focus,.multi-airdrop-amount:focus,
+.token-burn-fields input:focus,.token-authority-lookup input:focus,
+.authority-new input:focus,.token-metadata-lookup input:focus{
+  border-color:#9474ff!important;box-shadow:0 0 0 4px rgba(131,96,255,.12)!important;
+}
+.create-token-options,.create-token-check,.token-mint-check,.token-mint-meta-box,
+.create-token-cost-row,.create-token-cost-total,.distribute-summary,
+.multi-airdrop-summary,.multi-airdrop-stat,.liq-box,.liq-summary,
+.token-metadata-current,.token-metadata-details,.token-burn-status,
+.token-mint-status,.create-token-result,.distribute-results,.multi-airdrop-results,
+.token-metadata-note,.token-authority-note{
+  color:#3a3155!important;background:linear-gradient(135deg,#fff,#f2edff)!important;
+  border-color:rgba(130,97,236,.16)!important;border-radius:14px!important;
+}
+.create-token-check.active,.token-mint-check.active{
+  color:#4f36b5!important;background:linear-gradient(110deg,#e8e0ff,#ffe6f1)!important;
+  border-color:rgba(133,97,255,.35)!important;
+}
+.create-token-cost-row:nth-child(odd),.distribute-stat:nth-child(odd),
+.multi-airdrop-stat:nth-child(odd),.token-mint-meta-box:nth-child(odd){
+  background:linear-gradient(135deg,#fff7d7,#fff)!important;
+}
+.create-token-cost-row:nth-child(even),.distribute-stat:nth-child(even),
+.multi-airdrop-stat:nth-child(even),.token-mint-meta-box:nth-child(even){
+  background:linear-gradient(135deg,#e4fff8,#fff)!important;
+}
+.create-token-cost-row strong,.create-token-cost-total strong,
+.distribute-stat strong,.multi-airdrop-stat strong,.liq-box strong,
+.liq-summary strong,.token-mint-meta-box strong,.token-metadata-current strong,
+.token-burn-balance strong,.authority-current code{
+  color:#33284e!important;overflow-wrap:anywhere!important;
+}
+.distribute-grid,.liquidity-grid,.multi-airdrop-controls,.multi-airdrop-address-editor,
+.token-authority-grid,.token-metadata-details,.token-burn-fields{
+  gap:14px!important;
+}
+.distribute-card,.liquidity-card,.multi-airdrop-card,.token-burn-card,
+.token-authority-card,.token-metadata-card,.token-mint-card,.create-token-card{
+  padding:clamp(18px,2.5vw,30px)!important;
+}
+.distribute-card,.liquidity-card,.multi-airdrop-card,.create-token-card,
+.token-mint-card,.token-burn-card,.token-authority-card,.token-metadata-card{
+  position:relative!important;overflow:hidden!important;
+}
+.distribute-card:before,.liquidity-card:before,.multi-airdrop-card:before,
+.create-token-card:before,.token-mint-card:before,.token-burn-card:before,
+.token-authority-card:before,.token-metadata-card:before{
+  content:""!important;position:absolute!important;pointer-events:none!important;
+  inset:0 0 auto!important;height:5px!important;
+  background:linear-gradient(90deg,#ffd84d,#ff8bb8,#9678ff,#53d9c8)!important;
+}
+.create-token-button,.distribute-action,.liq-action,.multi-airdrop-action,
+.token-mint-button,.token-burn-button,.token-authority-lookup .connect,
+.token-metadata-lookup .connect,#tokenMetadataApp .connect{
+  color:#fff!important;border:0!important;border-radius:13px!important;
+  background:linear-gradient(105deg,#7654f6 0%,#a15ae8 36%,#ff68a8 70%,#ffae4a 100%)!important;
+  box-shadow:0 11px 24px rgba(128,83,231,.2)!important;
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!important;
+}
+.create-token-button:hover,.distribute-action:hover,.liq-action:hover,
+.multi-airdrop-action:hover,.token-mint-button:hover,.token-burn-button:hover,
+.token-authority-lookup .connect:hover,.token-metadata-lookup .connect:hover{
+  transform:translateY(-2px)!important;filter:saturate(1.12)!important;
+  box-shadow:0 15px 30px rgba(128,83,231,.27)!important;
+}
+.create-token-button:disabled,.distribute-action:disabled,.liq-action:disabled,
+.multi-airdrop-action:disabled,.token-mint-button:disabled,.token-burn-button:disabled,
+.token-authority-lookup .connect:disabled{
+  opacity:.48!important;filter:grayscale(.25)!important;transform:none!important;
+}
+.distribute-use-created,.distribute-add,.multi-airdrop-secondary,
+.token-burn-max,.authority-change,.authority-revoke,.token-metadata-lookup button{
+  border-radius:10px!important;font-weight:800!important;
+}
+.distribute-use-created,.distribute-add,.multi-airdrop-secondary,.token-burn-max{
+  color:#6547c7!important;background:linear-gradient(120deg,#eee7ff,#ffe9f3)!important;
+  border:1px solid rgba(125,89,236,.2)!important;
+}
+.distribute-remove{background:#fff0f4!important;color:#d4477b!important;border:1px solid #ffd0e0!important}
+.distribute-summary,.multi-airdrop-summary{display:grid!important;gap:9px!important}
+.distribute-stat,.multi-airdrop-stat{padding:13px!important;border:1px solid rgba(126,93,234,.12)!important;border-radius:13px!important}
+.distribute-status,.multi-airdrop-status,.liq-status,.create-token-status,
+.token-mint-status,.token-burn-status,.authority-status,.token-metadata-status{
+  background:linear-gradient(110deg,#f0eaff,#e5fff7)!important;
+  border:1px solid rgba(126,93,234,.18)!important;color:#4a3c6b!important;border-radius:13px!important;
+}
+.distribute-status.success,.multi-airdrop-status.success,.create-token-status.success,
+.token-mint-status.success,.token-burn-status.success{
+  background:linear-gradient(110deg,#d9fff0,#efffd5)!important;border-color:#9ce6c9!important;color:#176b54!important;
+}
+.distribute-status.error,.multi-airdrop-status.error,.create-token-status.error,
+.token-mint-status.error,.token-burn-status.error{
+  background:linear-gradient(110deg,#fff0f4,#fff4e8)!important;border-color:#ffc0cf!important;color:#9f3457!important;
+}
+.liq-box{background:linear-gradient(135deg,#fff7d8,#fff)!important}
+.liq-box:nth-child(2n){background:linear-gradient(135deg,#e3fff7,#fff)!important}
+.liq-box-head,.liq-summary div,.liq-step p,.liq-note{color:#77708b!important}
+.liq-step strong,.liq-help h3{color:#33284e!important}
+.liq-num,.multi-airdrop-help-num,.distribute-help-num,.create-token-help-num{
+  color:#fff!important;background:linear-gradient(145deg,#7a56f5,#ff6da9)!important;
+  box-shadow:0 5px 12px rgba(123,84,243,.2)!important;
+}
+.liq-link,.create-token-result a,.distribute-result a,.multi-airdrop-result a,
+.token-mint-tx,.token-burn-status a,.token-authority-card a,.token-metadata-card a{
+  color:#7552e8!important;font-weight:800!important;
+}
+.create-token-result-address,.distribute-result,.multi-airdrop-result{
+  background:linear-gradient(135deg,#e9fff6,#f0eaff)!important;
+  border:1px solid rgba(87,196,168,.24)!important;border-radius:13px!important;color:#342a50!important;
+}
+.create-token-result-label,.token-metadata-current-copy>span{color:#786c99!important}
+.create-token-result-address code,.distribute-result code,.multi-airdrop-result code,
+.token-metadata-card code{color:#4a3d6b!important;overflow-wrap:anywhere!important}
+.token-burn-head,.token-authority-head,.token-metadata-head{
+  border-bottom:1px solid rgba(128,96,230,.14)!important;
+}
+.token-burn-live,.token-authority-live,.token-metadata-network{
+  color:#178776!important;background:linear-gradient(110deg,#d8fff4,#e4fff0)!important;
+}
+.token-burn-status-top,.token-mint-status-top{color:#4b3b72!important}
+.token-burn-dot,.token-mint-dot{background:#35cbbb!important;box-shadow:0 0 10px rgba(53,203,187,.3)!important}
+.authority-row{
+  background:linear-gradient(145deg,#fff,#f4efff)!important;
+  border:1px solid rgba(128,96,230,.17)!important;border-radius:17px!important;
+  box-shadow:0 10px 26px rgba(73,52,132,.05)!important;
+}
+.authority-row[data-type="freeze"]{background:linear-gradient(145deg,#fff,#e8fbff)!important}
+.authority-row h3,.authority-row-top h3{color:#33284e!important}
+.authority-kicker{color:#7955f5!important}
+.authority-state{color:#6549c8!important;background:#eee8ff!important;border-radius:999px!important}
+.authority-current,.authority-new{background:rgba(255,255,255,.76)!important;border-color:rgba(128,96,230,.13)!important;border-radius:12px!important}
+.authority-current code{color:#43355f!important}
+.authority-change{color:#fff!important;background:linear-gradient(100deg,#7955f5,#ad5de6)!important;border:0!important}
+.authority-revoke{color:#a8315c!important;background:linear-gradient(100deg,#ffe2ed,#fff0e7)!important;border:1px solid #ffc3d7!important}
+.token-metadata-preview-wrap,.token-metadata-preview-placeholder{
+  background:linear-gradient(135deg,#fff3cc,#f0e8ff)!important;border-color:rgba(126,93,234,.18)!important;
+}
+.token-metadata-upload{background:linear-gradient(135deg,#fff,#f5f0ff)!important;border:1px dashed rgba(126,93,234,.35)!important}
+.token-metadata-upload:hover{background:linear-gradient(135deg,#fff4d4,#f4eaff)!important}
+.token-metadata-current-copy small,.token-metadata-current-copy code{color:#77708b!important}
+#multiAirdropAddresses{background:linear-gradient(135deg,#fff,#f7f2ff)!important;color:#33284e!important}
+.multi-airdrop-line-numbers{background:#f1ecff!important;color:#8a7daf!important;border-right:1px solid #e0d7ff!important}
+.multi-airdrop-hint,.multi-airdrop-help-step{color:#706985!important}
+.multi-airdrop-help-step strong{color:#403456!important}
+.token-mint-meta-box span,.create-token-cost-row span,.distribute-stat span,
+.multi-airdrop-stat span{color:#77708b!important}
+.token-mint-status a,.create-token-result-links a{color:#7955f5!important}
+#authorityModal{background:rgba(40,30,70,.4)!important;backdrop-filter:blur(7px)!important}
+#authorityModal>div{background:linear-gradient(145deg,#fff,#f1eaff)!important;color:#302548!important;border:1px solid white!important;border-radius:20px!important;box-shadow:0 25px 80px rgba(64,42,124,.25)!important}
+@media(max-width:760px){
+  .create-token-card,.distribute-card,.distribute-help,.liquidity-card,.liquidity-help,
+  .multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,
+  .token-metadata-card,.token-mint-card{border-radius:18px!important}
+}
