@@ -6436,3 +6436,334 @@ body .topbar>.brand .accent{
 }
 @media(max-width:900px){body .topbar>.brand>span{font-size:18px!important}}
 @media(max-width:560px){body .topbar>.brand>span{font-size:16px!important}}
+
+
+/* CREATE TOKEN PAGE — final layout and legibility pass */
+body .workspace-main>#create-token{
+  padding:34px clamp(20px,4vw,64px) 52px!important;
+  width:100%!important;
+  max-width:none!important;
+  overflow:visible!important;
+}
+body .workspace-main>#create-token .create-token-shell{
+  width:100%!important;
+  max-width:1320px!important;
+  margin:0 auto!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr)!important;
+  gap:24px!important;
+  align-items:start!important;
+}
+body .workspace-main>#create-token .create-token-head{
+  grid-column:1/-1!important;
+  margin:0 0 2px!important;
+  padding:0!important;
+}
+body .workspace-main>#create-token .create-token-title{
+  margin:0 0 12px!important;
+  color:#f7f8ff!important;
+  font-size:clamp(32px,3.4vw,46px)!important;
+  line-height:1.08!important;
+  letter-spacing:-.045em!important;
+}
+body .workspace-main>#create-token .create-token-copy{
+  max-width:760px!important;
+  color:#b9c6e5!important;
+  font-size:15px!important;
+  line-height:1.65!important;
+}
+body .workspace-main>#create-token .create-token-network{
+  color:#5cecff!important;
+  background:rgba(0,229,255,.08)!important;
+  border:1px solid rgba(0,229,255,.24)!important;
+  border-radius:999px!important;
+  padding:8px 12px!important;
+  font-size:10px!important;
+  font-weight:800!important;
+}
+body .workspace-main>#create-token .create-token-card,
+body .workspace-main>#create-token .create-token-help{
+  min-width:0!important;
+  width:100%!important;
+  padding:clamp(20px,2.1vw,30px)!important;
+  border:1px solid rgba(111,133,205,.32)!important;
+  border-radius:20px!important;
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(117,69,255,.13),transparent 40%),
+    linear-gradient(145deg,#121a30 0%,#0b1122 72%,#151027 100%)!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035)!important;
+  color:#f5f7ff!important;
+}
+body .workspace-main>#create-token .create-token-card:before,
+body .workspace-main>#create-token .create-token-help:before{
+  content:""!important;
+  display:block!important;
+  height:3px!important;
+  margin:-1px 0 22px!important;
+  border-radius:99px!important;
+  background:linear-gradient(90deg,#00dff3,#6357ff 52%,#e54bc4)!important;
+}
+body .workspace-main>#create-token .create-token-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:20px 14px!important;
+}
+body .workspace-main>#create-token .create-token-field{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+}
+body .workspace-main>#create-token .create-token-field label,
+body .workspace-main>#create-token .create-token-field>label{
+  display:block!important;
+  margin:0!important;
+  color:#c8d4f3!important;
+  font-size:11px!important;
+  line-height:1.4!important;
+  font-weight:850!important;
+  letter-spacing:.11em!important;
+}
+body .workspace-main>#create-token .create-token-field input:not([type="file"]){
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:50px!important;
+  padding:12px 14px!important;
+  border-radius:11px!important;
+  border:1px solid rgba(119,143,214,.34)!important;
+  background:#080e1d!important;
+  color:#fff!important;
+  font-size:15px!important;
+  line-height:1.4!important;
+  box-shadow:inset 0 2px 7px rgba(0,0,0,.22)!important;
+}
+body .workspace-main>#create-token .create-token-field input:focus{
+  border-color:#48dff4!important;
+  box-shadow:0 0 0 3px rgba(0,229,255,.12)!important;
+  outline:none!important;
+}
+body .workspace-main>#create-token .create-token-field small{
+  display:block!important;
+  margin:0!important;
+  color:#9eadd0!important;
+  font-size:11px!important;
+  line-height:1.5!important;
+}
+body .workspace-main>#create-token .create-token-logo-wrap{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(100px,118px)!important;
+  gap:12px!important;
+  align-items:center!important;
+}
+body .workspace-main>#create-token .create-token-logo-upload{
+  min-width:0!important;
+  min-height:116px!important;
+  border:1px dashed rgba(0,229,255,.42)!important;
+  border-radius:13px!important;
+  background:rgba(5,12,29,.75)!important;
+}
+body .workspace-main>#create-token .create-token-logo-placeholder{
+  color:#c3cdec!important;
+  font-size:12px!important;
+  line-height:1.6!important;
+}
+body .workspace-main>#create-token .create-token-logo-placeholder b{
+  color:#50e6f5!important;
+  font-size:14px!important;
+  letter-spacing:.08em!important;
+}
+body .workspace-main>#create-token .create-token-options{
+  display:grid!important;
+  gap:10px!important;
+  margin:20px 0 0!important;
+  padding:14px!important;
+  border:1px solid rgba(112,135,204,.3)!important;
+  border-radius:14px!important;
+  background:rgba(7,13,29,.72)!important;
+}
+body .workspace-main>#create-token .create-token-check{
+  display:flex!important;
+  align-items:flex-start!important;
+  gap:12px!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:13px 14px!important;
+  border:1px solid rgba(112,135,204,.3)!important;
+  border-radius:11px!important;
+  background:linear-gradient(120deg,rgba(30,45,83,.68),rgba(17,23,47,.86))!important;
+  color:#f5f7ff!important;
+  cursor:pointer!important;
+}
+body .workspace-main>#create-token .create-token-check input[type="checkbox"]{
+  display:block!important;
+  flex:0 0 16px!important;
+  width:16px!important;
+  height:16px!important;
+  min-width:16px!important;
+  margin:3px 0 0!important;
+  padding:0!important;
+  accent-color:#ffe500!important;
+}
+body .workspace-main>#create-token .create-token-check>span{
+  display:block!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+  color:#f4f6ff!important;
+  font-size:13px!important;
+  line-height:1.5!important;
+}
+body .workspace-main>#create-token .create-token-check>span>strong{
+  display:block!important;
+  margin:0 0 5px!important;
+  color:#fff!important;
+  font-size:13px!important;
+  line-height:1.4!important;
+  font-weight:850!important;
+}
+body .workspace-main>#create-token .create-token-check>span>span{
+  display:block!important;
+  margin:0!important;
+  color:#b8c5e5!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+body .workspace-main>#create-token .create-token-warning{
+  margin:12px 0 0!important;
+  padding:12px 13px!important;
+  border:1px solid rgba(255,198,76,.24)!important;
+  border-radius:10px!important;
+  background:rgba(255,180,40,.07)!important;
+  color:#c7d1ea!important;
+  font-size:12px!important;
+  line-height:1.65!important;
+}
+body .workspace-main>#create-token .create-token-warning b{
+  color:#ffd166!important;
+}
+body .workspace-main>#create-token .create-token-cost{
+  margin:18px 0 0!important;
+  padding:17px!important;
+  border:1px solid rgba(255,204,89,.25)!important;
+  border-radius:14px!important;
+  background:linear-gradient(145deg,rgba(255,193,55,.07),rgba(117,69,255,.07))!important;
+}
+body .workspace-main>#create-token .create-token-cost-title{
+  margin:0 0 12px!important;
+  color:#f5f7ff!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  letter-spacing:.12em!important;
+}
+body .workspace-main>#create-token .create-token-cost-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  margin:0!important;
+  padding:12px 13px!important;
+  border:1px solid rgba(116,139,209,.28)!important;
+  border-radius:10px!important;
+  background:#111a32!important;
+  color:#c4d0ed!important;
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+body .workspace-main>#create-token .create-token-cost-row span{
+  min-width:0!important;
+  color:#c4d0ed!important;
+}
+body .workspace-main>#create-token .create-token-cost-row strong{
+  flex:0 0 auto!important;
+  color:#fff!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+body .workspace-main>#create-token .create-token-button{
+  width:100%!important;
+  min-height:52px!important;
+  margin:16px 0 0!important;
+  border:1px solid rgba(255,255,255,.17)!important;
+  border-radius:12px!important;
+  background:linear-gradient(105deg,#3158df,#7843e8 55%,#d53cae)!important;
+  color:#fff!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  letter-spacing:.07em!important;
+  box-shadow:0 10px 24px rgba(94,67,224,.2)!important;
+}
+body .workspace-main>#create-token .create-token-button:disabled{
+  opacity:.62!important;
+  filter:saturate(.72)!important;
+  cursor:not-allowed!important;
+  box-shadow:none!important;
+}
+body .workspace-main>#create-token .create-token-status{
+  margin:12px 0 0!important;
+  padding:12px 14px!important;
+  border:1px solid rgba(105,132,207,.28)!important;
+  border-radius:10px!important;
+  background:#0b1429!important;
+  color:#b9c7e8!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+body .workspace-main>#create-token .create-token-help{
+  position:relative!important;
+  top:auto!important;
+}
+body .workspace-main>#create-token .create-token-help h3{
+  margin:8px 0 14px!important;
+  color:#fff!important;
+  font-size:clamp(22px,2vw,28px)!important;
+  line-height:1.2!important;
+}
+body .workspace-main>#create-token .create-token-help-step{
+  gap:12px!important;
+  padding:15px 0!important;
+  border-bottom:1px solid rgba(133,151,202,.18)!important;
+}
+body .workspace-main>#create-token .create-token-help-step strong{
+  color:#f5f7ff!important;
+  font-size:13px!important;
+  line-height:1.4!important;
+}
+body .workspace-main>#create-token .create-token-help-step span{
+  color:#b9c6e5!important;
+  font-size:12px!important;
+  line-height:1.55!important;
+}
+body .workspace-main>#create-token .create-token-help-section{
+  margin-top:20px!important;
+  padding-top:18px!important;
+  border-top:1px solid rgba(133,151,202,.18)!important;
+}
+body .workspace-main>#create-token .create-token-help-section h4{
+  color:#fff!important;
+  font-size:15px!important;
+}
+body .workspace-main>#create-token .create-token-help-section p,
+body .workspace-main>#create-token .create-token-help-tip{
+  color:#b9c6e5!important;
+  font-size:12px!important;
+  line-height:1.6!important;
+}
+@media(max-width:900px){
+  body .workspace-main>#create-token .create-token-shell{grid-template-columns:minmax(0,1fr)!important}
+  body .workspace-main>#create-token .create-token-card,
+  body .workspace-main>#create-token .create-token-help{grid-column:1!important}
+  body .workspace-main>#create-token .create-token-help{position:relative!important}
+}
+@media(max-width:560px){
+  body .workspace-main>#create-token{padding:26px 14px 36px!important}
+  body .workspace-main>#create-token .create-token-title{font-size:30px!important}
+  body .workspace-main>#create-token .create-token-grid{grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
+  body .workspace-main>#create-token .create-token-logo-wrap{grid-template-columns:minmax(0,1fr)!important}
+  body .workspace-main>#create-token .create-token-logo-upload{min-height:110px!important}
+  body .workspace-main>#create-token .create-token-card,
+  body .workspace-main>#create-token .create-token-help{padding:18px!important;border-radius:16px!important}
+  body .workspace-main>#create-token .create-token-check{padding:12px!important}
+  body .workspace-main>#create-token .create-token-cost-row{align-items:flex-start!important;flex-wrap:wrap!important}
+}
