@@ -5119,3 +5119,181 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .create-token-result,.distribute-result,.multi-airdrop-result{overflow-wrap:anywhere!important;word-break:break-word!important}
 .create-token-result code,.distribute-result code,.multi-airdrop-result code,.token-metadata-card code,.authority-current code{font-size:.9em!important;line-height:1.55!important}
 @media(max-width:600px){.create-token-card,.distribute-card,.liquidity-card,.multi-airdrop-card,.token-burn-card,.token-authority-card,.token-metadata-card,.token-mint-card{padding:18px 15px!important;box-shadow:0 12px 30px rgba(67,44,125,.09)!important}}
+
+
+/* === HIGH-CONTRAST NEON TOOL WINDOWS: cinematic dark UI, no pastel cards === */
+:root{
+ --tool-ink:#f5f7ff;--tool-muted:#aab5d1;--tool-border:rgba(94,132,255,.28);
+ --tool-violet:#8b5cff;--tool-pink:#ff3dba;--tool-cyan:#20d9ff;--tool-gold:#ffb547;
+}
+.create-token-card,.distribute-card,.distribute-help,.liquidity-card,.liquidity-help,
+.multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,
+.token-metadata-card,.token-mint-card{
+ color:#f5f7ff!important;
+ background:
+  radial-gradient(ellipse at 100% 0%,rgba(138,63,255,.23),transparent 37%),
+  radial-gradient(ellipse at 0% 100%,rgba(0,190,255,.13),transparent 42%),
+  linear-gradient(145deg,#10142a 0%,#0b1020 58%,#151027 100%)!important;
+ border:1px solid rgba(106,132,255,.34)!important;
+ border-radius:22px!important;
+ box-shadow:0 24px 65px rgba(0,0,0,.42),0 0 28px rgba(89,73,255,.10),inset 0 1px rgba(255,255,255,.07)!important;
+}
+.create-token-card:before,.distribute-card:before,.liquidity-card:before,
+.multi-airdrop-card:before,.token-burn-card:before,.token-authority-card:before,
+.token-metadata-card:before,.token-mint-card:before{
+ height:4px!important;background:linear-gradient(90deg,#00d5ff 0%,#535bff 32%,#bc38ff 65%,#ff3dba 82%,#ffb33f 100%)!important;
+}
+.create-token-title,.liquidity-title,.token-mint-card h2,.token-mint-card h3,
+.distribute-title,.token-metadata-head h3,.token-burn-head,.token-authority-head,
+.authority-row h3,.authority-row-top h3,.liq-step strong,.liq-help h3{
+ color:#fff!important;text-shadow:0 0 22px rgba(95,106,255,.18)!important;
+}
+.create-token-kicker,.distribute-kicker,.liquidity-kicker,.token-mint-kicker,
+.create-token-cost-title,.token-metadata-kicker,.authority-kicker{
+ color:#54dfff!important;letter-spacing:.11em!important;
+}
+.create-token-copy,.distribute-lead,.liquidity-sub,.create-token-note,
+.create-token-field small,.create-token-warning,.create-token-help,.distribute-note,
+.liq-note,.liq-status,.multi-airdrop-help,.token-metadata-head p,
+.token-metadata-note,.token-burn-balance,.multi-airdrop-hint,
+.multi-airdrop-help-step,.token-metadata-current-copy small,.token-mint-card p{
+ color:#aab5d1!important;
+}
+.create-token-network,.token-mint-network,.token-burn-live,.token-authority-live,
+.token-metadata-network,.trading-bot-status-pill{
+ color:#e9eaff!important;
+ background:linear-gradient(100deg,rgba(0,207,255,.17),rgba(119,70,255,.22),rgba(255,53,183,.16))!important;
+ border:1px solid rgba(98,133,255,.42)!important;border-radius:999px!important;
+}
+.create-token-field label,.token-mint-field label,.distribute-label,.liq-label,
+.multi-airdrop-label,.token-burn-fields label small,.token-authority-lookup label small,
+.authority-current small,.authority-new small,.token-metadata-lookup label small,
+#create-token label,#distributeTokens label,#liquidity label,#multi-airdrop label,
+#token-burn label,#authority-manager label,#token-mint label,#tokenMetadataApp label{
+ color:#d4dcf6!important;
+}
+.create-token-field input,.token-mint-field input,.distribute-input,.distribute-row input,
+.liq-input,.multi-airdrop-input,.multi-airdrop-addresses,.multi-airdrop-amount,
+.token-burn-fields input,.token-authority-lookup input,.authority-new input,
+.token-metadata-lookup input,.token-metadata-upload,.bot-field input,.bot-field select,.bot-field textarea{
+ color:#fff!important;background:rgba(5,9,23,.88)!important;
+ border:1px solid rgba(103,131,255,.42)!important;border-radius:11px!important;
+ box-shadow:inset 0 2px 8px rgba(0,0,0,.28)!important;
+}
+.create-token-field input::placeholder,.token-mint-field input::placeholder,
+.distribute-input::placeholder,.distribute-row input::placeholder,.liq-input::placeholder,
+.multi-airdrop-input::placeholder,.token-burn-fields input::placeholder,
+.token-authority-lookup input::placeholder,.authority-new input::placeholder,
+.token-metadata-lookup input::placeholder{color:#707d9f!important}
+.create-token-field input:focus,.token-mint-field input:focus,.distribute-input:focus,
+.distribute-row input:focus,.liq-input:focus,.multi-airdrop-input:focus,
+.multi-airdrop-addresses:focus,.multi-airdrop-amount:focus,.token-burn-fields input:focus,
+.token-authority-lookup input:focus,.authority-new input:focus,.token-metadata-lookup input:focus{
+ background:#090e22!important;border-color:#25dfff!important;
+ box-shadow:0 0 0 3px rgba(37,223,255,.14),0 0 22px rgba(95,92,255,.13)!important;outline:none!important;
+}
+.create-token-field input:disabled,.token-mint-field input:disabled,.distribute-input:disabled,
+.distribute-row input:disabled,.liq-input:disabled,.multi-airdrop-input:disabled,
+.token-burn-fields input:disabled,.token-authority-lookup input:disabled,
+.authority-new input:disabled,.token-metadata-lookup input:disabled{
+ background:#171d34!important;color:#8995b5!important;opacity:1!important;
+}
+.create-token-options,.create-token-check,.token-mint-check,.token-mint-meta-box,
+.create-token-cost-row,.create-token-cost-total,.distribute-summary,.multi-airdrop-summary,
+.multi-airdrop-stat,.liq-box,.liq-summary,.token-metadata-current,.token-metadata-details,
+.token-burn-status,.token-mint-status,.create-token-result,.distribute-results,
+.multi-airdrop-results,.token-metadata-note,.token-authority-note,.authority-current,
+.authority-new,.authority-row{
+ color:#f0f4ff!important;background:linear-gradient(145deg,rgba(22,29,58,.98),rgba(12,17,37,.98))!important;
+ border:1px solid rgba(92,120,230,.28)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.035),0 8px 24px rgba(0,0,0,.16)!important;
+ border-radius:14px!important;
+}
+.create-token-check.active,.token-mint-check.active{
+ color:#fff!important;background:linear-gradient(110deg,rgba(0,199,255,.22),rgba(123,74,255,.30),rgba(255,53,184,.19))!important;
+ border-color:#7c6dff!important;box-shadow:0 0 20px rgba(112,86,255,.14)!important;
+}
+.create-token-cost-row:nth-child(odd),.distribute-stat:nth-child(odd),
+.multi-airdrop-stat:nth-child(odd),.token-mint-meta-box:nth-child(odd){
+ background:linear-gradient(100deg,rgba(0,202,255,.12),rgba(24,31,62,.92))!important;
+}
+.create-token-cost-row:nth-child(even),.distribute-stat:nth-child(even),
+.multi-airdrop-stat:nth-child(even),.token-mint-meta-box:nth-child(even){
+ background:linear-gradient(100deg,rgba(181,55,255,.15),rgba(24,22,55,.92))!important;
+}
+.create-token-cost-row strong,.create-token-cost-total strong,.distribute-stat strong,
+.multi-airdrop-stat strong,.liq-box strong,.liq-summary strong,.token-mint-meta-box strong,
+.token-metadata-current strong,.token-burn-balance strong,.authority-current code{
+ color:#fff!important;overflow-wrap:anywhere!important;
+}
+.create-token-cost-total{background:linear-gradient(110deg,rgba(255,177,55,.18),rgba(255,48,167,.16),rgba(103,72,255,.2))!important;border-color:rgba(255,123,181,.4)!important}
+.distribute-summary{background:linear-gradient(125deg,rgba(0,214,196,.16),rgba(26,50,93,.7),rgba(87,69,255,.18))!important}
+.multi-airdrop-summary{background:linear-gradient(125deg,rgba(255,50,172,.18),rgba(94,44,191,.2),rgba(19,23,52,.95))!important}
+.liq-summary{background:linear-gradient(125deg,rgba(0,167,255,.19),rgba(69,83,255,.2),rgba(19,23,52,.95))!important}
+.token-metadata-current,.token-metadata-details{background:linear-gradient(125deg,rgba(125,71,255,.2),rgba(21,27,54,.96))!important}
+.token-burn-status{background:linear-gradient(125deg,rgba(255,95,63,.17),rgba(65,23,54,.55),rgba(20,20,43,.96))!important}
+.token-mint-status{background:linear-gradient(125deg,rgba(0,223,161,.15),rgba(0,139,255,.12),rgba(16,23,48,.96))!important}
+.distribute-status,.multi-airdrop-status,.liq-status,.create-token-status,
+.token-mint-status,.token-burn-status,.authority-status,.token-metadata-status{
+ color:#e9edff!important;background:linear-gradient(110deg,rgba(85,65,210,.24),rgba(0,188,219,.12))!important;
+ border:1px solid rgba(107,128,255,.35)!important;border-radius:12px!important;
+}
+.distribute-status.success,.multi-airdrop-status.success,.create-token-status.success,
+.token-mint-status.success,.token-burn-status.success{
+ color:#8dffdc!important;background:linear-gradient(110deg,rgba(0,216,158,.20),rgba(0,145,255,.10))!important;border-color:rgba(46,255,199,.4)!important;
+}
+.distribute-status.error,.multi-airdrop-status.error,.create-token-status.error,
+.token-mint-status.error,.token-burn-status.error{
+ color:#ffb2d4!important;background:linear-gradient(110deg,rgba(255,44,125,.22),rgba(255,108,58,.10))!important;border-color:rgba(255,76,148,.45)!important;
+}
+.create-token-button,.distribute-action,.liq-action,.multi-airdrop-action,.token-mint-button,
+.token-burn-button,.token-authority-lookup .connect,.token-metadata-lookup .connect,#tokenMetadataApp .connect{
+ color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:12px!important;
+ background:linear-gradient(105deg,#087cf5 0%,#5b42ff 34%,#b72cff 66%,#ff319a 100%)!important;
+ box-shadow:0 9px 30px rgba(87,62,255,.32),inset 0 1px rgba(255,255,255,.22)!important;
+ text-shadow:0 1px 3px rgba(20,12,60,.28)!important;font-weight:850!important;
+}
+.create-token-button:hover,.distribute-action:hover,.liq-action:hover,.multi-airdrop-action:hover,
+.token-mint-button:hover,.token-burn-button:hover,.token-authority-lookup .connect:hover,
+.token-metadata-lookup .connect:hover{
+ filter:saturate(1.28) brightness(1.12)!important;transform:translateY(-2px)!important;
+ box-shadow:0 12px 35px rgba(87,62,255,.45),0 0 22px rgba(255,49,154,.15)!important;
+}
+.create-token-button:disabled,.distribute-action:disabled,.liq-action:disabled,
+.multi-airdrop-action:disabled,.token-mint-button:disabled,.token-burn-button:disabled,
+.token-authority-lookup .connect:disabled{opacity:.42!important;filter:grayscale(.45)!important;transform:none!important}
+.distribute-use-created,.distribute-add,.multi-airdrop-secondary,.token-burn-max{
+ color:#c8cfff!important;background:linear-gradient(110deg,rgba(32,114,255,.18),rgba(133,57,255,.22))!important;
+ border:1px solid rgba(111,123,255,.4)!important;border-radius:10px!important;font-weight:800!important;
+}
+.distribute-remove,.authority-revoke{background:linear-gradient(110deg,rgba(255,40,111,.2),rgba(255,93,61,.12))!important;color:#ff9fc6!important;border:1px solid rgba(255,83,151,.42)!important}
+.authority-change{color:#fff!important;background:linear-gradient(100deg,#087cf5,#7744ff,#d52dcb)!important;border:0!important}
+.authority-state{color:#d8d6ff!important;background:rgba(119,83,255,.22)!important;border:1px solid rgba(133,111,255,.3)!important}
+.authority-row[data-type="freeze"]{background:linear-gradient(145deg,rgba(0,164,213,.16),rgba(13,22,45,.98))!important}
+.liq-box{background:linear-gradient(135deg,rgba(0,153,255,.16),rgba(20,25,51,.95))!important}
+.liq-box:nth-child(2n){background:linear-gradient(135deg,rgba(125,64,255,.18),rgba(20,22,48,.95))!important}
+.liq-box-head,.liq-summary div,.liq-step p,.liq-note{color:#aab5d1!important}
+.liq-num,.multi-airdrop-help-num,.distribute-help-num,.create-token-help-num{
+ color:#fff!important;background:linear-gradient(145deg,#00bfff,#6545ff 55%,#f32ca7)!important;
+ box-shadow:0 0 18px rgba(92,84,255,.28)!important;
+}
+.liq-link,.create-token-result a,.distribute-result a,.multi-airdrop-result a,
+.token-mint-tx,.token-burn-status a,.token-authority-card a,.token-metadata-card a,
+.token-mint-status a,.create-token-result-links a{color:#54dfff!important;font-weight:800!important}
+.create-token-result-address,.distribute-result,.multi-airdrop-result{
+ background:linear-gradient(120deg,rgba(0,206,176,.13),rgba(70,65,255,.18),rgba(20,25,51,.96))!important;
+ border:1px solid rgba(55,224,210,.32)!important;border-radius:13px!important;color:#f3f6ff!important;
+}
+.create-token-result-address code,.distribute-result code,.multi-airdrop-result code,
+.token-metadata-card code,.authority-current code{color:#f4f6ff!important;overflow-wrap:anywhere!important}
+.token-burn-head,.token-authority-head,.token-metadata-head{border-bottom:1px solid rgba(100,126,255,.28)!important}
+.token-burn-live,.token-authority-live,.token-metadata-network{color:#68ffe1!important;background:rgba(0,221,175,.12)!important;border-color:rgba(42,255,207,.25)!important}
+.token-burn-dot,.token-mint-dot{background:#24f0d0!important;box-shadow:0 0 12px rgba(36,240,208,.7)!important}
+.token-metadata-preview-wrap,.token-metadata-preview-placeholder{background:linear-gradient(135deg,#111735,#28154a,#101a34)!important;border-color:rgba(115,95,255,.4)!important}
+.token-metadata-upload{background:linear-gradient(135deg,#10172f,#20153b)!important;border:1px dashed rgba(110,132,255,.55)!important;color:#f3f5ff!important}
+.token-metadata-upload:hover{background:linear-gradient(135deg,#14284b,#35164d)!important}
+#multiAirdropAddresses{background:#080d1d!important;color:#f5f7ff!important}
+.multi-airdrop-line-numbers{background:#151b35!important;color:#7282bd!important;border-right:1px solid rgba(101,123,255,.3)!important}
+#authorityModal{background:rgba(2,5,16,.78)!important;backdrop-filter:blur(10px)!important}
+#authorityModal>div{background:linear-gradient(145deg,#141a36,#0a1023)!important;color:#f4f6ff!important;border:1px solid rgba(115,126,255,.45)!important;border-radius:20px!important;box-shadow:0 25px 80px rgba(0,0,0,.6),0 0 35px rgba(95,65,255,.15)!important}
+@media(max-width:760px){.create-token-card,.distribute-card,.distribute-help,.liquidity-card,.liquidity-help,.multi-airdrop-card,.multi-airdrop-help,.token-burn-card,.token-authority-card,.token-metadata-card,.token-mint-card{border-radius:17px!important}}
