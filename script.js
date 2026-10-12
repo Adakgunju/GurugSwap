@@ -1371,9 +1371,25 @@ async function updateTokenInfo(token) {
     let json;
     if (String(token.symbol || "").toUpperCase() === "GURUG") {
       // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
-      const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz", {cache:"no-store"});
-      const pairData = await pairRes.json();
-      json = {pairs: Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : [])};
+      const pairAddress = "8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz";
+      const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+      let pairData = null;
+      try {
+        const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
+        if (pairRes.ok) pairData = await pairRes.json();
+      } catch (pairError) {
+        console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+      }
+      let pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+      if (!pairs.some(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase())) {
+        const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
+          pairs = tokenPairs.filter(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
+        }
+      }
+      json = {pairs};
     } else {
       const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
       json = await res.json();
@@ -1446,16 +1462,30 @@ async function updateGurugMarketTicker() {
   if (!priceEl || !changeEl) return;
 
   try {
-    const res = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz", {
-      cache: "no-store"
-    });
-    const json = await res.json();
-    const pairs = Array.isArray(json?.pairs) ? json.pairs : (json?.pair ? [json.pair] : []);
-    const pair = pairs.find(p =>
-      p?.chainId === "solana" &&
-      String(p?.baseToken?.address || "").toLowerCase() === "g8zuwl2mz8dj16brfdjpco7657kju3y5ncrgz6jtpbm5"
-    ) || pairs.find(p => p?.chainId === "solana" && String(p?.pairAddress || "").toLowerCase() === "8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz");
-    if (!pair) throw new Error("GURUG market pair was not returned by DexScreener");
+    const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+    const pairAddress = "8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz";
+    let pairs = [];
+    try {
+      const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
+      if (pairRes.ok) {
+        const pairData = await pairRes.json();
+        pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+      }
+    } catch (pairError) {
+      console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+    }
+    let pair = pairs.find(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
+    if (!pair) {
+      const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
+      if (tokenRes.ok) {
+        const tokenData = await tokenRes.json();
+        const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
+        pair = tokenPairs
+          .filter(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase())
+          .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
+      }
+    }
+    if (!pair) throw new Error("No Solana market pair found for the GURUG mint");
     const price = Number(pair?.priceUsd);
     const change = Number(pair?.priceChange?.h24);
 
