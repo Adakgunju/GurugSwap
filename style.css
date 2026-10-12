@@ -5890,3 +5890,87 @@ body .workspace-main .token-info-foot a{color:#20e4ff!important;font-weight:850!
  body .workspace-main .token-info-card{padding:15px!important}
  body .workspace-main .token-info-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+
+/* === Final chrome pass: header and footer should frame the app, not distract === */
+body .topbar{
+ min-height:72px!important;height:auto!important;padding:10px clamp(20px,4vw,64px)!important;
+ display:grid!important;grid-template-columns:minmax(190px,1fr) auto minmax(230px,1fr)!important;
+ align-items:center!important;gap:24px!important;
+ background:linear-gradient(180deg,rgba(7,11,25,.98),rgba(9,13,28,.94))!important;
+ border:0!important;border-bottom:1px solid rgba(103,123,255,.28)!important;
+ border-radius:0 0 16px 16px!important;
+ box-shadow:0 12px 34px rgba(0,0,0,.24),inset 0 -1px rgba(255,255,255,.025)!important;
+}
+body .topbar .brand{display:inline-flex!important;align-items:center!important;gap:10px!important;min-width:0!important}
+body .topbar .brand-logo{width:42px!important;height:42px!important;object-fit:contain!important}
+body .topbar .brand>span{font-size:19px!important;letter-spacing:-.055em!important;font-weight:850!important;white-space:nowrap!important}
+body .topbar .brand .accent{background:linear-gradient(100deg,#ffd21f,#ff8b35,#ff2ba6)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+body .topbar .desktop-nav{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important}
+body .topbar .desktop-nav>a,body .topbar .desktop-nav .build-menu>summary{
+ min-height:40px!important;padding:0 15px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ border-radius:999px!important;border:1px solid transparent!important;background:transparent!important;
+ color:#aebbd9!important;font-size:11px!important;font-weight:800!important;letter-spacing:.055em!important;
+}
+body .topbar .desktop-nav>a.active{
+ color:#fff!important;background:linear-gradient(120deg,rgba(49,91,255,.18),rgba(128,60,255,.16),rgba(240,43,165,.12))!important;
+ border-color:rgba(119,111,255,.28)!important;box-shadow:inset 0 1px rgba(255,255,255,.06),0 0 22px rgba(100,60,255,.12)!important
+}
+body .topbar .desktop-nav .build-menu{position:relative!important}
+body .topbar .desktop-nav .build-menu[open]>summary{color:#fff!important;background:#151a35!important;border-color:rgba(115,128,255,.28)!important}
+body .topbar .build-menu-panel{
+ z-index:100!important;top:calc(100% + 12px)!important;min-width:220px!important;padding:8px!important;
+ border-radius:16px!important;background:rgba(10,15,32,.98)!important;border:1px solid rgba(112,128,255,.35)!important;
+ box-shadow:0 20px 55px rgba(0,0,0,.5)!important;backdrop-filter:blur(18px)!important
+}
+body .topbar .build-menu-panel a{display:flex!important;align-items:center!important;min-height:38px!important;padding:8px 12px!important;border-radius:9px!important;color:#dbe4ff!important;font-size:12px!important}
+body .topbar .build-menu-panel a:hover{background:linear-gradient(90deg,rgba(0,229,255,.12),rgba(140,55,255,.18))!important;color:#fff!important}
+body .topbar .top-actions{display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:12px!important;min-width:0!important}
+body .topbar .market-ticker{
+ min-height:42px!important;padding:0 13px!important;gap:9px!important;border-radius:999px!important;
+ background:linear-gradient(120deg,#151b31,#0c1224)!important;border:1px solid rgba(255,210,31,.28)!important;
+ color:#fff!important;box-shadow:inset 0 1px rgba(255,255,255,.04)!important
+}
+body .topbar .ticker-label{color:#aebbd9!important;font-size:9px!important;letter-spacing:.13em!important}
+body .topbar #gurugPrice{color:#fff!important;font-weight:850!important}
+body .topbar .ticker-change{color:#34f1c4!important}
+body .topbar .top-wallet{
+ min-height:42px!important;padding:0 19px!important;border-radius:999px!important;
+ color:#fff!important;background:linear-gradient(105deg,#315bff,#803cff 52%,#ed20b0)!important;
+ border:1px solid rgba(255,255,255,.18)!important;box-shadow:0 8px 22px rgba(96,56,255,.22)!important;
+ font-size:10px!important;font-weight:850!important;white-space:nowrap!important
+}
+body .topbar .mobile-menu-btn{border:1px solid rgba(112,128,255,.38)!important;background:#111831!important;color:#fff!important;border-radius:999px!important}
+body footer{
+ position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:20px!important;min-height:76px!important;padding:20px clamp(24px,7vw,100px)!important;margin-top:60px!important;
+ background:linear-gradient(110deg,#080d1c 0%,#10152a 48%,#17102b 100%)!important;
+ border-top:1px solid rgba(112,128,255,.3)!important;border-bottom:0!important;
+ color:#aebbd9!important;box-shadow:0 -14px 38px rgba(0,0,0,.15)!important;
+ font-size:10px!important;font-weight:800!important;letter-spacing:.14em!important;text-transform:uppercase!important
+}
+body footer:before{
+ content:""!important;position:absolute!important;left:7%!important;right:7%!important;top:-1px!important;height:1px!important;
+ background:linear-gradient(90deg,transparent,#00e5ff 22%,#7545ff 50%,#ff36b5 78%,transparent)!important;opacity:.8!important
+}
+body footer span{color:#aebbd9!important}
+body footer span:first-child{color:#fff!important}
+body footer span:nth-child(2){color:#5deaff!important}
+body footer span:last-child{color:#c4b6ff!important}
+body .workspace-main.single-section-view{padding-top:30px!important}
+body .workspace-main.single-section-view>#token-info.single-section-companion{margin-top:0!important}
+@media(max-width:900px){
+ body .topbar{grid-template-columns:1fr auto!important;gap:12px!important;padding:10px 18px!important}
+ body .topbar .desktop-nav{grid-column:1/-1;grid-row:2;justify-content:center!important;flex-wrap:wrap!important}
+ body .topbar .top-actions{grid-column:2;grid-row:1}
+ body .topbar .market-ticker{display:none!important}
+}
+@media(max-width:560px){
+ body .topbar{min-height:64px!important;padding:8px 12px!important;grid-template-columns:minmax(0,1fr) auto!important}
+ body .topbar .brand-logo{width:34px!important;height:34px!important}
+ body .topbar .brand>span{font-size:16px!important}
+ body .topbar .top-wallet{min-height:36px!important;padding:0 12px!important;font-size:9px!important}
+ body .topbar .desktop-nav{gap:3px!important}
+ body .topbar .desktop-nav>a,body .topbar .desktop-nav .build-menu>summary{min-height:34px!important;padding:0 10px!important;font-size:10px!important}
+ body footer{min-height:70px!important;flex-wrap:wrap!important;justify-content:center!important;text-align:center!important;gap:10px 20px!important;padding:18px 14px!important;font-size:9px!important;margin-top:36px!important}
+}
