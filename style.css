@@ -8972,3 +8972,39 @@ body .topbar>.brand .accent{
     outline: 0 !important;
   }
 }
+
+
+/* MOBILE SWAP CLEANUP — remove the large landing-stage frame only.
+   Keep the actual .swap-card and its token input panels intact. */
+@media (max-width: 850px) {
+  body .workspace-main .landing-stage {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    overflow: visible !important;
+  }
+  body .workspace-main .landing-stage::before {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main .landing-stage::after {
+    content: none !important;
+    display: none !important;
+  }
+  body .workspace-main .landing-stage .landing-copy {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  body .workspace-main .landing-stage .swap-card {
+    border: 1px solid rgba(0,229,255,.62) !important;
+    border-radius: 24px !important;
+    background: linear-gradient(150deg,#151c31 0%,#090e1d 72%,#1a1030 100%) !important;
+    box-shadow: 0 24px 65px rgba(0,0,0,.52),0 0 0 1px rgba(136,72,255,.2),0 0 30px rgba(94,58,255,.18) !important;
+  }
+}
