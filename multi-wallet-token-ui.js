@@ -1,0 +1,281 @@
+(() => {
+  "use strict";
+
+  // Set this only to a separately configured staging Worker URL. Do not point
+  // this UI at the production Worker until the multi-wallet migration is staged.
+  const apiBase = String(window.GURUG_MULTI_API_BASE || "").trim().replace(/\/+$/, "");
+  const section = document.getElementById("trading-bot");
+  if (!section || document.getElementById("multiWalletPanel")) return;
+
+  const panel = document.createElement("section");
+  panel.id = "multiWalletPanel";
+  panel.className = "multi-wallet-panel";
+  panel.innerHTML = `
+    <style>
+      .multi-wallet-panel{margin:28px 0 0;padding:24px;border:1px solid rgba(130,150,170,.3);border-radius:18px;background:var(--panel-bg,rgba(15,22,32,.6));color:inherit}
+      .multi-wallet-panel *{box-sizing:border-box}
+      .multi-wallet-panel h3{margin:0 0 8px;font-size:1.2rem}
+      .multi-wallet-panel p{margin:0 0 16px;line-height:1.55;opacity:.8}
+      .mw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+      .mw-field{display:flex;flex-direction:column;gap:6px;font-size:.8rem}
+      .mw-field input,.mw-field select{width:100%;min-width:0;padding:11px 12px;border:1px solid rgba(130,150,170,.4);border-radius:9px;background:transparent;color:inherit}
+      .mw-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+      .mw-button{border:1px solid rgba(130,150,170,.5);border-radius:9px;padding:10px 14px;background:transparent;color:inherit;cursor:pointer}
+      .mw-button.primary{background:#d6f36a;color:#151a10;border-color:#d6f36a;font-weight:700}
+      .mw-button:disabled{opacity:.45;cursor:not-allowed}
+      .mw-status{padding:12px;border-radius:10px;background:rgba(130,150,170,.1);font-size:.88rem;overflow-wrap:anywhere}
+      .mw-list{display:grid;gap:8px;margin:12px 0}
+      .mw-item{padding:12px;border:1px solid rgba(130,150,170,.25);border-radius:10px;overflow-wrap:anywhere}
+      .mw-item strong{display:block;margin-bottom:5px}
+      .mw-small{font-size:.78rem;opacity:.72}
+      @media(max-width:600px){.mw-grid{grid-template-columns:1fr}.multi-wallet-panel{padding:16px}}
+    </style>
+    <h3>Multi-wallet / Multi-token (Dry-run)</h3>
+    <p>Manage wallet-linked token strategies independently. This panel only supports dry-run configuration; it cannot start live trades.</p>
+    <div id="mwStatus" class="mw-status" role="status" aria-live="polite"></div>
+    <div class="mw-actions">
+      <button id="mwConnect" class="mw-button primary" type="button">Connect wallet</button>
+      <button id="mwRefresh" class="mw-button" type="button" disabled>Refresh wallets</button>
+      <button id="mwRegister" class="mw-button" type="button" disabled>Register connected wallet</button>
+    </div>
+    <div id="mwWallets" class="mw-list"></div>
+    <div class="mw-grid">
+      <label class="mw-field">Selected wallet
+        <select id="mwWalletSelect" disabled><option value="">Connect and register a wallet first</option></select>
+      </label>
+      <label class="mw-field">Token mint address
+        <input id="mwMint" placeholder="Solana token mint" autocomplete="off">
+      </label>
+      <label class="mw-field">Strategy
+        <select id="mwStrategy"><option value="DCA">DCA</option><option value="TARGET">Target price</option></select>
+      </label>
+      <label class="mw-field">Side
+        <select id="mwSide"><option value="BUY">BUY</option><option value="SELL">SELL</option></select>
+      </label>
+      <label class="mw-field">Trade amount (SOL for BUY / token units for SELL)
+        <input id="mwAmount" type="number" min="0.000000001" step="any" value="0.01">
+      </label>
+      <label class="mw-field">Interval (seconds, minimum 60)
+        <input id="mwInterval" type="number" min="60" step="1" value="300">
+      </label>
+      <label class="mw-field">Maximum trades
+        <input id="mwMaxTrades" type="number" min="1" step="1" value="1">
+      </label>
+      <label class="mw-field">Maximum spend (SOL; 0 = no cap)
+        <input id="mwMaxSpend" type="number" min="0" step="any" value="0.01">
+      </label>
+      <label class="mw-field">Target price (USD; required for Target)
+        <input id="mwTarget" type="number" min="0" step="any" placeholder="0.0001">
+      </label>
+      <label class="mw-field">Stop loss (USD, optional)
+        <input id="mwStopLoss" type="number" min="0" step="any" placeholder="Optional">
+      </label>
+      <label class="mw-field">Take profit (USD, optional)
+        <input id="mwTakeProfit" type="number" min="0" step="any" placeholder="Optional">
+      </label>
+    </div>
+    <div class="mw-actions">
+      <button id="mwCreate" class="mw-button primary" type="button" disabled>Save token config (disabled)</button>
+      <button id="mwLoadConfigs" class="mw-button" type="button" disabled>Load token configs</button>
+    </div>
+    <div id="mwConfigs" class="mw-list"></div>
+  `;
+  const legacyCard = section.querySelector(".trading-bot-card");
+  if (legacyCard) legacyCard.insertAdjacentElement("afterend", panel);
+  else section.appendChild(panel);
+
+  const $ = id => panel.querySelector("#" + id);
+  const status = message => { $("mwStatus").textContent = message; };
+  let connectedPublicKey = "";
+  let wallets = [];
+
+  if (!apiBase) {
+    status("Multi-wallet staging API is not configured. Live production endpoints are intentionally not used. Set window.GURUG_MULTI_API_BASE to a separate staging Worker URL after staging D1 is configured.");
+  } else {
+    status("Staging API configured. Connect a wallet to manage dry-run token configurations.");
+  }
+
+  function base58(bytes) {
+    const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    let digits = [0];
+    for (const byte of bytes) {
+      let carry = byte;
+      for (let i = 0; i < digits.length; i++) {
+        const value = digits[i] * 256 + carry;
+        digits[i] = value % 58;
+        carry = Math.floor(value / 58);
+      }
+      while (carry) { digits.push(carry % 58); carry = Math.floor(carry / 58); }
+    }
+    let zeros = 0;
+    while (zeros < bytes.length && bytes[zeros] === 0) zeros++;
+    const encoded = digits.length ? digits.reverse().map(n => alphabet[n]).join("") : "";
+    return "1".repeat(zeros) + encoded;
+  }
+
+  async function post(action, body) {
+    if (!apiBase) throw new Error("Staging API is not configured; no request was sent.");
+    const response = await fetch(apiBase + "/?action=" + encodeURIComponent(action), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      body: JSON.stringify(body)
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.ok) throw new Error(data.error || ("Request failed (" + response.status + ")."));
+    return data;
+  }
+
+  async function signChallenge(publicKey) {
+    const provider = window.solana;
+    if (!provider?.signMessage) throw new Error("Install or unlock Phantom (or a compatible Solana wallet) and connect it first.");
+    const challenge = await post("wallet-challenge", { publicKey });
+    const signed = await provider.signMessage(new TextEncoder().encode(challenge.message), "utf8");
+    return { nonce: challenge.nonce, signature: base58(signed.signature) };
+  }
+
+  async function ownerRequest(action, body) {
+    if (!connectedPublicKey) throw new Error("Connect a wallet first.");
+    const auth = await signChallenge(connectedPublicKey);
+    return post(action, { ...body, ...auth });
+  }
+
+  function renderWallets() {
+    const list = $("mwWallets");
+    const select = $("mwWalletSelect");
+    list.replaceChildren();
+    select.replaceChildren();
+    if (!wallets.length) {
+      list.textContent = "No registered wallets yet.";
+      select.add(new Option("Register a wallet first", ""));
+      select.disabled = true;
+      $("mwCreate").disabled = true;
+      $("mwLoadConfigs").disabled = true;
+      return;
+    }
+    for (const wallet of wallets) {
+      const item = document.createElement("div");
+      item.className = "mw-item";
+      const title = document.createElement("strong");
+      title.textContent = wallet.label || wallet.wallet_type || "Wallet";
+      const detail = document.createElement("div");
+      detail.className = "mw-small";
+      detail.textContent = wallet.public_key + " · " + (Number(wallet.enabled) ? "enabled" : "disabled");
+      item.append(title, detail);
+      list.appendChild(item);
+      select.add(new Option((wallet.label || wallet.public_key.slice(0, 8)) + " · #" + wallet.id, String(wallet.id)));
+    }
+    select.disabled = false;
+    $("mwCreate").disabled = !apiBase;
+    $("mwLoadConfigs").disabled = !apiBase;
+  }
+
+  async function refreshWallets() {
+    const data = await ownerRequest("wallets", { operation: "list" });
+    wallets = Array.isArray(data.wallets) ? data.wallets : [];
+    renderWallets();
+    status("Loaded " + wallets.length + " wallet(s).");
+  }
+
+  async function registerConnectedWallet() {
+    if (!connectedPublicKey) throw new Error("Connect a wallet first.");
+    // The owner and target are the same connected wallet here, so the same
+    // wallet signs two distinct, single-use challenges.
+    const walletProof = await signChallenge(connectedPublicKey);
+    const data = await ownerRequest("wallets", {
+      operation: "register",
+      walletProof,
+      wallet: { publicKey: connectedPublicKey, walletType: "user_connected", label: "Connected wallet" }
+    });
+    status("Wallet registered: " + data.wallet.public_key);
+    await refreshWallets();
+  }
+
+  async function loadConfigs() {
+    const walletId = $("mwWalletSelect").value;
+    if (!walletId) throw new Error("Select a wallet first.");
+    const data = await ownerRequest("token-configs", { operation: "list", walletId });
+    const list = $("mwConfigs");
+    list.replaceChildren();
+    if (!data.configs?.length) {
+      list.textContent = "No token configurations for this wallet.";
+      return;
+    }
+    for (const config of data.configs) {
+      const item = document.createElement("div");
+      item.className = "mw-item";
+      const title = document.createElement("strong");
+      title.textContent = config.token_mint + " · " + config.strategy + " / " + config.side;
+      const details = document.createElement("div");
+      details.className = "mw-small";
+      details.textContent = "Amount " + config.trade_amount + " · interval " + config.interval_seconds + "s · max trades " + config.max_trades + " · " + config.mode + " · " + (Number(config.enabled) ? "enabled" : "disabled");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "mw-button";
+      button.textContent = Number(config.enabled) ? "Disable dry-run" : "Enable dry-run";
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try {
+          await ownerRequest("token-configs", {
+            operation: "set-enabled", walletId, configId: config.id, enabled: !Number(config.enabled)
+          });
+          await loadConfigs();
+          status("Dry-run configuration updated. No live transaction was sent.");
+        } catch (error) { status(error.message); button.disabled = false; }
+      });
+      item.append(title, details, button);
+      list.appendChild(item);
+    }
+  }
+
+  async function createConfig() {
+    const walletId = $("mwWalletSelect").value;
+    const tokenMint = $("mwMint").value.trim();
+    if (!walletId) throw new Error("Select a wallet first.");
+    if (!tokenMint) throw new Error("Enter a token mint address.");
+    const strategy = $("mwStrategy").value;
+    const config = {
+      tokenMint,
+      strategy,
+      side: $("mwSide").value,
+      tradeAmount: Number($("mwAmount").value),
+      intervalSeconds: Number($("mwInterval").value),
+      maxTrades: Number($("mwMaxTrades").value),
+      maxTotalSpend: Number($("mwMaxSpend").value),
+      targetPrice: $("mwTarget").value ? Number($("mwTarget").value) : null,
+      stopLoss: $("mwStopLoss").value ? Number($("mwStopLoss").value) : null,
+      takeProfit: $("mwTakeProfit").value ? Number($("mwTakeProfit").value) : null,
+      mode: "dry_run",
+      enabled: 0
+    };
+    await ownerRequest("token-configs", { operation: "create", walletId, config });
+    status("Token config saved disabled in dry-run mode.");
+    await loadConfigs();
+  }
+
+  async function run(action) {
+    try {
+      status("Working…");
+      await action();
+    } catch (error) {
+      status(error?.message || String(error));
+    }
+  }
+
+  $("mwConnect").addEventListener("click", () => run(async () => {
+    if (!apiBase) throw new Error("Configure the separate staging API first. Production endpoint is intentionally not used.");
+    const provider = window.solana;
+    if (!provider?.connect) throw new Error("Install a compatible Solana wallet extension.");
+    const result = await provider.connect();
+    connectedPublicKey = (result.publicKey || provider.publicKey).toBase58();
+    $("mwConnect").textContent = connectedPublicKey.slice(0, 6) + "…" + connectedPublicKey.slice(-6);
+    $("mwRefresh").disabled = false;
+    $("mwRegister").disabled = false;
+    status("Connected wallet " + connectedPublicKey + ". Loading its wallet list…");
+    await refreshWallets();
+  }));
+  $("mwRefresh").addEventListener("click", () => run(refreshWallets));
+  $("mwRegister").addEventListener("click", () => run(registerConnectedWallet));
+  $("mwLoadConfigs").addEventListener("click", () => run(loadConfigs));
+  $("mwCreate").addEventListener("click", () => run(createConfig));
+})();
