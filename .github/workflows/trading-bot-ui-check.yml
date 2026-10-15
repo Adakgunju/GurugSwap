@@ -4,12 +4,17 @@ on:
   pull_request:
     paths:
       - "trading-bot.js"
+      - "multi-wallet-token-ui.js"
+      - "index.html"
       - ".github/workflows/trading-bot-ui-check.yml"
   push:
     branches:
       - "fix/trading-bot-gurug-mint-lock"
+      - "feature/**"
     paths:
       - "trading-bot.js"
+      - "multi-wallet-token-ui.js"
+      - "index.html"
       - ".github/workflows/trading-bot-ui-check.yml"
 
 permissions:
@@ -26,7 +31,9 @@ jobs:
         with:
           node-version: "22"
       - name: Check JavaScript syntax
-        run: node --check trading-bot.js
+        run: |
+          node --check trading-bot.js
+          node --check multi-wallet-token-ui.js
       - name: Check critical UI safety guards
         run: |
           node --input-type=module <<'NODE'
@@ -34,11 +41,16 @@ jobs:
           import assert from "node:assert/strict";
 
           const source = readFileSync("trading-bot.js", "utf8");
+          const multi = readFileSync("multi-wallet-token-ui.js", "utf8");
           assert.match(source, /const supportedTokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5"/, "GURUG mint must remain fixed to the supported mint");
           assert.match(source, /tokenMintInput\.readOnly = true/, "token mint field must be read-only");
           assert.match(source, /!ready \|\| !backendConnected/, "saving must require a confirmed backend connection");
           assert.match(source, /if \(!response\.ok \|\| !data\?\.ok\)/, "backend status must reject unsuccessful responses");
           assert.doesNotMatch(source, /row\.innerHTML\s*=/, "trade history must not inject backend values using innerHTML");
           assert.match(source, /cell\.textContent = value/, "trade history must render values as text");
+          assert.match(multi, /GURUG_MULTI_API_BASE/, "multi-wallet UI must require an explicitly configured API base");
+          assert.match(multi, /mode: "dry_run"/, "multi-token UI must create dry-run configs only");
+          assert.match(multi, /operation: "set-enabled"/, "multi-token UI must call the per-config dry-run enable route");
+          assert.doesNotMatch(multi, /action=stop|BOT_PRIVATE_KEY|sendRawTransaction/, "multi-wallet UI must not contain live trading controls or private keys");
           console.log("Trading bot UI safety checks passed.");
           NODE
