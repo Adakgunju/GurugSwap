@@ -296,9 +296,14 @@
     try {
       let data;
       if (enabled === 0) {
+        // The Worker requires the same wallet signature for stop as settings.
+        // Sign the exact timestamped message before sending the stop request.
+        const auth = await getWalletSignature();
         const response = await fetch("https://gurug-trading-bot.pcaticom.workers.dev/trade?action=stop", {
           method: "POST",
-          cache: "no-store"
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+          body: JSON.stringify(auth)
         });
         data = await response.json();
         if (!response.ok || !data?.ok) throw new Error(data?.error || "Could not stop bot.");
