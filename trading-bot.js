@@ -153,7 +153,12 @@
           ? Number(trade.amount_token || 0).toFixed(6) + " GURUG"
           : Number(trade.amount_sol || 0).toFixed(4) + " SOL";
         const price = trade.price_usd == null ? "—" : "$" + Number(trade.price_usd).toFixed(6);
-        row.innerHTML = "<span>" + side + "</span><span>" + amount + "</span><span>" + price + "</span><span>" + status + "</span>";
+        // Treat backend-provided values as text, never as HTML.
+        [side, amount, price, status].forEach(value => {
+          const cell = document.createElement("span");
+          cell.textContent = value;
+          row.appendChild(cell);
+        });
         history.appendChild(row);
       });
     } catch {}
