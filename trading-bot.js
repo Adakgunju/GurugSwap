@@ -7,6 +7,9 @@
   const statusMeta = document.getElementById("botStatusMeta");
   const statusMessage = document.getElementById("botStatusMessage");
   const storageKey = "gurugSwap.tradingBotStrategy";
+  // The current Worker explicitly rejects every mint except GURUG.
+  const supportedTokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+  let backendConnected = false;
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
   const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
   const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
@@ -37,7 +40,13 @@
     })();
 
     const save = document.getElementById("botSaveButton");
-    if (save) save.disabled = !ready;
+    if (save) save.disabled = !ready || !backendConnected;
+
+    // Do not allow live settings/start/stop actions until backend status has been confirmed.
+    if (!backendConnected) {
+      if (button) button.disabled = true;
+      return;
+    }
 
     // Keep STOP BOT available whenever the backend says the bot is running.
     if (button && button.dataset.enabled === "1") {
@@ -75,6 +84,13 @@
       const data = await response.json();
       const backendStatus = document.getElementById("botBackendStatus");
       const startButton = document.getElementById("botStartButton");
+      if (!response.ok || !data?.ok) {
+        backendConnected = false;
+        if (backendStatus) backendStatus.textContent = "BACKEND UNAVAILABLE";
+        updateStartButtonState();
+        return;
+      }
+      backendConnected = true;
       if (data?.ok) {
         backendStatus.textContent = Number(data.enabled) === 1 ? "BACKEND ONLINE / ACTIVE" : "BACKEND ONLINE / STOPPED";
         statusCard?.classList.remove("error");
@@ -100,8 +116,10 @@
         }
       }
     } catch {
+      backendConnected = false;
       const backendStatus = document.getElementById("botBackendStatus");
       if (backendStatus) backendStatus.textContent = "BACKEND OFFLINE";
+      updateStartButtonState();
     }
   }
 
@@ -135,7 +153,12 @@
           ? Number(trade.amount_token || 0).toFixed(6) + " GURUG"
           : Number(trade.amount_sol || 0).toFixed(4) + " SOL";
         const price = trade.price_usd == null ? "—" : "$" + Number(trade.price_usd).toFixed(6);
-        row.innerHTML = "<span>" + side + "</span><span>" + amount + "</span><span>" + price + "</span><span>" + status + "</span>";
+        // Treat backend-provided values as text, never as HTML.
+        [side, amount, price, status].forEach(value => {
+          const cell = document.createElement("span");
+          cell.textContent = value;
+          row.appendChild(cell);
+        });
         history.appendChild(row);
       });
     } catch {}
@@ -246,7 +269,7 @@
   function collectSettings() {
     return {
       strategy: strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca",
-      tokenMint: document.getElementById("botTokenMint")?.value.trim() || "",
+      tokenMint: supportedTokenMint,
       side: document.getElementById("botSide")?.value || "buy",
       tradeAmount: document.getElementById("botTradeAmount")?.value || "",
       interval: document.getElementById("botInterval")?.value || "300",
@@ -337,5 +360,13 @@
       if (config.strategy && ["dca","target"].includes(config.strategy)) setStrategy(config.strategy);
     }
   } catch {}
+  // Keep the form aligned with the single-token Worker before enabling Save/Start.
+  const tokenMintInput = document.getElementById("botTokenMint");
+  if (tokenMintInput) {
+    tokenMintInput.value = supportedTokenMint;
+    tokenMintInput.readOnly = true;
+    tokenMintInput.setAttribute("aria-readonly", "true");
+    tokenMintInput.title = "This bot backend currently supports GURUG only.";
+  }
   updateStartButtonState();
 })();
