@@ -1,0 +1,44 @@
+name: Trading bot UI checks
+
+on:
+  pull_request:
+    paths:
+      - "trading-bot.js"
+      - ".github/workflows/trading-bot-ui-check.yml"
+  push:
+    branches:
+      - "fix/trading-bot-gurug-mint-lock"
+    paths:
+      - "trading-bot.js"
+      - ".github/workflows/trading-bot-ui-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check JavaScript syntax
+        run: node --check trading-bot.js
+      - name: Check critical UI safety guards
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          import assert from "node:assert/strict";
+
+          const source = readFileSync("trading-bot.js", "utf8");
+          assert.match(source, /const supportedTokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5"/, "GURUG mint must remain fixed to the supported mint");
+          assert.match(source, /tokenMintInput\.readOnly = true/, "token mint field must be read-only");
+          assert.match(source, /!ready \|\| !backendConnected/, "saving must require a confirmed backend connection");
+          assert.match(source, /if \(!response\.ok \|\| !data\?\.ok\)/, "backend status must reject unsuccessful responses");
+          assert.doesNotMatch(source, /row\.innerHTML\s*=/, "trade history must not inject backend values using innerHTML");
+          assert.match(source, /cell\.textContent = value/, "trade history must render values as text");
+          console.log("Trading bot UI safety checks passed.");
+          NODE
