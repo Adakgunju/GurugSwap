@@ -1,0 +1,42 @@
+name: Trading bot UI checks
+
+on:
+  pull_request:
+    paths:
+      - "trading-bot.js"
+      - ".github/workflows/trading-bot-ui-check.yml"
+  push:
+    branches:
+      - "fix/trading-bot-signed-stop-request"
+    paths:
+      - "trading-bot.js"
+      - ".github/workflows/trading-bot-ui-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check JavaScript syntax
+        run: node --check trading-bot.js
+      - name: Check signed stop request contract
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          import assert from "node:assert/strict";
+
+          const source = readFileSync("trading-bot.js", "utf8");
+          assert.match(source, /async function getWalletSignature\(\)/, "wallet signing helper must exist");
+          assert.match(source, /const message = "Gurug Bot Settings:\\n" \+ timestamp/, "client must sign the Worker-defined message");
+          assert.match(source, /signatureBytes: Array\.from\(result\.signature \|\| \[\]\)/, "signature must be sent as a byte array");
+          assert.match(source, /fetch\("https:\/\/gurug-trading-bot\.pcaticom\.workers\.dev\/trade\?action=stop",\s*\{[\s\S]*?method: "POST"[\s\S]*?body: JSON\.stringify\(auth\)/, "stop request must POST the signed payload");
+          console.log("Signed stop request static checks passed.");
+          NODE
