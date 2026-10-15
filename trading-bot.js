@@ -7,6 +7,8 @@
   const statusMeta = document.getElementById("botStatusMeta");
   const statusMessage = document.getElementById("botStatusMessage");
   const storageKey = "gurugSwap.tradingBotStrategy";
+  // The current Worker explicitly rejects every mint except GURUG.
+  const supportedTokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
   const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
   const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
@@ -246,7 +248,7 @@
   function collectSettings() {
     return {
       strategy: strategyButtons.find(button => button.classList.contains("active"))?.dataset.strategy || "dca",
-      tokenMint: document.getElementById("botTokenMint")?.value.trim() || "",
+      tokenMint: supportedTokenMint,
       side: document.getElementById("botSide")?.value || "buy",
       tradeAmount: document.getElementById("botTradeAmount")?.value || "",
       interval: document.getElementById("botInterval")?.value || "300",
@@ -337,5 +339,13 @@
       if (config.strategy && ["dca","target"].includes(config.strategy)) setStrategy(config.strategy);
     }
   } catch {}
+  // Keep the form aligned with the single-token Worker before enabling Save/Start.
+  const tokenMintInput = document.getElementById("botTokenMint");
+  if (tokenMintInput) {
+    tokenMintInput.value = supportedTokenMint;
+    tokenMintInput.readOnly = true;
+    tokenMintInput.setAttribute("aria-readonly", "true");
+    tokenMintInput.title = "This bot backend currently supports GURUG only.";
+  }
   updateStartButtonState();
 })();
