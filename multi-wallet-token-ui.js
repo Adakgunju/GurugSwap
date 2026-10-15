@@ -3,7 +3,7 @@
 
   // Set this only to a separately configured staging Worker URL. Do not point
   // this UI at the production Worker until the multi-wallet migration is staged.
-  const apiBase = String(window.GURUG_MULTI_API_BASE || "").trim().replace(/\/+$/, "");
+  let apiBase = String(window.GURUG_MULTI_API_BASE || "").trim().replace(/\/+$/, "");
   const section = document.getElementById("trading-bot");
   if (!section || document.getElementById("multiWalletPanel")) return;
 
@@ -32,6 +32,15 @@
     </style>
     <h3>Multi-wallet / Multi-token (Dry-run)</h3>
     <p>Manage wallet-linked token strategies independently. This panel only supports dry-run configuration; it cannot start live trades.</p>
+    <div class="mw-grid">
+      <label class="mw-field">Staging Worker URL (HTTPS; hostname must include “staging”)
+        <input id="mwApiUrl" type="url" placeholder="https://your-staging-worker.example.workers.dev" autocomplete="url">
+      </label>
+      <div class="mw-field" style="justify-content:end">
+        <span>Only a separately named staging endpoint is accepted. The URL is kept in this page only.</span>
+        <button id="mwSetApi" class="mw-button" type="button">Use staging endpoint</button>
+      </div>
+    </div>
     <div id="mwStatus" class="mw-status" role="status" aria-live="polite"></div>
     <div class="mw-actions">
       <button id="mwConnect" class="mw-button primary" type="button">Connect wallet</button>
@@ -262,7 +271,7 @@
     }
   }
 
-  $("mwConnect").addEventListener("click", () => run(async () => {
+  $("mwSetApi").addEventListener("click", () => run(async () => {\n    const raw = $("mwApiUrl").value.trim();\n    let parsed;\n    try { parsed = new URL(raw); } catch { throw new Error("Enter a valid staging Worker URL."); }\n    if (parsed.protocol !== "https:" || !parsed.hostname.toLowerCase().includes("staging")) {\n      throw new Error("For safety, use HTTPS and a hostname containing “staging”. Production endpoints are rejected.");\n    }\n    if (parsed.username || parsed.password || parsed.search || parsed.hash) {\n      throw new Error("Use a clean Worker origin without credentials, query parameters, or fragments.");\n    }\n    apiBase = parsed.origin.replace(/\\/+$/, "");\n    $("mwConnect").disabled = false;\n    $("mwCreate").disabled = wallets.length === 0;\n    $("mwLoadConfigs").disabled = wallets.length === 0;\n    status("Staging endpoint selected for this page session: " + apiBase);\n  }));\n\n  $("mwConnect").addEventListener("click", () => run(async () => {
     if (!apiBase) throw new Error("Configure the separate staging API first. Production endpoint is intentionally not used.");
     const provider = window.solana;
     if (!provider?.connect) throw new Error("Install a compatible Solana wallet extension.");
