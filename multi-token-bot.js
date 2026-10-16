@@ -280,7 +280,7 @@
         const row = document.createElement("div");
         row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(255,229,0,.14)";
         const details = document.createElement("span");
-        details.textContent = "#" + config.id + " · " + config.token_mint + " · " + config.strategy + " · " + String(config.mode || "dry_run").toUpperCase() + (Number(config.enabled) ? " · ENABLED" : " · DISABLED");
+        details.textContent = "#" + config.id + " · " + config.token_mint + " · " + config.strategy + " " + (config.side || "BUY") + " · Amount " + config.trade_amount + " · Every " + config.interval_seconds + "s · " + String(config.mode || "dry_run").toUpperCase() + (Number(config.enabled) ? " · ENABLED" : " · DISABLED");
         details.style.cssText = "overflow-wrap:anywhere;flex:1;min-width:180px";
         const toggle = document.createElement("button");
         toggle.type = "button";
