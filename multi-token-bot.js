@@ -75,10 +75,17 @@
   function renderWallets(wallets) {
     if (walletSelect) {
       walletSelect.replaceChildren();
-      for (const wallet of wallets) {
+      const enabledWallets = wallets.filter(wallet => Number(wallet.enabled) === 1 || wallet.enabled === true);
+      if (!enabledWallets.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = wallets.length ? "No enabled wallets available" : "Register a wallet first";
+        walletSelect.append(option);
+      }
+      for (const wallet of enabledWallets) {
         const option = document.createElement("option");
         option.value = String(wallet.id);
-        option.textContent = shortKey(wallet.public_key) + " · " + (wallet.wallet_type || "wallet") + (Number(wallet.enabled) ? "" : " · disabled");
+        option.textContent = shortKey(wallet.public_key) + " · " + (wallet.wallet_type || "wallet");
         walletSelect.append(option);
       }
     }
