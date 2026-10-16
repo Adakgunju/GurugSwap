@@ -243,18 +243,54 @@
     }
   });
 
+  async function loadConfigs() {
+    const walletId = Number(walletSelect?.value);
+    if (!Number.isSafeInteger(walletId) || walletId <= 0) throw new Error("Register and select a wallet first.");
+    const data = await authenticated("token-configs", { operation: "list", walletId });
+    const output = $("multiBotConfigResult");
+    if (!output) return;
+    output.replaceChildren();
+    const configs = data.configs || [];
+    if (!configs.length) {
+      output.textContent = "No token configurations for this wallet yet.";
+    } else {
+      for (const config of configs) {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid rgba(255,229,0,.14)";
+        const details = document.createElement("span");
+        details.textContent = "#" + config.id + " · " + config.token_mint + " · " + config.strategy + " · " + String(config.mode || "dry_run").toUpperCase() + (Number(config.enabled) ? " · ENABLED" : " · DISABLED");
+        details.style.cssText = "overflow-wrap:anywhere;flex:1;min-width:180px";
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = Number(config.enabled) ? "bot-secondary" : "bot-primary";
+        toggle.textContent = Number(config.enabled) ? "PAUSE DRY RUN" : "ENABLE DRY RUN";
+        toggle.addEventListener("click", async () => {
+          try {
+            toggle.disabled = true;
+            setStatus((Number(config.enabled) ? "Disabling" : "Enabling") + " dry-run config #" + config.id + "…");
+            await authenticated("token-configs", {
+              operation: "set-enabled",
+              walletId,
+              configId: config.id,
+              enabled: !Number(config.enabled)
+            });
+            await loadConfigs();
+            setStatus("Dry-run config #" + config.id + " updated. Live trading remains disabled.");
+          } catch (error) {
+            toggle.disabled = false;
+            setStatus(error.message || "Could not update configuration.", true);
+          }
+        });
+        row.append(details, toggle);
+        output.append(row);
+      }
+    }
+    setStatus("Loaded " + configs.length + " token configuration(s).");
+  }
+
   $("multiBotLoadConfigs")?.addEventListener("click", async () => {
     try {
-      const walletId = Number(walletSelect?.value);
-      if (!Number.isSafeInteger(walletId) || walletId <= 0) throw new Error("Register and select a wallet first.");
-      const data = await authenticated("token-configs", { operation: "list", walletId });
-      const output = $("multiBotConfigResult");
-      if (output) {
-        output.textContent = data.configs?.length
-          ? data.configs.map(c => "#" + c.id + " · " + c.token_mint + " · " + c.strategy + " · " + c.mode.toUpperCase() + (Number(c.enabled) ? " · ENABLED" : " · DISABLED")).join("\n")
-          : "No token configurations for this wallet yet.";
-      }
-      setStatus("Loaded " + (data.configs?.length || 0) + " token configuration(s).");
+      await loadConfigs();
     } catch (error) {
       setStatus(error.message || "Could not load token configurations.", true);
     }
