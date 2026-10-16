@@ -235,9 +235,10 @@
       };
       setStatus("Saving disabled dry-run configuration…");
       const data = await authenticated("token-configs", { operation: "create", walletId, config });
-      setStatus("Configuration saved in DRY-RUN mode and left disabled. Live trading is not activated.");
       const output = $("multiBotConfigResult");
       if (output) output.textContent = "Saved config #" + data.config.id + " · " + data.config.strategy + " · DRY RUN · DISABLED";
+      await loadConfigs();
+      setStatus("Configuration #" + data.config.id + " saved. It is disabled in DRY-RUN mode; enable it below when ready to simulate.");
     } catch (error) {
       setStatus(error.message || "Could not save token configuration.", true);
     }
