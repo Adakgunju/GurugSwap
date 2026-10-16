@@ -1381,12 +1381,19 @@ async function updateTokenInfo(token) {
         console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
       }
       let pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
-      if (!pairs.some(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase())) {
+      const hasGurugPair = list => list.some(p =>
+        p?.chainId === "solana" &&
+        (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+         String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase())
+      );
+      if (!hasGurugPair(pairs)) {
         const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
         if (tokenRes.ok) {
           const tokenData = await tokenRes.json();
           const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
-          pairs = tokenPairs.filter(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
+          pairs = tokenPairs.filter(p => p?.chainId === "solana" &&
+            (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+             String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase()));
         }
       }
       json = {pairs};
@@ -1474,19 +1481,23 @@ async function updateGurugMarketTicker() {
     } catch (pairError) {
       console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
     }
-    let pair = pairs.find(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
+    const matchesGurug = p => p?.chainId === "solana" &&
+      (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+       String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
+    let pair = pairs.filter(matchesGurug).sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
     if (!pair) {
       const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
       if (tokenRes.ok) {
         const tokenData = await tokenRes.json();
         const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
-        pair = tokenPairs
-          .filter(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase())
+        pair = tokenPairs.filter(matchesGurug)
           .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
       }
     }
     if (!pair) throw new Error("No Solana market pair found for the GURUG mint");
-    const price = Number(pair?.priceUsd);
+    const isBaseGurug = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
+    const price = isBaseGurug ? Number(pair?.priceUsd) :
+      (Number(pair?.priceNative) > 0 ? Number(pair?.priceUsd) / Number(pair?.priceNative) : NaN);
     const change = Number(pair?.priceChange?.h24);
 
     if (Number.isFinite(price)) {
