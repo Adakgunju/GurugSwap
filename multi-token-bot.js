@@ -108,6 +108,11 @@
     }
   }
 
+  // Keep the primary account proof in memory while the user switches Phantom's
+  // active account to the secondary wallet they want to register. Never persist signatures.
+  let pendingOwnerAuth = null;
+  let pendingOwnerPublicKey = null;
+
   async function loadWallets() {
     setStatus("Authenticating wallet and loading your registered wallets…");
     const data = await authenticated("wallets", { operation: "list" });
@@ -131,17 +136,39 @@
       const walletProvider = provider();
       if (!walletProvider?.publicKey) throw new Error("Connect your Phantom wallet first.");
       const publicKey = walletProvider.publicKey.toBase58();
-      setStatus("Please approve the wallet ownership signature in Phantom…");
-      // The owner signature and target-wallet proof are distinct one-time challenges.
+
+      if (!pendingOwnerAuth) {
+        setStatus("Sign once with your primary account to establish the wallet group…");
+        pendingOwnerAuth = await signedChallenge(walletProvider, publicKey);
+        pendingOwnerPublicKey = publicKey;
+        setStatus(
+          "Primary account verified in this session: " + shortKey(publicKey) +
+          ". To add another wallet, switch Phantom to that wallet and click REGISTER CONNECTED WALLET again. " +
+          "This signature only authenticates settings; it cannot transfer tokens."
+        );
+        const button = $("multiBotRegister");
+        if (button) button.textContent = "REGISTER / CONTINUE";
+        return;
+      }
+
+      setStatus("Sign a separate ownership proof with the wallet currently selected in Phantom…");
       const walletProof = await signedChallenge(walletProvider, publicKey);
-      const auth = await signedChallenge(walletProvider, publicKey);
       const data = await post("wallets", {
-        ...auth,
+        ...pendingOwnerAuth,
         operation: "register",
         wallet: { publicKey, walletType: "user_connected", label: "GurugSwap connected wallet" },
         walletProof
       });
-      setStatus("Wallet registered successfully. No private key was shared.");
+
+      pendingOwnerAuth = null;
+      const registeredButton = $("multiBotRegister");
+      if (registeredButton) registeredButton.textContent = "REGISTER CONNECTED WALLET";
+      setStatus(
+        "Wallet " + shortKey(data.wallet?.public_key || publicKey) +
+        " registered under primary account " + shortKey(pendingOwnerPublicKey) +
+        ". No private key was shared."
+      );
+      pendingOwnerPublicKey = null;
       await loadWallets();
     } catch (error) {
       setStatus(error.message || "Could not register wallet.", true);
