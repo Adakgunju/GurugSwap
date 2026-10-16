@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#fffbe4">
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
-  <link rel="stylesheet" href="style.css?v=132">
+  <link rel="stylesheet" href="style.css?v=134">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -358,7 +358,7 @@
     </div>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=45"></script>
+  <script src="script.js?v=46"></script>
   <script src="create-token-v15.js?v=27"></script>
   <script src="distribute-token.js?v=7"></script>
   <script src="multi-airdrop.js?v=9"></script>
@@ -453,7 +453,12 @@
               console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
             }
             let gurugPairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
-            if (!gurugPairs.some(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase())) {
+            const hasGurugPair = pairs => pairs.some(p =>
+              p?.chainId === "solana" &&
+              (String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase() ||
+               String(p?.quoteToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase())
+            );
+            if (!hasGurugPair(gurugPairs)) {
               const tokenRes = await fetch(
                 "https://api.dexscreener.com/latest/dex/tokens/" + GURUG_MINT,
                 {cache:"no-store"}
@@ -461,7 +466,9 @@
               if (tokenRes.ok) {
                 const tokenData = await tokenRes.json();
                 gurugPairs = (Array.isArray(tokenData?.pairs) ? tokenData.pairs : [])
-                  .filter(p => p?.chainId === "solana" && String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase());
+                  .filter(p => p?.chainId === "solana" &&
+                    (String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase() ||
+                     String(p?.quoteToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase()));
               }
             }
             market = {pairs: gurugPairs};
