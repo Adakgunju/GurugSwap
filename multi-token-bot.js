@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const API = "https://gurug-trading-bot.pcaticom.workers.dev/";
+  const API = window.GURUG_TRADING_BOT_API_BASE || "https://gurug-trading-bot-preview.pcaticom.workers.dev/";
   const $ = (id) => document.getElementById(id);
   const status = $("multiBotStatus");
   const walletSelect = $("multiBotWallet");
