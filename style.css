@@ -9475,3 +9475,25 @@ body .topbar>.brand .accent{
     margin-top: 12px !important;
   }
 }
+
+
+/* Multi-wallet trading bot workspace */
+.multi-bot-panel{margin-top:28px;padding:clamp(18px,3vw,28px);border:1px solid rgba(101,128,190,.28);border-radius:22px;background:linear-gradient(145deg,rgba(14,23,43,.96),rgba(20,20,38,.96));color:#f5f7ff}
+.multi-bot-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.multi-bot-panel-head h3{margin:8px 0 0;font-size:clamp(22px,3vw,30px);letter-spacing:-.03em}
+.multi-bot-panel-head h3 span{color:#8fa9ff}
+.multi-bot-safe{padding:7px 10px;border:1px solid rgba(91,222,178,.45);border-radius:999px;color:#72e7bf;font-size:10px;font-weight:800;letter-spacing:.1em}
+.multi-bot-copy{max-width:760px;color:#aeb8d0;font-size:13px;line-height:1.65}
+.multi-bot-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.multi-bot-status{padding:12px 14px;border:1px solid rgba(125,150,204,.25);border-radius:12px;background:rgba(255,255,255,.035);color:#c4d0ed;font-size:12px;line-height:1.5;white-space:pre-wrap}
+.multi-bot-status.is-error{border-color:rgba(255,105,122,.5);color:#ffadb7}
+.multi-bot-wallet-list{display:grid;gap:8px;margin:12px 0;color:#9ca9c5;font-size:12px}
+.multi-bot-wallet-row{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid rgba(125,150,204,.18);border-radius:10px}
+.multi-bot-wallet-row small{color:#72e7bf;font-weight:800;font-size:10px}
+.multi-bot-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.multi-bot-field{display:grid;gap:7px;min-width:0}
+.multi-bot-field small{color:#9eabc7;font-size:10px;font-weight:800;letter-spacing:.09em}
+.multi-bot-field input,.multi-bot-field select{box-sizing:border-box;width:100%;min-width:0;min-height:44px;padding:10px 12px;border:1px solid rgba(135,157,207,.28);border-radius:10px;background:#10182a;color:#f5f7ff;font:inherit;font-size:13px}
+.multi-bot-wide{grid-column:1/-1}
+.multi-bot-result{min-height:22px;max-height:220px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border-radius:10px;background:rgba(0,0,0,.2);color:#aebee0;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+@media(max-width:600px){.multi-bot-form{grid-template-columns:1fr}.multi-bot-wide{grid-column:auto}.multi-bot-actions button{width:100%}.multi-bot-wallet-row{flex-direction:column;gap:5px}}
