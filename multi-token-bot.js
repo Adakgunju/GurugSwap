@@ -265,6 +265,33 @@
     }
   });
 
+  async function loadHistory() {
+    const walletId = Number(walletSelect?.value);
+    if (!Number.isSafeInteger(walletId) || walletId <= 0) throw new Error("Register and select a wallet first.");
+    const data = await authenticated("token-trades", { operation: "list", walletId });
+    const output = $("multiBotHistory");
+    if (!output) return;
+    output.replaceChildren();
+    const trades = data.trades || [];
+    if (!trades.length) {
+      output.textContent = "No dry-run execution records for this wallet yet. Enable a configuration and wait for the next scheduler tick.";
+      return;
+    }
+    for (const trade of trades) {
+      const row = document.createElement("div");
+      row.style.cssText = "padding:9px 0;border-bottom:1px solid rgba(255,229,0,.14);overflow-wrap:anywhere";
+      const amount = trade.side === "SELL"
+        ? (trade.amount_token == null ? "—" : String(trade.amount_token) + " token")
+        : (trade.amount_sol == null ? "—" : String(trade.amount_sol) + " SOL");
+      row.textContent = "#" + trade.id + " · " + String(trade.status || "unknown").toUpperCase() +
+        " · " + String(trade.side || "—") + " · " + amount +
+        " · price $" + (trade.price_usd == null ? "unavailable" : Number(trade.price_usd).toPrecision(6)) +
+        " · config #" + (trade.token_config_id || "—") +
+        " · " + (trade.created_at || "time unavailable");
+      output.append(row);
+    }
+  }
+
   async function loadConfigs() {
     const walletId = Number(walletSelect?.value);
     if (!Number.isSafeInteger(walletId) || walletId <= 0) throw new Error("Register and select a wallet first.");
@@ -307,7 +334,8 @@
         output.append(row);
       }
     }
-    setStatus("Loaded " + configs.length + " token configuration(s).");
+    await loadHistory();
+    setStatus("Loaded " + configs.length + " token configuration(s) and refreshed dry-run history.");
   }
 
   walletSelect?.addEventListener("change", async () => {
