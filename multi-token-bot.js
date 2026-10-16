@@ -289,6 +289,15 @@
     setStatus("Loaded " + configs.length + " token configuration(s).");
   }
 
+  walletSelect?.addEventListener("change", async () => {
+    try {
+      await loadConfigs();
+    } catch (error) {
+      // A newly rendered wallet list can briefly have no selection.
+      setStatus(error.message || "Could not load token configurations.", true);
+    }
+  });
+
   $("multiBotLoadConfigs")?.addEventListener("click", async () => {
     try {
       await loadConfigs();
