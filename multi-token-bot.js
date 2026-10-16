@@ -142,7 +142,7 @@
         pendingOwnerAuth = await signedChallenge(walletProvider, publicKey);
         pendingOwnerPublicKey = publicKey;
         setStatus(
-          "Primary account signature captured in this session: " + shortKey(publicKey) +
+          "Primary account signature captured (server verification happens on the next request): " + shortKey(publicKey) +
           ". To add another wallet, switch Phantom to that wallet and click REGISTER CONNECTED WALLET again. " +
           "This signature only authenticates settings; it cannot transfer tokens."
         );
