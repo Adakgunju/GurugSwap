@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#fffbe4">
   <title>GURUG SWAP — SOL ↔ GURUG</title>
   <meta name="description" content="GURUG SWAP — the home of GURUG on Solana.">
-  <link rel="stylesheet" href="style.css?v=132">
+  <link rel="stylesheet" href="style.css?v=133">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -283,6 +283,36 @@
           <div class="bot-history-empty">No automated trades yet.</div>
         </div>
 
+        <div class="multi-bot-panel" aria-labelledby="multiBotHeading">
+          <div class="multi-bot-panel-head">
+            <div><span class="trading-bot-kicker">MULTI-WALLET FOUNDATION</span><h3 id="multiBotHeading">Multi-token <span>workspace</span></h3></div>
+            <span class="multi-bot-safe">DRY RUN ONLY</span>
+          </div>
+          <p class="multi-bot-copy">Authenticate with your connected Solana wallet, register it, and save token-specific configurations. Each new configuration stays disabled and cannot place live trades.</p>
+          <div class="multi-bot-actions">
+            <button id="multiBotConnect" class="bot-secondary" type="button">CONNECT / LOAD WALLETS</button>
+            <button id="multiBotRegister" class="bot-secondary" type="button">REGISTER CONNECTED WALLET</button>
+          </div>
+          <div id="multiBotStatus" class="multi-bot-status" role="status" aria-live="polite">Not connected to multi-wallet API yet.</div>
+          <div id="multiBotWalletList" class="multi-bot-wallet-list">Connect your wallet to load registered wallets.</div>
+          <label class="multi-bot-field"><small>WALLET FOR TOKEN CONFIG</small><select id="multiBotWallet"><option value="">Connect and load wallets first</option></select></label>
+          <div class="multi-bot-form">
+            <label class="multi-bot-field multi-bot-wide"><small>TOKEN MINT</small><input id="multiBotMint" type="text" placeholder="Solana token mint address"></label>
+            <label class="multi-bot-field"><small>STRATEGY</small><select id="multiBotStrategy"><option value="DCA">DCA</option><option value="TARGET">TARGET PRICE</option></select></label>
+            <label class="multi-bot-field"><small>SIDE</small><select id="multiBotSide"><option value="BUY">BUY</option><option value="SELL">SELL</option></select></label>
+            <label class="multi-bot-field"><small>AMOUNT (SOL FOR BUY)</small><input id="multiBotAmount" type="number" min="0.000001" step="any" value="0.01"></label>
+            <label class="multi-bot-field"><small>INTERVAL</small><select id="multiBotInterval"><option value="60">1 minute</option><option value="300" selected>5 minutes</option><option value="900">15 minutes</option><option value="3600">1 hour</option></select></label>
+            <label class="multi-bot-field"><small>MAX TRADES</small><input id="multiBotMaxTrades" type="number" min="1" step="1" value="1"></label>
+            <label class="multi-bot-field"><small>MAX TOTAL SPEND (SOL)</small><input id="multiBotMaxSpend" type="number" min="0" step="any" value="0"></label>
+            <label class="multi-bot-field"><small>TARGET PRICE (USD, TARGET ONLY)</small><input id="multiBotTarget" type="number" min="0" step="any" placeholder="Optional for DCA"></label>
+          </div>
+          <div class="multi-bot-actions">
+            <button id="multiBotCreateConfig" class="bot-primary" type="button">SAVE DISABLED DRY-RUN CONFIG</button>
+            <button id="multiBotLoadConfigs" class="bot-secondary" type="button">LOAD CONFIGS</button>
+          </div>
+          <pre id="multiBotConfigResult" class="multi-bot-result">No token configuration loaded.</pre>
+        </div>
+
         <div class="trading-bot-foot"><span>RULE-BASED</span><span>NON-CUSTODIAL UI</span><span>SOLANA MAINNET</span></div>
       </div>
     </section>
@@ -367,6 +397,7 @@
   <script src="token-authority.js?v=6"></script>
   <script src="token-mint.js?v=24"></script>
   <script src="trading-bot.js?v=19"></script>
+  <script src="multi-token-bot.js?v=1"></script>
   <script>
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
