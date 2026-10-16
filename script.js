@@ -1371,7 +1371,7 @@ async function updateTokenInfo(token) {
     let json;
     if (String(token.symbol || "").toUpperCase() === "GURUG") {
       // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
-      const pairAddress = "8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz";
+      const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
       const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
       let pairData = null;
       try {
@@ -1470,7 +1470,7 @@ async function updateGurugMarketTicker() {
 
   try {
     const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
-    const pairAddress = "8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz";
+    const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
     let pairs = [];
     try {
       const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
