@@ -129,16 +129,11 @@
     }
   }
 
-  // Keep the primary account proof in memory while the user switches Phantom's
-  // active account to the secondary wallet they want to register. Never persist signatures.
-  let pendingOwnerAuth = null;
-  let pendingOwnerPublicKey = null;
-
   async function loadWallets() {
-    setStatus("Authenticating wallet and loading your registered wallets…");
+    setStatus("Authenticating your Phantom wallet and loading its workspace…");
     const data = await authenticated("wallets", { operation: "list" });
     renderWallets(data.wallets || []);
-    setStatus("Connected to the bot API. Wallets are scoped to the signed-in wallet.");
+    setStatus("Connected. Your workspace is private to the currently signed-in Phantom wallet.");
   }
 
   $("multiBotConnect")?.addEventListener("click", async () => {
@@ -153,59 +148,26 @@
   });
 
   $("multiBotRegister")?.addEventListener("click", async () => {
+    const button = $("multiBotRegister");
+    if (button) button.disabled = true;
     try {
       const walletProvider = provider();
       if (!walletProvider?.publicKey) throw new Error("Connect your Phantom wallet first.");
       const publicKey = walletProvider.publicKey.toBase58();
-
-      if (!pendingOwnerAuth) {
-        setStatus("Sign once with your primary account to establish the wallet group…");
-        pendingOwnerAuth = await signedChallenge(walletProvider, publicKey);
-        pendingOwnerPublicKey = publicKey;
-        setStatus(
-          "Primary account signature captured (server verification happens on the next request): " + shortKey(publicKey) +
-          ". To add another wallet, switch Phantom to that wallet and click REGISTER CONNECTED WALLET again. " +
-          "This signature only authenticates settings; it cannot transfer tokens."
-        );
-        const button = $("multiBotRegister");
-        if (button) button.textContent = "REGISTER / CONTINUE";
-        return;
-      }
-
-      if (publicKey === pendingOwnerPublicKey) {
-        throw new Error("Switch Phantom to a different secondary wallet before continuing.");
-      }
-
-      setStatus("Sign a separate ownership proof with the wallet currently selected in Phantom…");
-      const walletProof = await signedChallenge(walletProvider, publicKey);
+      setStatus("Sign once to register the currently connected wallet as your private workspace…");
+      const auth = await signedChallenge(walletProvider, publicKey);
       const data = await post("wallets", {
-        ...pendingOwnerAuth,
+        ...auth,
         operation: "register",
-        wallet: { publicKey, walletType: "user_connected", label: "GurugSwap connected wallet" },
-        walletProof
+        wallet: { publicKey, walletType: "user_connected", label: "GurugSwap user wallet" }
       });
-
-      pendingOwnerAuth = null;
-      const registeredButton = $("multiBotRegister");
-      if (registeredButton) registeredButton.textContent = "REGISTER CONNECTED WALLET";
-      setStatus(
-        "Wallet " + shortKey(data.wallet?.public_key || publicKey) +
-        " registered under primary account " + shortKey(pendingOwnerPublicKey) +
-        ". No private key was shared."
-      );
-      pendingOwnerPublicKey = null;
-      setStatus("Registration complete. Switch Phantom back to the primary account and click CONNECT / LOAD WALLETS to refresh the full wallet group.");
+      renderWallets([data.wallet]);
+      setStatus("Your wallet is registered. Select it below to configure tokens. No private key was shared.");
+      await loadWallets();
     } catch (error) {
-      const message = error.message || "Could not register wallet.";
-      if (/invalid or expired wallet challenge/i.test(message)) {
-        pendingOwnerAuth = null;
-        pendingOwnerPublicKey = null;
-        const button = $("multiBotRegister");
-        if (button) button.textContent = "REGISTER CONNECTED WALLET";
-        setStatus("The primary signature expired. Click REGISTER CONNECTED WALLET again to restart the two-step flow.", true);
-        return;
-      }
-      setStatus(message, true);
+      setStatus(error.message || "Could not register your wallet.", true);
+    } finally {
+      if (button) button.disabled = false;
     }
   });
 
