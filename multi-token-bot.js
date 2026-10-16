@@ -171,7 +171,16 @@
       pendingOwnerPublicKey = null;
       setStatus("Registration complete. Switch Phantom back to the primary account and click CONNECT / LOAD WALLETS to refresh the full wallet group.");
     } catch (error) {
-      setStatus(error.message || "Could not register wallet.", true);
+      const message = error.message || "Could not register wallet.";
+      if (/invalid or expired wallet challenge/i.test(message)) {
+        pendingOwnerAuth = null;
+        pendingOwnerPublicKey = null;
+        const button = $("multiBotRegister");
+        if (button) button.textContent = "REGISTER CONNECTED WALLET";
+        setStatus("The primary signature expired. Click REGISTER CONNECTED WALLET again to restart the two-step flow.", true);
+        return;
+      }
+      setStatus(message, true);
     }
   });
 
