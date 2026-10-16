@@ -103,6 +103,27 @@
         const state = document.createElement("small");
         state.textContent = Number(wallet.enabled) ? "ENABLED" : "DISABLED";
         item.append(label, state);
+        if (Number(wallet.enabled) === 1 || wallet.enabled === true) {
+          const disable = document.createElement("button");
+          disable.type = "button";
+          disable.className = "bot-secondary";
+          disable.textContent = "DISABLE";
+          disable.addEventListener("click", async () => {
+            if (!window.confirm("Disable this wallet for new dry-run configurations? Existing configuration history will be retained.")) return;
+            disable.disabled = true;
+            try {
+              setStatus("Disabling wallet " + shortKey(wallet.public_key) + "…");
+              const result = await authenticated("wallets", { operation: "disable", walletId: wallet.id });
+              if (!result.disabled) throw new Error("Wallet was already disabled or could not be found.");
+              await loadWallets();
+              setStatus("Wallet disabled. Its history is retained; it can no longer be selected for new dry-run configurations.");
+            } catch (error) {
+              disable.disabled = false;
+              setStatus(error.message || "Could not disable wallet.", true);
+            }
+          });
+          item.append(disable);
+        }
         walletList.append(item);
       }
     }
