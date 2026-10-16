@@ -6,7 +6,6 @@
   const status = $("multiBotStatus");
   const walletSelect = $("multiBotWallet");
   const walletList = $("multiBotWalletList");
-  const SOL_MINT = "So11111111111111111111111111111111111111112";
 
   function provider() {
     return window.phantom?.solana?.isPhantom ? window.phantom.solana :
@@ -148,15 +147,42 @@
       if (!Number.isSafeInteger(walletId) || walletId <= 0) throw new Error("Register and select a wallet first.");
       const strategy = $("multiBotStrategy")?.value || "DCA";
       const targetPrice = $("multiBotTarget")?.value || "";
+      const tokenMint = $("multiBotMint")?.value.trim() || "";
+      const tradeAmount = Number($("multiBotAmount")?.value);
+      const intervalSeconds = Number($("multiBotInterval")?.value || 300);
+      const maxTrades = Number($("multiBotMaxTrades")?.value || 1);
+      const maxTotalSpend = Number($("multiBotMaxSpend")?.value || 0);
+      const parsedTarget = targetPrice === "" ? null : Number(targetPrice);
+
+      // Catch common form errors before requesting a wallet signature.
+      if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(tokenMint)) {
+        throw new Error("Enter a valid-looking Solana token mint address.");
+      }
+      if (!Number.isFinite(tradeAmount) || tradeAmount <= 0) {
+        throw new Error("Trade amount must be greater than 0.");
+      }
+      if (!Number.isSafeInteger(intervalSeconds) || intervalSeconds < 60) {
+        throw new Error("Interval must be at least 60 whole seconds.");
+      }
+      if (!Number.isSafeInteger(maxTrades) || maxTrades < 1) {
+        throw new Error("Maximum trades must be a positive whole number.");
+      }
+      if (!Number.isFinite(maxTotalSpend) || maxTotalSpend < 0) {
+        throw new Error("Maximum total spend cannot be negative.");
+      }
+      if (strategy === "TARGET" && (!Number.isFinite(parsedTarget) || parsedTarget <= 0)) {
+        throw new Error("Enter a target price greater than 0 for TARGET strategy.");
+      }
+
       const config = {
-        tokenMint: $("multiBotMint")?.value.trim() || "",
+        tokenMint,
         strategy,
         side: $("multiBotSide")?.value || "BUY",
-        tradeAmount: Number($("multiBotAmount")?.value),
-        intervalSeconds: Number($("multiBotInterval")?.value || 300),
-        maxTrades: Number($("multiBotMaxTrades")?.value || 1),
-        maxTotalSpend: Number($("multiBotMaxSpend")?.value || 0),
-        targetPrice: targetPrice === "" ? null : Number(targetPrice),
+        tradeAmount,
+        intervalSeconds,
+        maxTrades,
+        maxTotalSpend,
+        targetPrice: parsedTarget,
         mode: "dry_run",
         enabled: 0
       };
