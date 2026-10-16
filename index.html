@@ -289,10 +289,10 @@
             <div><span class="trading-bot-kicker">MULTI-WALLET WORKSPACE</span><h3 id="multiBotHeading">Multi-token <span>workspace</span></h3></div>
             <span class="multi-bot-safe">DRY RUN ONLY</span>
           </div>
-          <p class="multi-bot-copy">Sign with your primary Phantom wallet, then switch to register additional wallets. Each wallet can have its own token configuration. New configurations are saved disabled in dry-run mode and cannot place live trades.</p>
+          <p class="multi-bot-copy">Connect your own Phantom wallet to create a private workspace. Each user manages their own token configurations and dry-run history; wallets, settings, and records are isolated by the signed-in wallet. New configurations are saved disabled in dry-run mode and cannot place live trades.</p>
           <div class="multi-bot-actions">
             <button id="multiBotConnect" class="bot-secondary" type="button">CONNECT / LOAD WALLETS</button>
-            <button id="multiBotRegister" class="bot-secondary" type="button">REGISTER CONNECTED WALLET</button>
+            <button id="multiBotRegister" class="bot-secondary" type="button">REGISTER MY WALLET</button>
           </div>
           <div id="multiBotStatus" class="multi-bot-status" role="status" aria-live="polite">Connect Phantom to manage multiple wallets and token strategies.</div>
           <div id="multiBotWalletList" class="multi-bot-wallet-list">No wallet group loaded.</div>
@@ -400,7 +400,7 @@
   <script src="token-authority.js?v=6"></script>
   <script src="token-mint.js?v=24"></script>
   <script src="trading-bot.js?v=19"></script>
-  <script src="multi-token-bot.js?v=9"></script>
+  <script src="multi-token-bot.js?v=10"></script>
   <script>
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
