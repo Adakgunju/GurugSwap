@@ -169,7 +169,7 @@
         ". No private key was shared."
       );
       pendingOwnerPublicKey = null;
-      await loadWallets();
+      setStatus("Registration complete. Switch Phantom back to the primary account and click CONNECT / LOAD WALLETS to refresh the full wallet group.");
     } catch (error) {
       setStatus(error.message || "Could not register wallet.", true);
     }
