@@ -142,13 +142,17 @@
         pendingOwnerAuth = await signedChallenge(walletProvider, publicKey);
         pendingOwnerPublicKey = publicKey;
         setStatus(
-          "Primary account verified in this session: " + shortKey(publicKey) +
+          "Primary account signature captured in this session: " + shortKey(publicKey) +
           ". To add another wallet, switch Phantom to that wallet and click REGISTER CONNECTED WALLET again. " +
           "This signature only authenticates settings; it cannot transfer tokens."
         );
         const button = $("multiBotRegister");
         if (button) button.textContent = "REGISTER / CONTINUE";
         return;
+      }
+
+      if (publicKey === pendingOwnerPublicKey) {
+        throw new Error("Switch Phantom to a different secondary wallet before continuing.");
       }
 
       setStatus("Sign a separate ownership proof with the wallet currently selected in Phantom…");
