@@ -93,9 +93,15 @@
       const saved = await protectedPost(provider, publicKey, "token-configs", {
         operation: "create", walletId, config: collectConfig()
       });
-      setStatus("Saved disabled DRY-RUN config #" + saved.config.id + " for wallet " +
+      const enabled = await protectedPost(provider, publicKey, "token-configs", {
+        operation: "set-enabled", walletId, configId: saved.config.id, enabled: true
+      });
+      if (!enabled.config || Number(enabled.config.enabled) !== 1) {
+        throw new Error("Configuration was saved, but the preview API did not confirm dry-run activation.");
+      }
+      setStatus("DRY RUN active for config #" + saved.config.id + " / wallet " +
         publicKey.slice(0, 5) + "…" + publicKey.slice(-5) +
-        ". Mint verified on-chain; live trading was not started.");
+        ". Mint verified on-chain; simulation only—no live swaps or signatures.");
     } catch (error) {
       setStatus(error?.message || "Could not save dry-run configuration.", true);
     } finally {
