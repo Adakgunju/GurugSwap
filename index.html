@@ -284,38 +284,6 @@
         </div>
 
 
-        <div class="multi-bot-panel" aria-labelledby="multiBotHeading">
-          <div class="multi-bot-panel-head">
-            <div><span class="trading-bot-kicker">MULTI-USER WORKSPACE</span><h3 id="multiBotHeading">Multi-user <span>trading workspace</span></h3></div>
-            <span class="multi-bot-safe">DRY RUN ONLY</span>
-          </div>
-          <p class="multi-bot-copy">Each user signs in with their own Phantom wallet and gets a separate trading workspace. Your token strategies, settings, and dry-run history are private to your account and isolated from other users. New configurations are saved disabled in dry-run mode and cannot place live trades.</p>
-          <div class="multi-bot-actions">
-            <button id="multiBotConnect" class="bot-secondary" type="button">CONNECT PHANTOM / LOAD MY WORKSPACE</button>
-            <button id="multiBotRegister" class="bot-secondary" type="button">REGISTER MY ACCOUNT</button>
-          </div>
-          <div id="multiBotStatus" class="multi-bot-status" role="status" aria-live="polite">Connect your Phantom wallet to open your personal trading workspace.</div>
-          <div id="multiBotWalletList" class="multi-bot-wallet-list">No user workspace loaded.</div>
-          <label class="multi-bot-field"><small>MY TRADING ACCOUNT</small><select id="multiBotWallet"><option value="">Connect Phantom and load your workspace first</option></select></label>
-          <div class="multi-bot-form">
-            <label class="multi-bot-field multi-bot-wide"><small>TOKEN MINT</small><input id="multiBotMint" type="text" placeholder="Solana token mint address"></label>
-            <label class="multi-bot-field"><small>STRATEGY</small><select id="multiBotStrategy"><option value="DCA">DCA</option><option value="TARGET">TARGET PRICE</option></select></label>
-            <label class="multi-bot-field"><small>SIDE</small><select id="multiBotSide"><option value="BUY">BUY</option><option value="SELL">SELL</option></select></label>
-            <label class="multi-bot-field"><small>AMOUNT (SOL FOR BUY)</small><input id="multiBotAmount" type="number" min="0.000001" step="any" value="0.01"></label>
-            <label class="multi-bot-field"><small>INTERVAL</small><select id="multiBotInterval"><option value="60">1 minute</option><option value="300" selected>5 minutes</option><option value="900">15 minutes</option><option value="3600">1 hour</option></select></label>
-            <label class="multi-bot-field"><small>MAX TRADES</small><input id="multiBotMaxTrades" type="number" min="1" step="1" value="1"></label>
-            <label class="multi-bot-field"><small>MAX TOTAL SPEND (SOL)</small><input id="multiBotMaxSpend" type="number" min="0" step="any" value="0"></label>
-            <label class="multi-bot-field"><small>TARGET PRICE (USD, TARGET ONLY)</small><input id="multiBotTarget" type="number" min="0" step="any" placeholder="Optional for DCA"></label>
-          </div>
-          <div class="multi-bot-actions">
-            <button id="multiBotCreateConfig" class="bot-primary" type="button">SAVE DISABLED DRY-RUN CONFIG</button>
-            <button id="multiBotLoadConfigs" class="bot-secondary" type="button">LOAD CONFIGS</button>
-          </div>
-          <pre id="multiBotConfigResult" class="multi-bot-result">No token configuration loaded.</pre>
-          <h4 style="margin:18px 0 8px">DRY-RUN EXECUTION HISTORY</h4>
-          <div id="multiBotHistory" class="multi-bot-result">Connect your Phantom account to load your private execution history.</div>
-        </div>
-
         <div class="trading-bot-foot"><span>RULE-BASED</span><span>NON-CUSTODIAL UI</span><span>SOLANA MAINNET</span></div>
       </div>
     </section>
@@ -400,7 +368,6 @@
   <script src="token-authority.js?v=6"></script>
   <script src="token-mint.js?v=24"></script>
   <script src="trading-bot.js?v=19"></script>
-  <script src="multi-token-bot.js?v=11"></script>
   <script>
     // Independent TOKEN INFO bridge.
     // It follows the visible TO token and updates the card directly,
