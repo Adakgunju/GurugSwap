@@ -284,7 +284,7 @@
     if (parsed.username || parsed.password || parsed.search || parsed.hash) {
       throw new Error("Use a clean Worker origin without credentials, query parameters, or fragments.");
     }
-    apiBase = parsed.origin.replace(/\\/+$/, "");
+    apiBase = parsed.origin.replace(/\/+$/, "");
     $("mwConnect").disabled = false;
     $("mwCreate").disabled = wallets.length === 0;
     $("mwLoadConfigs").disabled = wallets.length === 0;
