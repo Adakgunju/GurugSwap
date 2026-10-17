@@ -251,8 +251,7 @@
     $("mwConfirmLink").disabled = true;
     connectedPublicKey = targetPublicKey;
     $("mwConnect").textContent = targetPublicKey.slice(0, 6) + "…" + targetPublicKey.slice(-6);
-    status("Secondary wallet linked: " + data.wallet.public_key + ". Reconnect the primary wallet to manage the same wallet group.");
-    await refreshWallets();
+    status("Secondary wallet linked: " + data.wallet.public_key + ". Switch Phantom back to the primary wallet, click Connect wallet, then Refresh wallets to manage the linked wallet group.");
   }
 
   async function registerConnectedWallet() {
