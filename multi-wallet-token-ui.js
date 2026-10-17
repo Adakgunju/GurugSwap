@@ -175,8 +175,32 @@
       detail.className = "mw-small";
       detail.textContent = wallet.public_key + " · " + (Number(wallet.enabled) ? "enabled" : "disabled");
       item.append(title, detail);
+      if (Number(wallet.enabled)) {
+        const disable = document.createElement("button");
+        disable.type = "button";
+        disable.className = "mw-button";
+        disable.textContent = "Disable wallet";
+        disable.addEventListener("click", async () => {
+          disable.disabled = true;
+          try {
+            await ownerRequest("wallets", { operation: "disable", walletId: wallet.id });
+            if (String(wallet.id) === $("mwWalletSelect").value) {
+              $("mwConfigs").replaceChildren();
+              $("mwTrades").replaceChildren();
+            }
+            await refreshWallets();
+            status("Wallet disabled. Its configurations and history remain stored; this wallet will no longer be eligible for new token configurations.");
+          } catch (error) {
+            status(error?.message || String(error));
+            disable.disabled = false;
+          }
+        });
+        item.appendChild(disable);
+      }
       list.appendChild(item);
-      select.add(new Option((wallet.label || wallet.public_key.slice(0, 8)) + " · #" + wallet.id, String(wallet.id)));
+      if (Number(wallet.enabled)) {
+        select.add(new Option((wallet.label || wallet.public_key.slice(0, 8)) + " · #" + wallet.id, String(wallet.id)));
+      }
     }
     select.disabled = false;
     $("mwCreate").disabled = !apiBase;
