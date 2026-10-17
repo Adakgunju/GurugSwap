@@ -86,8 +86,11 @@
     <div class="mw-actions">
       <button id="mwCreate" class="mw-button primary" type="button" disabled>Save token config (disabled)</button>
       <button id="mwLoadConfigs" class="mw-button" type="button" disabled>Load token configs</button>
+      <button id="mwLoadTrades" class="mw-button" type="button" disabled>Load recent dry-run trades</button>
     </div>
     <div id="mwConfigs" class="mw-list"></div>
+    <h3 style="margin-top:24px">Recent trade history</h3>
+    <div id="mwTrades" class="mw-list"></div>
   `;
   const legacyCard = section.querySelector(".trading-bot-card");
   if (legacyCard) legacyCard.insertAdjacentElement("afterend", panel);
@@ -160,6 +163,7 @@
       select.disabled = true;
       $("mwCreate").disabled = true;
       $("mwLoadConfigs").disabled = true;
+      $("mwLoadTrades").disabled = true;
       return;
     }
     for (const wallet of wallets) {
@@ -177,6 +181,7 @@
     select.disabled = false;
     $("mwCreate").disabled = !apiBase;
     $("mwLoadConfigs").disabled = !apiBase;
+    $("mwLoadTrades").disabled = !apiBase;
   }
 
   async function refreshWallets() {
@@ -235,6 +240,43 @@
       item.append(title, details, button);
       list.appendChild(item);
     }
+  }
+
+  async function loadTrades() {
+    const walletId = $("mwWalletSelect").value;
+    if (!walletId) throw new Error("Select a wallet first.");
+    const data = await ownerRequest("token-trades", { walletId });
+    const list = $("mwTrades");
+    list.replaceChildren();
+    const trades = Array.isArray(data.trades) ? data.trades : [];
+    if (!trades.length) {
+      list.textContent = "No trade history for this wallet yet. Enabled dry-run strategies are evaluated by the preview scheduler about once per minute.";
+      return;
+    }
+    for (const trade of trades) {
+      const item = document.createElement("div");
+      item.className = "mw-item";
+      const title = document.createElement("strong");
+      title.textContent = String(trade.side || "TRADE") + " · " + String(trade.status || "unknown").toUpperCase();
+      const details = document.createElement("div");
+      details.className = "mw-small";
+      const amount = trade.side === "BUY"
+        ? String(trade.amount_sol ?? "—") + " SOL"
+        : String(trade.amount_token ?? "—") + " token units";
+      const price = Number(trade.price_usd);
+      details.textContent = String(trade.token_mint || "") + " · " + amount +
+        " · price " + (Number.isFinite(price) && price > 0 ? "$" + price.toPrecision(6) : "—") +
+        " · " + String(trade.created_at || "time unavailable");
+      item.append(title, details);
+      if (trade.error_message) {
+        const error = document.createElement("div");
+        error.className = "mw-small";
+        error.textContent = "Note: " + String(trade.error_message);
+        item.appendChild(error);
+      }
+      list.appendChild(item);
+    }
+    status("Loaded " + trades.length + " recent trade record(s). Dry-run records do not represent on-chain transactions.");
   }
 
   async function createConfig() {
@@ -299,6 +341,7 @@
     $("mwConnect").disabled = false;
     $("mwCreate").disabled = wallets.length === 0;
     $("mwLoadConfigs").disabled = wallets.length === 0;
+    $("mwLoadTrades").disabled = wallets.length === 0;
     status("Preview/staging endpoint selected for this page session: " + apiBase);
   }));
 
@@ -317,5 +360,6 @@
   $("mwRefresh").addEventListener("click", () => run(refreshWallets));
   $("mwRegister").addEventListener("click", () => run(registerConnectedWallet));
   $("mwLoadConfigs").addEventListener("click", () => run(loadConfigs));
+  $("mwLoadTrades").addEventListener("click", () => run(loadTrades));
   $("mwCreate").addEventListener("click", () => run(createConfig));
 })();
