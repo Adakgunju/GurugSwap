@@ -1396,6 +1396,12 @@ async function updateTokenInfo(token) {
              String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase()));
         }
       }
+      // Keep the configured GURUG pool when it is returned; do not silently
+      // switch the display to a different pool just because it has more liquidity.
+      const configuredPair = pairs.find(p =>
+        String(p?.pairAddress || "").toLowerCase() === pairAddress.toLowerCase()
+      );
+      if (configuredPair) pairs = [configuredPair];
       json = {pairs};
     } else {
       const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
@@ -1413,8 +1419,16 @@ async function updateTokenInfo(token) {
       return;
     }
 
-    const price = Number(pair.priceUsd);
-    const change = Number(pair.priceChange?.h24);
+    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === String(token.mint || "").toLowerCase();
+    const basePriceUsd = Number(pair.priceUsd);
+    const nativePrice = Number(pair.priceNative);
+    const price = isBaseToken ? basePriceUsd :
+      (Number.isFinite(basePriceUsd) && Number.isFinite(nativePrice) && nativePrice > 0
+        ? basePriceUsd / nativePrice
+        : NaN);
+    // DexScreener's 24h change belongs to the base token. Do not mislabel it
+    // as the quote token's change when the selected mint is the quote asset.
+    const change = isBaseToken ? Number(pair.priceChange?.h24) : NaN;
     const liquidity = Number(pair.liquidity?.usd);
     const volume = Number(pair.volume?.h24);
 
