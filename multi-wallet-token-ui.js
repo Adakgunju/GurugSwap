@@ -84,7 +84,7 @@
       </label>
     </div>
     <div class="mw-actions">
-      <button id="mwCreate" class="mw-button primary" type="button" disabled>Save token config (disabled)</button>
+      <button id="mwCreate" class="mw-button primary" type="button" disabled>Save dry-run config</button>
       <button id="mwLoadConfigs" class="mw-button" type="button" disabled>Load token configs</button>
       <button id="mwLoadTrades" class="mw-button" type="button" disabled>Load recent dry-run trades</button>
     </div>
