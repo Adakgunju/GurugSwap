@@ -241,27 +241,38 @@
     const walletId = $("mwWalletSelect").value;
     const tokenMint = $("mwMint").value.trim();
     if (!walletId) throw new Error("Select a wallet first.");
-    if (!tokenMint) throw new Error("Enter a token mint address.");
+    if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(tokenMint)) {
+      throw new Error("Enter a valid-looking Solana token mint address (32–44 base58 characters).");
+    }
     const strategy = $("mwStrategy").value;
+    const side = $("mwSide").value;
+    const tradeAmount = Number($("mwAmount").value);
+    const intervalSeconds = Number($("mwInterval").value);
+    const maxTrades = Number($("mwMaxTrades").value);
+    const maxTotalSpend = Number($("mwMaxSpend").value);
+    const targetPrice = $("mwTarget").value ? Number($("mwTarget").value) : null;
+    const stopLoss = $("mwStopLoss").value ? Number($("mwStopLoss").value) : null;
+    const takeProfit = $("mwTakeProfit").value ? Number($("mwTakeProfit").value) : null;
+    if (!Number.isFinite(tradeAmount) || tradeAmount <= 0) throw new Error("Trade amount must be greater than zero.");
+    if (!Number.isSafeInteger(intervalSeconds) || intervalSeconds < 60) throw new Error("Interval must be at least 60 seconds.");
+    if (!Number.isSafeInteger(maxTrades) || maxTrades < 1) throw new Error("Maximum trades must be a positive whole number.");
+    if (!Number.isFinite(maxTotalSpend) || maxTotalSpend < 0) throw new Error("Maximum spend cannot be negative.");
+    if (strategy === "TARGET" && (!Number.isFinite(targetPrice) || targetPrice <= 0)) {
+      throw new Error("Target strategy requires a target price greater than zero.");
+    }
+    for (const [label, value] of [["Stop loss", stopLoss], ["Take profit", takeProfit]]) {
+      if (value !== null && (!Number.isFinite(value) || value <= 0)) {
+        throw new Error(label + " must be greater than zero when specified.");
+      }
+    }
     const config = {
-      tokenMint,
-      strategy,
-      side: $("mwSide").value,
-      tradeAmount: Number($("mwAmount").value),
-      intervalSeconds: Number($("mwInterval").value),
-      maxTrades: Number($("mwMaxTrades").value),
-      maxTotalSpend: Number($("mwMaxSpend").value),
-      targetPrice: $("mwTarget").value ? Number($("mwTarget").value) : null,
-      stopLoss: $("mwStopLoss").value ? Number($("mwStopLoss").value) : null,
-      takeProfit: $("mwTakeProfit").value ? Number($("mwTakeProfit").value) : null,
-      mode: "dry_run",
-      enabled: 0
+      tokenMint, strategy, side, tradeAmount, intervalSeconds, maxTrades, maxTotalSpend,
+      targetPrice, stopLoss, takeProfit, mode: "dry_run", enabled: 0
     };
     await ownerRequest("token-configs", { operation: "create", walletId, config });
-    status("Token config saved disabled in dry-run mode.");
+    status("Token config saved disabled in dry-run mode. No live transaction was sent.");
     await loadConfigs();
   }
-
   async function run(action) {
     try {
       status("Working…");
