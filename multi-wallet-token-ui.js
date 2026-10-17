@@ -33,8 +33,8 @@
     <h3>Multi-wallet / Multi-token (Dry-run)</h3>
     <p>Manage wallet-linked token strategies independently. This panel only supports dry-run configuration; it cannot start live trades.</p>
     <div class="mw-grid">
-      <label class="mw-field">Isolated preview Worker URL (HTTPS; not the production bot)
-        <input id="mwApiUrl" type="url" placeholder="https://your-staging-worker.example.workers.dev" autocomplete="url">
+      <label class="mw-field">Preview Worker URL (isolated; not the production bot)
+        <input id="mwApiUrl" type="url" value="https://gurug-trading-bot-preview.pcaticom.workers.dev" placeholder="https://gurug-trading-bot-preview.pcaticom.workers.dev" autocomplete="url">
       </label>
       <div class="mw-field" style="justify-content:end">
         <span>Only the isolated preview Worker or a separately named staging endpoint is accepted. The URL is kept in this page only.</span>
@@ -383,6 +383,15 @@
   }));
   $("mwRefresh").addEventListener("click", () => run(refreshWallets));
   $("mwRegister").addEventListener("click", () => run(registerConnectedWallet));
+  $("mwWalletSelect").addEventListener("change", () => {
+    $("mwConfigs").replaceChildren();
+    $("mwTrades").replaceChildren();
+    if (!$("mwWalletSelect").value) return;
+    run(async () => {
+      await loadConfigs();
+      await loadTrades();
+    });
+  });
   $("mwLoadConfigs").addEventListener("click", () => run(loadConfigs));
   $("mwLoadTrades").addEventListener("click", () => run(loadTrades));
   $("mwCreate").addEventListener("click", () => run(createConfig));
