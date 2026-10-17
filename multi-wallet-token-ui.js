@@ -46,6 +46,8 @@
       <button id="mwConnect" class="mw-button primary" type="button">Connect wallet</button>
       <button id="mwRefresh" class="mw-button" type="button" disabled>Refresh wallets</button>
       <button id="mwRegister" class="mw-button" type="button" disabled>Register connected wallet</button>
+      <button id="mwPrepareLink" class="mw-button" type="button" disabled>Prepare to add another wallet</button>
+      <button id="mwConfirmLink" class="mw-button" type="button" disabled>Confirm switched wallet</button>
     </div>
     <div id="mwWallets" class="mw-list"></div>
     <div class="mw-grid">
@@ -100,6 +102,7 @@
   const status = message => { $("mwStatus").textContent = message; };
   let connectedPublicKey = "";
   let wallets = [];
+  let pendingWalletLink = null;
 
   if (!apiBase) {
     status("Multi-wallet staging API is not configured. Live production endpoints are intentionally not used. Set window.GURUG_MULTI_API_BASE to a separate staging Worker URL after staging D1 is configured.");
@@ -213,6 +216,43 @@
     wallets = Array.isArray(data.wallets) ? data.wallets : [];
     renderWallets();
     status("Loaded " + wallets.length + " wallet(s).");
+  }
+
+  async function prepareSecondaryWalletLink() {
+    if (!connectedPublicKey) throw new Error("Connect the primary wallet first.");
+    const ownerPublicKey = connectedPublicKey;
+    const ownerAuth = await signChallenge(ownerPublicKey);
+    pendingWalletLink = { ownerPublicKey, ownerAuth, createdAt: Date.now() };
+    $("mwConfirmLink").disabled = false;
+    status("Primary wallet authenticated. In Phantom, switch to the wallet you want to add, then click “Confirm switched wallet” within 5 minutes. Do not disconnect the site.");
+  }
+
+  async function confirmSecondaryWalletLink() {
+    if (!pendingWalletLink) throw new Error("First click “Prepare to add another wallet” while connected to the primary wallet.");
+    if (Date.now() - pendingWalletLink.createdAt > 4 * 60 * 1000) {
+      pendingWalletLink = null;
+      $("mwConfirmLink").disabled = true;
+      throw new Error("The primary-wallet authorization expired. Prepare again.");
+    }
+    const provider = window.solana;
+    const targetPublicKey = provider?.publicKey?.toBase58?.() || "";
+    if (!targetPublicKey) throw new Error("Connect the wallet you want to add in Phantom first.");
+    if (targetPublicKey === pendingWalletLink.ownerPublicKey) {
+      throw new Error("Phantom still shows the primary wallet. Switch to a different wallet, then confirm.");
+    }
+    const walletProof = await signChallenge(targetPublicKey);
+    const data = await post("wallets", {
+      operation: "register",
+      ...pendingWalletLink.ownerAuth,
+      walletProof,
+      wallet: { publicKey: targetPublicKey, walletType: "user_connected", label: "Linked wallet" }
+    });
+    pendingWalletLink = null;
+    $("mwConfirmLink").disabled = true;
+    connectedPublicKey = targetPublicKey;
+    $("mwConnect").textContent = targetPublicKey.slice(0, 6) + "…" + targetPublicKey.slice(-6);
+    status("Secondary wallet linked: " + data.wallet.public_key + ". Reconnect the primary wallet to manage the same wallet group.");
+    await refreshWallets();
   }
 
   async function registerConnectedWallet() {
@@ -378,11 +418,14 @@
     $("mwConnect").textContent = connectedPublicKey.slice(0, 6) + "…" + connectedPublicKey.slice(-6);
     $("mwRefresh").disabled = false;
     $("mwRegister").disabled = false;
+    $("mwPrepareLink").disabled = false;
     status("Connected wallet " + connectedPublicKey + ". Loading its wallet list…");
     await refreshWallets();
   }));
   $("mwRefresh").addEventListener("click", () => run(refreshWallets));
   $("mwRegister").addEventListener("click", () => run(registerConnectedWallet));
+  $("mwPrepareLink").addEventListener("click", () => run(prepareSecondaryWalletLink));
+  $("mwConfirmLink").addEventListener("click", () => run(confirmSecondaryWalletLink));
   $("mwWalletSelect").addEventListener("change", () => {
     $("mwConfigs").replaceChildren();
     $("mwTrades").replaceChildren();
