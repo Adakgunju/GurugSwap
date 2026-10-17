@@ -326,7 +326,7 @@
     if (raw) {
       const config = JSON.parse(raw);
       const map = {
-        botTokenMint:"tokenMint", botSide:"side", botTradeAmount:"tradeAmount",
+        botSide:"side", botTradeAmount:"tradeAmount",
         botInterval:"interval", botMaxTrades:"maxTrades", botTargetPrice:"targetPrice",
         botStopLoss:"stopLoss", botTakeProfit:"takeProfit", botMaxSpend:"maxSpend"
       };
