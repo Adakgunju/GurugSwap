@@ -76,6 +76,73 @@
       mode: "dry_run", enabled: 0
     };
   }
+
+  // Keep saved settings and simulation history visible in the existing trading-bot form.
+  const panel = document.createElement("section");
+  panel.className = "bot-status-card";
+  panel.style.marginTop = "14px";
+  panel.innerHTML = '<div style="font-weight:700;margin-bottom:8px">MY DRY-RUN CONFIGURATIONS</div><div data-config-list>Connect Phantom and save a configuration to view it here.</div><div style="font-weight:700;margin:14px 0 8px">SIMULATION HISTORY</div><div data-trade-list>No simulation records loaded.</div>';
+  status.insertAdjacentElement("afterend", panel);
+  let activeProvider = null;
+  let activePublicKey = null;
+  let activeWalletId = null;
+  const escapeText = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[char]);
+  async function loadSavedData() {
+    if (!activeProvider || !activePublicKey || !activeWalletId) return;
+    const [configData, tradeData] = await Promise.all([
+      protectedPost(activeProvider, activePublicKey, "token-configs", {
+        operation: "list", walletId: activeWalletId
+      }),
+      protectedPost(activeProvider, activePublicKey, "token-trades", {
+        walletId: activeWalletId
+      })
+    ]);
+    const configList = panel.querySelector("[data-config-list]");
+    const tradeList = panel.querySelector("[data-trade-list]");
+    const configs = Array.isArray(configData.configs) ? configData.configs : [];
+    const trades = Array.isArray(tradeData.trades) ? tradeData.trades : [];
+    configList.innerHTML = configs.length ? configs.map(config =>
+      '<div style="padding:8px 0;border-top:1px solid #333"><strong>#' + escapeText(config.id) +
+      ' · ' + escapeText(config.strategy) + ' / ' + escapeText(config.side) + '</strong><div style="overflow-wrap:anywhere;font-size:12px">' +
+      escapeText(config.token_mint) + '</div><div style="font-size:12px">Mode: ' + escapeText(config.mode) +
+      ' · ' + (Number(config.enabled) === 1 ? 'DRY RUN ON' : 'OFF') + ' · Amount: ' +
+      escapeText(config.trade_amount) + ' SOL</div></div>'
+    ).join("") : "No saved configurations for this wallet.";
+    tradeList.innerHTML = trades.length ? trades.map(trade =>
+      '<div style="padding:8px 0;border-top:1px solid #333"><strong>' + escapeText(trade.side) +
+      ' · ' + escapeText(trade.status) + '</strong><div style="font-size:12px;overflow-wrap:anywhere">' +
+      escapeText(trade.token_mint) + '</div><div style="font-size:12px">Token amount: ' +
+      escapeText(trade.amount_token) + ' · SOL: ' + escapeText(trade.amount_sol) +
+      ' · Price USD: ' + escapeText(trade.price_usd) + '</div><div style="font-size:12px">' +
+      escapeText(trade.created_at) + '</div></div>'
+    ).join("") : "No simulation history for this wallet yet.";
+  }
+  const refreshButton = document.createElement("button");
+  refreshButton.type = "button";
+  refreshButton.className = "bot-secondary";
+  refreshButton.textContent = "REFRESH CONFIGS & HISTORY";
+  refreshButton.style.marginTop = "12px";
+  refreshButton.addEventListener("click", async () => {
+    refreshButton.disabled = true;
+    try {
+      if (!activeProvider || !activeProvider.publicKey) throw new Error("Connect Phantom and save once to load this wallet's data.");
+      activePublicKey = activeProvider.publicKey.toBase58();
+      const walletData = await protectedPost(activeProvider, activePublicKey, "wallets", {operation:"list"});
+      const wallet = (walletData.wallets || []).find(item => item.public_key === activePublicKey && Number(item.enabled) === 1);
+      if (!wallet) throw new Error("No registered wallet found for the connected Phantom account.");
+      activeWalletId = Number(wallet.id);
+      await loadSavedData();
+      setStatus("Saved configurations and simulation history refreshed for the connected wallet.");
+    } catch (error) {
+      setStatus(error?.message || "Could not refresh wallet data.", true);
+    } finally {
+      refreshButton.disabled = false;
+    }
+  });
+  panel.appendChild(refreshButton);
+
   button.addEventListener("click", async () => {
     button.disabled = true;
     try {
@@ -84,11 +151,14 @@
       if (!provider) throw new Error("Phantom was not found. Install or unlock Phantom, then try again.");
       if (!provider.publicKey) await provider.connect();
       const publicKey = provider.publicKey.toBase58();
+      activeProvider = provider;
+      activePublicKey = publicKey;
       const registered = await protectedPost(provider, publicKey, "wallets", {
         operation: "register",
         wallet: { publicKey, walletType: "user_connected", label: "GurugSwap Phantom" }
       });
       const walletId = Number(registered.wallet?.id);
+      activeWalletId = walletId;
       if (!Number.isSafeInteger(walletId) || walletId <= 0) throw new Error("Preview API did not return a valid wallet ID.");
       const saved = await protectedPost(provider, publicKey, "token-configs", {
         operation: "create", walletId, config: collectConfig()
@@ -99,6 +169,7 @@
       if (!enabled.config || Number(enabled.config.enabled) !== 1) {
         throw new Error("Configuration was saved, but the preview API did not confirm dry-run activation.");
       }
+      await loadSavedData();
       setStatus("DRY RUN active for config #" + saved.config.id + " / wallet " +
         publicKey.slice(0, 5) + "…" + publicKey.slice(-5) +
         ". Mint verified on-chain; simulation only—no live swaps or signatures.");
