@@ -39,12 +39,31 @@
     const save = document.getElementById("botSaveButton");
     if (save) save.disabled = !ready;
 
+    // Explain why START is unavailable instead of leaving the user with a silent button.
+    const missing = [];
+    const mint = document.getElementById("botTokenMint")?.value.trim() || "";
+    const amount = Number(document.getElementById("botTradeAmount")?.value);
+    const maxTrades = Number(document.getElementById("botMaxTrades")?.value);
+    const maxSpend = Number(document.getElementById("botMaxSpend")?.value);
+    const targetPrice = Number(document.getElementById("botTargetPrice")?.value);
+    const side = document.getElementById("botSide")?.value || "buy";
+    const interval = document.getElementById("botInterval")?.value || "";
+    if (!mint) missing.push("token mint address");
+    if (!Number.isFinite(amount) || amount <= 0) missing.push("trade amount");
+    if (!Number.isFinite(maxTrades) || maxTrades <= 0) missing.push("maximum trades");
+    if (!interval) missing.push("interval");
+    if (side !== "sell" && (!Number.isFinite(maxSpend) || maxSpend <= 0)) missing.push("maximum total spend");
+    if (currentStrategy() === "target" && (!Number.isFinite(targetPrice) || targetPrice <= 0)) missing.push("target price");
+
     // Keep STOP BOT available whenever the backend says the bot is running.
     if (button && button.dataset.enabled === "1") {
       button.disabled = false;
       return;
     }
     if (button) button.disabled = !ready;
+    if (!ready && statusMessage && missing.length) {
+      statusMessage.textContent = "Cannot start yet. Complete: " + missing.join(", ") + ".";
+    }
   }
 
   function setStrategy(strategy) {
