@@ -26,7 +26,9 @@
       <a href="#token-burn">토큰 소각</a>
       <a href="#token-mint" onclick="document.getElementById('token-mint')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">토큰 민트</a>
       <a href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">토큰 권한 관리</a>
-      <a href="#links">구루그 네트워크</a>
+      <a href="#trading-bot">자동매매 봇</a>
+      <a href="#trading-bot">자동매매 봇</a>
+    <a href="#links">구루그 네트워크</a>
     </nav>
     <div class="top-actions">
       <div class="market-ticker" aria-label="GURUG market price"><span class="ticker-label">GURUG</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
@@ -138,6 +140,7 @@
         <a class="workspace-nav" href="#token-burn"><span>06</span><b>토큰 소각</b><em>↗</em></a>
         <a class="workspace-nav" href="#token-mint" onclick="document.getElementById('token-mint')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;"><span>10</span><b>토큰 민트</b><em>↗</em></a>
         <a class="workspace-nav" href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;"><span>09</span><b>토큰 권한 관리</b><em>↗</em></a>
+        <a class="workspace-nav" href="#trading-bot"><span>10</span><b>자동매매 봇</b><em>↗</em></a>
         <a class="workspace-nav" href="#links"><span>07</span><b>구루그 네트워크</b><em>↗</em></a>
         <div class="sidebar-foot"><span>SOLANA</span><span>비수탁형</span></div>
       </aside>
@@ -260,6 +263,14 @@
       <div id="tokenAuthorityApp"></div>
     </section>
 
+    <section id="trading-bot" class="trading-bot-section" aria-label="자동매매 봇">
+      <div class="trading-bot-intro">
+        <div class="platform-section-kicker">10 / 자동매매 봇</div>
+        <h2>나만의 <span class="section-title-accent">거래 전략.</span></h2>
+        <p>지갑별 토큰 전략을 저장하고 드라이런으로 모의 실행을 확인하세요. 이 화면은 실거래를 실행하지 않습니다.</p>
+      </div>
+    </section>
+
     <section id="partner-ads" class="partner-ads">
       <div class="partner-ads-heading">
         <div class="platform-section-kicker">07 / PARTNER ADS</div>
@@ -297,6 +308,7 @@
   <script src="token-burn.js?v=ko1"></script>
   <script src="token-authority.js?v=ko1"></script>
   <script src="token-mint.js?v=ko1"></script>
+  <script src="../multi-wallet-token-ui.js?v=2"></script>
   <script>
     // Independent 토큰 정보 bridge.
     // It follows the visible TO token and updates the card directly,
