@@ -225,6 +225,113 @@
     }
   });
 
+  $("multiBotRaydiumSwap")?.addEventListener("click", async () => {
+    const button = $("multiBotRaydiumSwap");
+    const output = $("multiBotRaydiumQuoteResult");
+    const SOL_MINT = "So11111111111111111111111111111111111111112";
+    const walletProvider = provider();
+    try {
+      if (!walletProvider) throw new Error("Phantom was not found. Connect Phantom first.");
+      if (!walletProvider.publicKey) await walletProvider.connect();
+      if (typeof walletProvider.signAndSendTransaction !== "function") {
+        throw new Error("This wallet does not support signAndSendTransaction.");
+      }
+      if (!window.solanaWeb3?.VersionedTransaction || !window.solanaWeb3?.Connection) {
+        throw new Error("Solana Web3 library did not load; refresh the page and try again.");
+      }
+      const tokenMint = $("multiBotMint")?.value.trim() || "";
+      const side = $("multiBotSide")?.value || "BUY";
+      const amount = String($("multiBotAmount")?.value || "").trim();
+      if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(tokenMint)) {
+        throw new Error("Enter a valid-looking Solana token mint first.");
+      }
+      if (!amount || !Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+        throw new Error("Enter a positive trade amount first.");
+      }
+      const inputLabel = side === "BUY" ? "SOL" : "token";
+      const outputLabel = side === "BUY" ? "token" : "SOL";
+      if (!window.confirm(
+        "You are about to request a Solana MAINNET swap through Raydium.\\n\\n" +
+        side + " · spend " + amount + " " + inputLabel + "\\n" +
+        "Receive " + outputLabel + " (final amount depends on the quote)\\n" +
+        "Slippage: 0.5%\\n\\n" +
+        "Phantom will show the transaction for your approval. Only approve if the details look correct."
+      )) return;
+      if (button) button.disabled = true;
+      if (output) output.textContent = "Refreshing Raydium mainnet quote before building the swap…";
+      const quote = await post("raydium-quote", {
+        inputMint: side === "BUY" ? SOL_MINT : tokenMint,
+        outputMint: side === "BUY" ? tokenMint : SOL_MINT,
+        amount,
+        slippageBps: 50
+      });
+      if (output) output.textContent =
+        "Quote: " + quote.amount + " " + inputLabel + " → " +
+        quote.expectedOutput + " " + outputLabel +
+        ". Building unsigned Raydium transaction(s)…";
+      const built = await post("raydium-build", {
+        inputMint: side === "BUY" ? SOL_MINT : tokenMint,
+        outputMint: side === "BUY" ? tokenMint : SOL_MINT,
+        walletPublicKey: walletProvider.publicKey.toBase58(),
+        amount,
+        slippageBps: 50
+      });
+      if (!Array.isArray(built.transactions) || built.transactions.length === 0) {
+        throw new Error("Raydium did not return any transactions.");
+      }
+      const connection = new window.solanaWeb3.Connection(
+        "https://api.mainnet-beta.solana.com", "confirmed"
+      );
+      const signatures = [];
+      for (let i = 0; i < built.transactions.length; i++) {
+        const encoded = built.transactions[i]?.transaction;
+        if (typeof encoded !== "string" || !encoded) {
+          throw new Error("Raydium returned an invalid transaction payload.");
+        }
+        const raw = Uint8Array.from(atob(encoded), ch => ch.charCodeAt(0));
+        const transaction = window.solanaWeb3.VersionedTransaction.deserialize(raw);
+        if (transaction.message.staticAccountKeys[0]?.toBase58() !== walletProvider.publicKey.toBase58()) {
+          throw new Error("Transaction fee payer does not match the connected Phantom wallet.");
+        }
+        if (output) output.textContent =
+          "Phantom approval " + (i + 1) + " of " + built.transactions.length +
+          " · quote was " + quote.expectedOutput + " " + outputLabel + ".";
+        const sent = await walletProvider.signAndSendTransaction(transaction, {
+          preflightCommitment: "confirmed",
+          skipPreflight: false,
+          maxRetries: 3
+        });
+        const signature = sent?.signature || sent;
+        if (typeof signature !== "string" || !signature) {
+          throw new Error("Wallet did not return a transaction signature.");
+        }
+        signatures.push(signature);
+        if (output) output.textContent =
+          "Transaction submitted (" + (i + 1) + "/" + built.transactions.length +
+          "): " + signature + " · waiting for confirmation…";
+        const latest = await connection.getLatestBlockhash("confirmed");
+        const confirmation = await connection.confirmTransaction({
+          signature,
+          blockhash: latest.blockhash,
+          lastValidBlockHeight: latest.lastValidBlockHeight
+        }, "confirmed");
+        if (confirmation?.value?.err) {
+          throw new Error("On-chain transaction failed: " + JSON.stringify(confirmation.value.err));
+        }
+      }
+      if (output) output.textContent =
+        "SWAP CONFIRMED · " + signatures.join(" · ") +
+        " · " + quote.amount + " " + inputLabel + " → estimated " +
+        quote.expectedOutput + " " + outputLabel + ". Verify final balances in Phantom.";
+      setStatus("Raydium mainnet swap confirmed. Signature(s): " + signatures.join(", "));
+    } catch (error) {
+      if (output) output.textContent = error.message || "Swap could not be completed.";
+      setStatus(error.message || "Swap could not be completed.", true);
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
+
   $("multiBotCreateConfig")?.addEventListener("click", async () => {
     try {
       const walletId = Number(walletSelect?.value);
