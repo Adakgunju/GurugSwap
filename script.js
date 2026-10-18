@@ -1481,7 +1481,22 @@ if (tokenInfoSwapButton) {
 }
 
 // Initial TOKEN INFO follows the default TO token (GURUG).
-// Later TO selections call updateTokenInfo() directly with the selected token.
+// Keep the card synchronized with the visible RECEIVE (TO) token label as a
+// second, independent safeguard in case a picker path misses its direct call.
+const tokenInfoToSymbolEl = document.getElementById("toTokenSymbol");
+if (tokenInfoToSymbolEl) {
+  let lastObservedToSymbol = tokenInfoToSymbolEl.textContent.trim();
+  new MutationObserver(() => {
+    const nextSymbol = tokenInfoToSymbolEl.textContent.trim();
+    if (!nextSymbol || nextSymbol === lastObservedToSymbol) return;
+    lastObservedToSymbol = nextSymbol;
+    updateTokenInfo(toToken);
+  }).observe(tokenInfoToSymbolEl, {
+    childList: true,
+    characterData: true,
+    subtree: true
+  });
+}
 updateTokenInfo(toToken);
 
 /* --- LIVE GURUG MARKET TICKER --- */
