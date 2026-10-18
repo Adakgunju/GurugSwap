@@ -745,6 +745,859 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
+  // Directly synchronize the TOKEN INFO card from the committed TO token.
+  // Do not depend on the market-data request to update identity fields.
+  const infoNameEl = document.getElementById("tokenInfoName");
+  const infoSymbolEl = document.getElementById("tokenInfoSymbol");
+  const infoMintEl = document.getElementById("tokenInfoMint");
+  const infoIdentityEl = document.getElementById("tokenInfoIdentity");
+  const infoStatusEl = document.getElementById("tokenInfoStatus");
+  const infoChartEl = document.getElementById("tokenInfoChart");
+  if (infoNameEl) infoNameEl.textContent = toToken.name || "Solana Token";
+  if (infoSymbolEl) infoSymbolEl.textContent = "$" + (toToken.symbol || "TOKEN");
+  if (infoMintEl) infoMintEl.textContent = toToken.mint || "—";
+  if (infoIdentityEl) {
+    infoIdentityEl.innerHTML =
+      tokenInfoIconMarkup(toToken) +
+      '<div><strong>' + (toToken.name || "Solana Token") +
+      '</strong><small>
+  updateSwapButtonState();
+}
+const TOKEN_RECENTS_KEY = "gurugSwap.recentTokens";
+
+function getRecentTokenMints() {
+  try {
+    const data = JSON.parse(localStorage.getItem(TOKEN_RECENTS_KEY) || "[]");
+    return Array.isArray(data) ? data.filter(isLikelyMint).slice(0, 6) : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberToken(token) {
+  if (!token?.mint) return;
+  try {
+    const next = [token.mint, ...getRecentTokenMints().filter(mint => mint !== token.mint)].slice(0, 6);
+    localStorage.setItem(TOKEN_RECENTS_KEY, JSON.stringify(next));
+  } catch {}
+}
+
+function tokenSearchLabel(token) {
+  const symbol = token.symbol || "TOKEN";
+  const name = token.name || "Solana Token";
+  return symbol === name ? symbol : symbol + " · " + name;
+}
+
+async function renderTokenList(query = "") {
+  if (!tokenList) return;
+  const q = query.trim().toLowerCase();
+
+  let remoteTokens = [];
+  if (q.length >= 2) {
+    try {
+      const res = await fetch(JUPITER_TOKEN_SEARCH + "?query=" + encodeURIComponent(query.trim()), {
+        cache: "no-store"
+      });
+      if (res.ok) {
+        const remote = await res.json();
+        if (Array.isArray(remote)) {
+          remoteTokens = remote
+            .filter(token => token?.id && token?.symbol)
+            .map(token => ({
+              symbol: token.symbol,
+              name: token.name || "Solana Token",
+              mint: token.id,
+              decimals: Number.isInteger(token.decimals) ? token.decimals : null,
+              icon: token.icon || token.logoURI || "",
+              verified: !!token.isVerified,
+              source: "jupiter"
+            }));
+        }
+      }
+    } catch (err) {
+      console.warn("Token search failed:", err);
+    }
+  }
+
+  remoteTokens.forEach(token => {
+    applyCanonicalTokenIcon(token);
+
+    const existing = TOKEN_CATALOG.find(item => item.mint === token.mint);
+    if (existing) {
+      Object.assign(existing, token);
+      applyCanonicalTokenIcon(existing);
+    } else {
+      TOKEN_CATALOG.push(token);
+    }
+  });
+
+  const all = [...TOKEN_CATALOG, ...remoteTokens];
+  const seen = new Set();
+  let matches = all.filter(token => {
+    if (seen.has(token.mint)) return false;
+    seen.add(token.mint);
+    if (!q) return true;
+    return token.symbol.toLowerCase().includes(q) ||
+      token.name.toLowerCase().includes(q) ||
+      token.mint.toLowerCase() === q;
+  });
+
+  const recentMints = getRecentTokenMints();
+  const recentRank = mint => recentMints.indexOf(mint);
+  const pinnedMints = new Set(TOKEN_CATALOG.slice(0, 3).map(token => token.mint));
+
+  matches.sort((a, b) => {
+    if (!q) {
+      const ap = pinnedMints.has(a.mint);
+      const bp = pinnedMints.has(b.mint);
+      if (ap !== bp) return ap ? -1 : 1;
+
+      const ar = recentRank(a.mint);
+      const br = recentRank(b.mint);
+      if (ar !== -1 || br !== -1) {
+        if (ar === -1) return 1;
+        if (br === -1) return -1;
+        return ar - br;
+      }
+      return 0;
+    }
+
+    const aExact = a.symbol.toLowerCase() === q || a.name.toLowerCase() === q;
+    const bExact = b.symbol.toLowerCase() === q || b.name.toLowerCase() === q;
+    if (aExact !== bExact) return aExact ? -1 : 1;
+
+    const av = !!a.verified;
+    const bv = !!b.verified;
+    if (av !== bv) return av ? -1 : 1;
+    return 0;
+  });
+
+  matches = matches.slice(0, 30);
+  tokenList.innerHTML = "";
+
+  if (!matches.length) {
+    const empty = document.createElement("div");
+    empty.className = "token-empty";
+    empty.textContent = isLikelyMint(q)
+      ? "Looking up this mint address..."
+      : "No matching Solana token found.";
+    tokenList.appendChild(empty);
+
+    if (isLikelyMint(q)) {
+      const token = await fetchTokenByMint(query.trim());
+      if (token) {
+        renderTokenList(token.symbol);
+      } else {
+        empty.textContent = "Mint address not found or not a supported token.";
+      }
+    }
+    return;
+  }
+
+  matches.forEach(token => {
+    applyCanonicalTokenIcon(token);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "token-option";
+
+    const badge = token.verified
+      ? '<span class="token-verified" title="Verified token">✓</span>'
+      : "";
+    const recent = !q && recentMints.includes(token.mint)
+      ? '<span class="token-recent">RECENT</span>'
+      : "";
+    const side = token.mint === fromToken.mint
+      ? "FROM"
+      : token.mint === toToken.mint
+        ? "TO"
+        : "";
+
+    button.innerHTML =
+      tokenIconMarkup(token) +
+      '<span><strong>' + token.symbol + badge + '</strong><small>' +
+      tokenSearchLabel(token) + '</small></span><em>' +
+      (side || recent) +
+      '</em>';
+
+    button.addEventListener("click", async () => {
+      const target = tokenPicker.dataset.target;
+
+      // Update the selected token immediately. TOKEN INFO uses this exact
+      // selected object, so it cannot fall back to the initial GURUG token.
+      if (target === "from") {
+        if (token.mint === toToken.mint) {
+          toToken = fromToken;
+        }
+        fromToken = token;
+        // TOKEN INFO is tied to the RECEIVE (TO) token, not FROM.
+
+      } else {
+        if (token.mint === fromToken.mint) fromToken = toToken;
+        toToken = token;
+      }
+
+      if (tokenPicker) tokenPicker.hidden = true;
+      updateTokenButtons();
+      // Update TOKEN INFO only after the selected TO state and button label
+      // have both been committed. Pass the current toToken, never the stale
+      // token object from the previous picker state.
+      updateTokenInfo(toToken);
+      resetQuoteForTokenChange();
+
+      // Hydrate the icon after selection without changing which token
+      // TOKEN INFO is showing.
+      await hydrateTokenIcon(token);
+      rememberToken(token);
+    });
+
+    tokenList.appendChild(button);
+  });
+}
+
+function openTokenPicker(target) {
+  if (!tokenPicker) return;
+  tokenPicker.dataset.target = target;
+  tokenPicker.hidden = false;
+  if (tokenSearch) {
+    tokenSearch.value = "";
+    renderTokenList();
+    setTimeout(() => tokenSearch.focus(), 0);
+  }
+}
+
+function resetQuoteForTokenChange() {
+  clearTimeout(quoteTimer);
+  lastSwapResponse = null;
+  if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
+  if (solAmountInput) {
+    solAmountInput.value = "";
+    solAmountInput.placeholder = "0.00";
+  }
+  setSwapStatus("Select an amount to get a live quote.");
+}
+
+if (fromTokenButton) fromTokenButton.addEventListener("click", () => openTokenPicker("from"));
+if (toTokenButton) toTokenButton.addEventListener("click", () => openTokenPicker("to"));
+if (closeTokenPicker) closeTokenPicker.addEventListener("click", () => { if (tokenPicker) tokenPicker.hidden = true; });
+let tokenSearchTimer;
+if (tokenSearch) tokenSearch.addEventListener("input", () => {
+  clearTimeout(tokenSearchTimer);
+  tokenSearchTimer = setTimeout(() => renderTokenList(tokenSearch.value), 250);
+});
+if (tokenPicker) tokenPicker.addEventListener("click", (event) => { if (event.target === tokenPicker) tokenPicker.hidden = true; });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape" && tokenPicker) tokenPicker.hidden = true; });
+
+if (swapDirectionButton) {
+  swapDirectionButton.addEventListener("click", () => {
+    const oldFrom = fromToken;
+    fromToken = toToken;
+    toToken = oldFrom;
+    // After reversing direction, the RECEIVE token is the most relevant token.
+    activeTokenInfoMint = toToken.mint;
+    updateTokenInfo(toToken);
+    updateTokenButtons();
+    resetQuoteForTokenChange();
+    refreshBalancesSoon();
+  });
+}
+
+updateTokenButtons();
+refreshBalancesSoon();
+hydrateCatalogIcons();
+setInterval(refreshWalletBalances, 30000);
+
+function setSwapStatus(message, error = false, state = "") {
+  if (!swapStatus) return;
+  const label = document.getElementById("swapStatusLabel");
+  const messageEl = document.getElementById("swapStatusMessage");
+  const progress = document.getElementById("swapProgressFill");
+  const txLink = document.getElementById("swapTxLink");
+
+  swapStatus.classList.remove("error", "success", "active");
+  if (state === "active") swapStatus.classList.add("active");
+  if (state === "success") swapStatus.classList.add("success");
+  if (error) swapStatus.classList.add("error");
+
+  if (label) {
+    label.textContent = error ? "SWAP FAILED"
+      : state === "success" ? "SWAP SUCCESSFUL"
+      : state === "active" ? "PROCESSING"
+      : "READY TO SWAP";
+  }
+  if (messageEl) messageEl.textContent = message;
+  if (progress) progress.style.width = error ? "100%" : state === "success" ? "100%" : state === "active" ? "72%" : "0%";
+  if (txLink && state !== "success") {
+    txLink.hidden = true;
+    txLink.removeAttribute("href");
+  }
+}
+
+function showSwapSuccess(solAmount, gurugAmount, signature) {
+  if (!swapStatus) return;
+  const label = document.getElementById("swapStatusLabel");
+  const messageEl = document.getElementById("swapStatusMessage");
+  const progress = document.getElementById("swapProgressFill");
+  const txLink = document.getElementById("swapTxLink");
+
+  swapStatus.classList.remove("error", "active");
+  swapStatus.classList.add("success");
+
+  if (label) label.textContent = "SWAP SUCCESSFUL";
+  if (messageEl) messageEl.textContent = solAmount + " " + fromToken.symbol + " → " + gurugAmount + " " + toToken.symbol;
+  if (progress) progress.style.width = "100%";
+  if (txLink && signature) {
+    txLink.href = "https://solscan.io/tx/" + signature;
+    txLink.hidden = false;
+  }
+}
+
+async function getGurugDecimals() {
+  if (gurugDecimals !== null) return gurugDecimals;
+  const res = await fetch("https://api.mainnet-beta.solana.com", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      jsonrpc:"2.0", id:1, method:"getTokenSupply",
+      params:[mint]
+    })
+  });
+  const json = await res.json();
+  gurugDecimals = json?.result?.value?.decimals ?? 6;
+  return gurugDecimals;
+}
+
+function parseSolToLamports(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.round(n * 1000000000).toString();
+}
+
+function formatToken(raw, decimals) {
+  const n = Number(raw) / Math.pow(10, decimals);
+  if (!Number.isFinite(n)) return "0.00";
+  return n.toLocaleString("en-US", {maximumFractionDigits: 4});
+}
+
+function parseTokenAmount(value, decimals) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.round(n * Math.pow(10, decimals)).toString();
+}
+
+async function getTokenDecimals(token) {
+  if (token.decimals !== null && token.decimals !== undefined) return token.decimals;
+  if (token.mint === mint) return await getGurugDecimals();
+  const res = await fetch("https://api.mainnet-beta.solana.com", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({jsonrpc:"2.0",id:1,method:"getTokenSupply",params:[token.mint]})
+  });
+  const json = await res.json();
+  token.decimals = json?.result?.value?.decimals ?? 6;
+  return token.decimals;
+}
+
+async function getQuote() {
+  if (isSwapping) return;
+  const decimals = await getTokenDecimals(fromToken);
+  const amount = parseTokenAmount(solAmountInput?.value, decimals);
+  if (!amount) {
+    if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
+    lastSwapResponse = null;
+    setSwapStatus("Enter an amount to get a live quote.");
+    return;
+  }
+
+  try {
+    setSwapStatus("Getting live Raydium quote...");
+    const slippageBps = Math.round(Number(slippageEl?.value || 0.5) * 100);
+    const url = RAYDIUM_API + "/compute/swap-base-in"
+      + "?inputMint=" + encodeURIComponent(fromToken.mint)
+      + "&outputMint=" + encodeURIComponent(toToken.mint)
+      + "&amount=" + amount
+      + "&slippageBps=" + slippageBps
+      + "&txVersion=" + TX_VERSION;
+
+    const res = await fetch(url);
+    const json = await res.json();
+    if (!res.ok || !json.success || !json.data) throw new Error(json.msg || "Quote failed");
+
+    lastSwapResponse = json;
+    const outputDecimals = await getTokenDecimals(toToken);
+    if (gurugAmountEl) gurugAmountEl.textContent = formatToken(json.data.outputAmount, outputDecimals);
+    setSwapStatus("Quote ready. Review the amount, then approve in Phantom.");
+  } catch (err) {
+    lastSwapResponse = null;
+    if (gurugAmountEl) gurugAmountEl.textContent = "—";
+    setSwapStatus("Could not get a quote. Try again in a moment.", true);
+    console.error(err);
+  }
+}
+
+let quoteTimer;
+let isSwapping = false;
+const maxButton = document.getElementById("maxButton");
+if (maxButton) {
+  maxButton.addEventListener("click", applyMaxAmount);
+}
+
+if (solAmountInput) {
+  solAmountInput.addEventListener("input", () => {
+    clearTimeout(quoteTimer);
+    if (swapStatus?.classList.contains("success")) {
+      swapStatus.classList.remove("success");
+      const label = document.getElementById("swapStatusLabel");
+      const messageEl = document.getElementById("swapStatusMessage");
+      const progress = document.getElementById("swapProgressFill");
+      const txLink = document.getElementById("swapTxLink");
+      if (label) label.textContent = "PROCESSING";
+      if (messageEl) messageEl.textContent = "Getting a new live Raydium quote...";
+      if (progress) progress.style.width = "35%";
+      if (txLink) {
+        txLink.hidden = true;
+        txLink.removeAttribute("href");
+      }
+    }
+    updateSwapButtonState();
+    quoteTimer = setTimeout(getQuote, 350);
+  });
+}
+if (slippageEl) slippageEl.addEventListener("change", getQuote);
+
+async function executeGurugSwap() {
+  const provider = getPhantomProvider();
+  if (!provider?.publicKey) {
+    setSwapStatus("Connect Phantom first.", true);
+    await connectPhantom();
+    return;
+  }
+
+  const inputDecimals = await getTokenDecimals(fromToken);
+  const amount = parseTokenAmount(solAmountInput?.value, inputDecimals);
+
+  await refreshWalletBalances();
+  const requestedAmount = Number(solAmountInput?.value || 0);
+  if (walletTokenBalance !== null && requestedAmount > walletTokenBalance) {
+    updateSwapButtonState();
+    return;
+  }
+  if (!amount) {
+    setSwapStatus("Enter an amount first.", true);
+    return;
+  }
+
+  clearTimeout(quoteTimer);
+  isSwapping = true;
+  swapButton.disabled = true;
+  setSwapStatus("Preparing transaction...", false, "active");
+
+  try {
+    if (!lastSwapResponse) {
+      await getQuote();
+      if (!lastSwapResponse) throw new Error("No valid quote");
+    }
+
+    const feeRes = await fetch(RAYDIUM_BASE_API + "/main/auto-fee");
+    const feeJson = await feeRes.json();
+    const priorityFee = String(feeJson?.data?.default?.h || feeJson?.data?.default?.m || 0);
+
+    // Raydium needs the user's actual SPL token accounts when SOL is not
+    // the input/output side. Native SOL is handled by wrapSol/unwrapSol.
+    const inputAccount = fromToken.symbol === "SOL"
+      ? undefined
+      : await getOwnerTokenAccount(fromToken);
+
+    const outputAccount = toToken.symbol === "SOL"
+      ? undefined
+      : await getOwnerTokenAccount(toToken);
+
+    if (fromToken.symbol !== "SOL" && !inputAccount) {
+      throw new Error("Could not find your " + fromToken.symbol + " token account.");
+    }
+
+    const txRes = await fetch(RAYDIUM_API + "/transaction/swap-base-in", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        computeUnitPriceMicroLamports: priorityFee,
+        swapResponse: lastSwapResponse,
+        txVersion: TX_VERSION,
+        wallet: provider.publicKey.toString(),
+        wrapSol: fromToken.symbol === "SOL",
+        unwrapSol: toToken.symbol === "SOL",
+        inputAccount,
+        outputAccount
+      })
+    });
+
+    const txJson = await txRes.json();
+    if (!txRes.ok || !txJson.success || !txJson.data?.length) {
+      throw new Error(txJson.msg || "Transaction build failed");
+    }
+
+    const transactions = txJson.data.map(item =>
+      solanaWeb3.VersionedTransaction.deserialize(
+        Uint8Array.from(atob(item.transaction), c => c.charCodeAt(0))
+      )
+    );
+
+    const signatures = [];
+    for (const tx of transactions) {
+      setSwapStatus("Waiting for Phantom approval...");
+      const signed = await provider.signAndSendTransaction(tx);
+      signatures.push(signed.signature);
+    }
+
+    setSwapStatus("Transaction sent. Waiting for on-chain confirmation...", false, "active");
+    // Use a fallback RPC list for confirmation. The public Solana RPC can rate-limit
+    // browser traffic with HTTP 403 even when the swap itself has already landed.
+    const confirmationRpcs = [
+      "https://solana-rpc.publicnode.com",
+      "https://api.mainnet-beta.solana.com"
+    ];
+
+    for (const signature of signatures) {
+      setSwapStatus("Confirming your swap on Solana...", false, "active");
+      let confirmed = false;
+      let lastRpcError = null;
+
+      for (const rpcUrl of confirmationRpcs) {
+        try {
+          const connection = new solanaWeb3.Connection(rpcUrl, "confirmed");
+
+          for (let attempt = 0; attempt < 45; attempt++) {
+            const statusResult = await connection.getSignatureStatuses([signature], {
+              searchTransactionHistory: true
+            });
+            const status = statusResult?.value?.[0];
+
+            if (status?.err) {
+              throw new Error("Transaction failed on-chain. Check the transaction details.");
+            }
+
+            if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
+              confirmed = true;
+              break;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+
+          if (confirmed) break;
+        } catch (rpcError) {
+          lastRpcError = rpcError;
+          console.warn("Confirmation RPC failed:", rpcUrl, rpcError);
+        }
+      }
+
+      if (!confirmed) {
+        const explorerUrl = "https://solscan.io/tx/" + signature;
+        throw new Error("Swap was sent, but confirmation could not be checked automatically. Check the transaction: " + explorerUrl);
+      }
+    }
+
+    const confirmedFromAmount = Number(solAmountInput?.value || 0).toLocaleString("en-US", { maximumFractionDigits: 6 });
+    const confirmedToAmount = gurugAmountEl?.textContent || "0.00";
+    const finalSignature = signatures[signatures.length - 1];
+
+    showSwapSuccess(confirmedFromAmount, confirmedToAmount, finalSignature);
+
+    lastSwapResponse = null;
+    if (solAmountInput) solAmountInput.value = "";
+    if (gurugAmountEl) gurugAmountEl.textContent = "0.00";
+  } catch (err) {
+    console.error("GURUG swap failed:", err);
+    const message = err?.message || "Swap cancelled or failed.";
+    setSwapStatus(message, true);
+  } finally {
+    isSwapping = false;
+    swapButton.disabled = false;
+  }
+}
+
+if (swapButton) swapButton.addEventListener("click", executeGurugSwap);
+
+
+/* --- TOKEN INFO / LIVE MARKET PANEL --- */
+const TOKEN_INFO_DEX = "https://api.dexscreener.com/latest/dex/tokens/";
+
+function formatUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  if (n >= 1) return "$" + n.toLocaleString("en-US", {maximumFractionDigits:2});
+  if (n >= 0.01) return "$" + n.toLocaleString("en-US", {maximumFractionDigits:4});
+  return "$" + n.toLocaleString("en-US", {maximumFractionDigits:8});
+}
+
+function formatCompactUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  if (n >= 1000000000) return "$" + (n / 1000000000).toFixed(2) + "B";
+  if (n >= 1000000) return "$" + (n / 1000000).toFixed(2) + "M";
+  if (n >= 1000) return "$" + (n / 1000).toFixed(1) + "K";
+  return "$" + n.toFixed(0);
+}
+
+function tokenInfoIconMarkup(token) {
+  applyCanonicalTokenIcon(token);
+  if (token?.symbol === "SOL") {
+    return '<span class="token-info-icon sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
+  }
+  if (token?.icon) {
+    return '<img class="token-info-icon" src="' + token.icon + '" alt="">';
+  }
+  return '<span class="token-info-icon token-info-placeholder">' + String(token?.symbol || "?").slice(0,1).toUpperCase() + '</span>';
+}
+
+let tokenInfoRequestId = 0;
+let activeTokenInfoMint = null;
+
+async function updateTokenInfo(token) {
+  // Reflect the currently selected TO token; the default selection is GURUG.
+  activeTokenInfoMint = token.mint;
+  const requestId = ++tokenInfoRequestId;
+  const nameEl = document.getElementById("tokenInfoName");
+  const symbolEl = document.getElementById("tokenInfoSymbol");
+  const identityEl = document.getElementById("tokenInfoIdentity");
+  const mintEl = document.getElementById("tokenInfoMint");
+  const statusEl = document.getElementById("tokenInfoStatus");
+  const priceEl = document.getElementById("tokenInfoPrice");
+  const changeEl = document.getElementById("tokenInfoChange");
+  const liquidityEl = document.getElementById("tokenInfoLiquidity");
+  const volumeEl = document.getElementById("tokenInfoVolume");
+  const networkEl = document.getElementById("tokenInfoNetwork");
+  const chartEl = document.getElementById("tokenInfoChart");
+  const swapEl = document.getElementById("tokenInfoSwap");
+
+  if (!nameEl || !token) return;
+
+  applyCanonicalTokenIcon(token);
+  nameEl.textContent = token.name || "Solana Token";
+  symbolEl.textContent = "$" + (token.symbol || "TOKEN");
+  mintEl.textContent = token.mint || "—";
+  networkEl.textContent = "SOLANA";
+  if (swapEl) swapEl.hidden = false;
+  identityEl.innerHTML =
+    tokenInfoIconMarkup(token) +
+    '<div><strong>' + (token.name || "Solana Token") +
+    '</strong><small>$' + (token.symbol || "TOKEN") + '</small></div>';
+
+  statusEl.textContent = "LOADING MARKET";
+  priceEl.textContent = "—";
+  changeEl.textContent = "—";
+  changeEl.style.color = "";
+  liquidityEl.textContent = "—";
+  volumeEl.textContent = "—";
+  chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
+
+  try {
+    let json;
+    if (String(token.symbol || "").toUpperCase() === "GURUG") {
+      // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
+      const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
+      const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+      let pairData = null;
+      try {
+        const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
+        if (pairRes.ok) pairData = await pairRes.json();
+      } catch (pairError) {
+        console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+      }
+      let pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+      const hasGurugPair = list => list.some(p =>
+        p?.chainId === "solana" &&
+        (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+         String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase())
+      );
+      if (!hasGurugPair(pairs)) {
+        const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
+          pairs = tokenPairs.filter(p => p?.chainId === "solana" &&
+            (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+             String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase()));
+        }
+      }
+      // Keep the configured GURUG pool when it is returned; do not silently
+      // switch the display to a different pool just because it has more liquidity.
+      const configuredPair = pairs.find(p =>
+        String(p?.pairAddress || "").toLowerCase() === pairAddress.toLowerCase()
+      );
+      if (configuredPair) pairs = [configuredPair];
+      json = {pairs};
+    } else {
+      const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
+      json = await res.json();
+    }
+    if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint) return;
+    const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
+    const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
+    const pair = solanaPairs.sort((a,b) =>
+      Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)
+    )[0];
+
+    if (!pair) {
+      statusEl.textContent = "NO MARKET DATA";
+      return;
+    }
+
+    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === String(token.mint || "").toLowerCase();
+    const basePriceUsd = Number(pair.priceUsd);
+    const nativePrice = Number(pair.priceNative);
+    const price = isBaseToken ? basePriceUsd :
+      (Number.isFinite(basePriceUsd) && Number.isFinite(nativePrice) && nativePrice > 0
+        ? basePriceUsd / nativePrice
+        : NaN);
+    // DexScreener's 24h change belongs to the base token. Do not mislabel it
+    // as the quote token's change when the selected mint is the quote asset.
+    const change = isBaseToken ? Number(pair.priceChange?.h24) : NaN;
+    const liquidity = Number(pair.liquidity?.usd);
+    const volume = Number(pair.volume?.h24);
+
+    priceEl.textContent = formatUsd(price);
+    changeEl.textContent = Number.isFinite(change)
+      ? (change >= 0 ? "+" : "") + change.toFixed(2) + "%"
+      : "—";
+    changeEl.style.color = Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
+    liquidityEl.textContent = formatCompactUsd(liquidity);
+    volumeEl.textContent = formatCompactUsd(volume);
+    statusEl.textContent = "LIVE MARKET";
+    chartEl.href = pair.url || chartEl.href;
+  } catch (err) {
+    console.warn("Token info market lookup failed:", err);
+    statusEl.textContent = "MARKET DATA UNAVAILABLE";
+  }
+}
+
+const tokenInfoCopyButton = document.getElementById("tokenInfoCopy");
+if (tokenInfoCopyButton) {
+  tokenInfoCopyButton.addEventListener("click", async () => {
+    const value = document.getElementById("tokenInfoMint")?.textContent || "";
+    if (!value || value === "—") return;
+    try {
+      await navigator.clipboard.writeText(value);
+      const label = document.getElementById("tokenInfoCopyText");
+      if (label) {
+        label.textContent = "COPIED!";
+        setTimeout(() => label.textContent = "COPY", 1400);
+      }
+    } catch {
+      alert(value);
+    }
+  });
+}
+
+const tokenInfoSwapButton = document.getElementById("tokenInfoSwap");
+if (tokenInfoSwapButton) {
+  tokenInfoSwapButton.addEventListener("click", () => {
+    document.getElementById("swap")?.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
+
+// Initial TOKEN INFO follows the default TO token (GURUG).
+// Keep the card synchronized with the visible RECEIVE (TO) token label as a
+// second, independent safeguard in case a picker path misses its direct call.
+const tokenInfoToSymbolEl = document.getElementById("toTokenSymbol");
+if (tokenInfoToSymbolEl) {
+  let lastObservedToSymbol = tokenInfoToSymbolEl.textContent.trim();
+  new MutationObserver(() => {
+    const nextSymbol = tokenInfoToSymbolEl.textContent.trim();
+    if (!nextSymbol || nextSymbol === lastObservedToSymbol) return;
+    lastObservedToSymbol = nextSymbol;
+    updateTokenInfo(toToken);
+  }).observe(tokenInfoToSymbolEl, {
+    childList: true,
+    characterData: true,
+    subtree: true
+  });
+}
+updateTokenInfo(toToken);
+
+/* --- LIVE GURUG MARKET TICKER --- */
+async function updateGurugMarketTicker() {
+  const priceEl = document.getElementById("gurugPrice");
+  const changeEl = document.getElementById("gurugChange");
+  if (!priceEl || !changeEl) return;
+
+  try {
+    const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+    const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
+    let pairs = [];
+    try {
+      const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
+      if (pairRes.ok) {
+        const pairData = await pairRes.json();
+        pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+      }
+    } catch (pairError) {
+      console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+    }
+    const matchesGurug = p => p?.chainId === "solana" &&
+      (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+       String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
+    let pair = pairs.filter(matchesGurug).sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
+    if (!pair) {
+      const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
+      if (tokenRes.ok) {
+        const tokenData = await tokenRes.json();
+        const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
+        pair = tokenPairs.filter(matchesGurug)
+          .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
+      }
+    }
+    if (!pair) throw new Error("No Solana market pair found for the GURUG mint");
+    const isBaseGurug = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
+    const price = isBaseGurug ? Number(pair?.priceUsd) :
+      (Number(pair?.priceNative) > 0 ? Number(pair?.priceUsd) / Number(pair?.priceNative) : NaN);
+    const change = Number(pair?.priceChange?.h24);
+
+    if (Number.isFinite(price)) {
+      priceEl.textContent = price < 0.000001
+        ? "$" + price.toFixed(10)
+        : price < 0.001
+          ? "$" + price.toFixed(7)
+          : "$" + price.toFixed(6);
+    }
+
+    if (Number.isFinite(change)) {
+      changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
+      changeEl.classList.toggle("down", change < 0);
+    }
+  } catch (err) {
+    console.log("GURUG ticker update failed.", err);
+  }
+}
+
+updateGurugMarketTicker();
+setInterval(updateGurugMarketTicker, 30000);
+
+
+const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
+if (heroConnectWalletBtn) {
+  heroConnectWalletBtn.addEventListener("click", async () => {
+    const provider = getPhantomProvider();
+    if (provider?.publicKey) {
+      try {
+        await provider.disconnect();
+        updateWalletButton(null);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      await connectPhantom();
+    }
+  });
+}
+
+
+ + (toToken.symbol || "TOKEN") + '</small></div>';
+  }
+  if (infoStatusEl) infoStatusEl.textContent = "LOADING MARKET";
+  if (infoChartEl && toToken.mint) {
+    infoChartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(toToken.mint);
+  }
+
   refreshBalancesSoon();
   updateSwapButtonState();
 }
