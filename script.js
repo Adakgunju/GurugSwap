@@ -745,9 +745,6 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
-  // TOKEN INFO must follow the committed TO token whenever the visible token buttons refresh.
-  updateTokenInfo(toToken);
-
   refreshBalancesSoon();
   updateSwapButtonState();
 }
@@ -914,27 +911,18 @@ async function renderTokenList(query = "") {
       // Update the selected token immediately. TOKEN INFO uses this exact
       // selected object, so it cannot fall back to the initial GURUG token.
       if (target === "from") {
-        if (token.mint === toToken.mint) {
-          toToken = fromToken;
-        }
+        if (token.mint === toToken.mint) toToken = fromToken;
         fromToken = token;
-        // TOKEN INFO follows the token the user most recently selected,
-        // whether it was the PAY or RECEIVE side.
-        activeTokenInfoMint = token.mint;
-        updateTokenInfo(token);
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
+        // Commit the selected TO token to TOKEN INFO immediately.
         activeTokenInfoMint = token.mint;
         updateTokenInfo(token);
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
-      // Re-apply TOKEN INFO after the visible TO button has been committed.
-      // Use the current toToken state, not the clicked token object, so this
-      // remains correct even if selecting a token swaps the opposite side.
-      updateTokenInfo(toToken);
       resetQuoteForTokenChange();
 
       // Hydrate the icon after selection without changing which token
@@ -985,9 +973,6 @@ if (swapDirectionButton) {
     const oldFrom = fromToken;
     fromToken = toToken;
     toToken = oldFrom;
-    // After reversing direction, the RECEIVE token is the most relevant token.
-    activeTokenInfoMint = toToken.mint;
-    updateTokenInfo(toToken);
     updateTokenButtons();
     resetQuoteForTokenChange();
     refreshBalancesSoon();
@@ -1386,9 +1371,38 @@ async function updateTokenInfo(token) {
     let json;
     if (String(token.symbol || "").toUpperCase() === "GURUG") {
       // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
-      const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/8rl8yz5lj3pyyjvmsaxses6ok1ugu14ldjzm7chdqfhz", {cache:"no-store"});
-      const pairData = await pairRes.json();
-      json = {pairs: Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : [])};
+      const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
+      const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+      let pairData = null;
+      try {
+        const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
+        if (pairRes.ok) pairData = await pairRes.json();
+      } catch (pairError) {
+        console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+      }
+      let pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+      const hasGurugPair = list => list.some(p =>
+        p?.chainId === "solana" &&
+        (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+         String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase())
+      );
+      if (!hasGurugPair(pairs)) {
+        const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
+          pairs = tokenPairs.filter(p => p?.chainId === "solana" &&
+            (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
+             String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase()));
+        }
+      }
+      // Keep the configured GURUG pool when it is returned; do not silently
+      // switch the display to a different pool just because it has more liquidity.
+      const configuredPair = pairs.find(p =>
+        String(p?.pairAddress || "").toLowerCase() === pairAddress.toLowerCase()
+      );
+      if (configuredPair) pairs = [configuredPair];
+      json = {pairs};
     } else {
       const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
       json = await res.json();
@@ -1405,8 +1419,16 @@ async function updateTokenInfo(token) {
       return;
     }
 
-    const price = Number(pair.priceUsd);
-    const change = Number(pair.priceChange?.h24);
+    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === String(token.mint || "").toLowerCase();
+    const basePriceUsd = Number(pair.priceUsd);
+    const nativePrice = Number(pair.priceNative);
+    const price = isBaseToken ? basePriceUsd :
+      (Number.isFinite(basePriceUsd) && Number.isFinite(nativePrice) && nativePrice > 0
+        ? basePriceUsd / nativePrice
+        : NaN);
+    // DexScreener's 24h change belongs to the base token. Do not mislabel it
+    // as the quote token's change when the selected mint is the quote asset.
+    const change = isBaseToken ? Number(pair.priceChange?.h24) : NaN;
     const liquidity = Number(pair.liquidity?.usd);
     const volume = Number(pair.volume?.h24);
 
@@ -1451,22 +1473,7 @@ if (tokenInfoSwapButton) {
 }
 
 // Initial TOKEN INFO follows the default TO token (GURUG).
-// Keep the card synchronized with the visible RECEIVE (TO) token label as a
-// second, independent safeguard in case a picker path misses its direct call.
-const tokenInfoToSymbolEl = document.getElementById("toTokenSymbol");
-if (tokenInfoToSymbolEl) {
-  let lastObservedToSymbol = tokenInfoToSymbolEl.textContent.trim();
-  new MutationObserver(() => {
-    const nextSymbol = tokenInfoToSymbolEl.textContent.trim();
-    if (!nextSymbol || nextSymbol === lastObservedToSymbol) return;
-    lastObservedToSymbol = nextSymbol;
-    updateTokenInfo(toToken);
-  }).observe(tokenInfoToSymbolEl, {
-    childList: true,
-    characterData: true,
-    subtree: true
-  });
-}
+// Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
 /* --- LIVE GURUG MARKET TICKER --- */
