@@ -745,6 +745,11 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
+  // TOKEN INFO must always reflect the current RECEIVE (TO) token.
+  // Centralizing this here prevents it from remaining on the default GURUG
+  // after the TO selection changes, regardless of which UI path triggered it.
+  if (toToken?.mint) updateTokenInfo(toToken);
+
   refreshBalancesSoon();
   updateSwapButtonState();
 }
