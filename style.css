@@ -10141,3 +10141,15 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     padding-top: 12px !important;
   }
 }
+
+
+/* Mobile: align Liquidity Pool intro text with the inset used on other tool pages. */
+@media (max-width: 850px) {
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-kicker,
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-title,
+  body .workspace-main > #liquidity.gurug-liquidity .liquidity-sub {
+    margin-left: 6px !important;
+    margin-right: 6px !important;
+    box-sizing: border-box !important;
+  }
+}
