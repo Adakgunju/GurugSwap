@@ -911,12 +911,17 @@ async function renderTokenList(query = "") {
       // Update the selected token immediately. TOKEN INFO uses this exact
       // selected object, so it cannot fall back to the initial GURUG token.
       if (target === "from") {
-        if (token.mint === toToken.mint) toToken = fromToken;
+        if (token.mint === toToken.mint) {
+          toToken = fromToken;
+        }
         fromToken = token;
+        // TOKEN INFO follows the token the user most recently selected,
+        // whether it was the PAY or RECEIVE side.
+        activeTokenInfoMint = token.mint;
+        updateTokenInfo(token);
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
-        // Commit the selected TO token to TOKEN INFO immediately.
         activeTokenInfoMint = token.mint;
         updateTokenInfo(token);
       }
@@ -973,6 +978,9 @@ if (swapDirectionButton) {
     const oldFrom = fromToken;
     fromToken = toToken;
     toToken = oldFrom;
+    // After reversing direction, the RECEIVE token is the most relevant token.
+    activeTokenInfoMint = toToken.mint;
+    updateTokenInfo(toToken);
     updateTokenButtons();
     resetQuoteForTokenChange();
     refreshBalancesSoon();
