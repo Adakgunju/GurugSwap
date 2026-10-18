@@ -10121,3 +10121,15 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+
+/* Mobile: inset Token Distribution heading text to align comfortably with the form card. */
+@media (max-width: 850px) {
+  body .workspace-main > #distributeTokens .distribute-kicker,
+  body .workspace-main > #distributeTokens .distribute-title,
+  body .workspace-main > #distributeTokens .distribute-lead {
+    margin-left: 6px !important;
+    margin-right: 6px !important;
+    box-sizing: border-box !important;
+  }
+}
