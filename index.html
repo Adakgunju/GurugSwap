@@ -25,7 +25,6 @@
           <a href="#token-burn">Token Burn</a>
           <a href="#token-mint">Token Mint</a>
           <a href="#trading-bot">Trading Bot</a>
-          <a href="#multi-token-bot">Multi-Token Bot (Preview)</a>
           <a href="#authority-manager">Token Authority</a>
         </div>
       </details>
@@ -46,7 +45,6 @@
     <a href="#token-burn">TOKEN BURN</a>
     <a href="#token-mint" onclick="document.getElementById('token-mint')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN MINT</a>
     <a href="#trading-bot">TRADING BOT</a>
-    <a href="#multi-token-bot">MULTI-TOKEN BOT (PREVIEW)</a>
     <a href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN AUTHORITY</a>
     <a href="#links">GURUG NETWORK</a>
   </div>
@@ -181,51 +179,7 @@
       </div>
       <div id="multiAirdropApp"></div>
     </section>
-
-
-    <section id="multi-token-bot" class="trading-bot-section" aria-label="Multi-wallet token bot">
-      <div class="trading-bot-intro">
-        <div class="platform-section-kicker">12 / MULTI-WALLET TOKEN BOT</div>
-        <h2>Any Solana token. <span class="section-title-accent">Your wallet.</span></h2>
-        <p>Connect your wallet, request a live Raydium mainnet quote, and approve a one-off swap in Phantom. Scheduled multi-token strategies remain dry-run only.</p>
-      </div>
-      <div class="trading-bot-card">
-        <div class="trading-bot-head">
-          <div><span class="trading-bot-kicker">MULTI-TOKEN WORKSPACE</span><h3>Wallet-linked <span>Strategies</span></h3>
-          <p>Wallet authentication uses a one-time signed challenge. Never share a seed phrase or private key.</p></div>
-          <div class="trading-bot-status-pill"><i></i><span>PREVIEW / DRY RUN</span></div>
-        </div>
-        <div id="multiBotStatus" role="status" aria-live="polite" style="padding:12px;margin:12px 0;border:1px solid rgba(255,229,0,.22);border-radius:10px;overflow-wrap:anywhere">Preview backend not checked yet.</div>
-        <div class="bot-actions" style="justify-content:flex-start;flex-wrap:wrap">
-          <button id="multiBotConnect" class="bot-primary" type="button">CONNECT WALLET</button>
-          <button id="multiBotRegister" class="bot-secondary" type="button">REGISTER WALLET</button>
-        </div>
-        <div class="bot-form-grid">
-          <label class="bot-field bot-field-wide"><small>YOUR REGISTERED WALLET</small><select id="multiBotWallet"><option value="">Connect and load wallets first</option></select></label>
-          <label class="bot-field bot-field-wide"><small>SOLANA TOKEN MINT</small><input id="multiBotMint" type="text" placeholder="Paste any valid SPL / Token-2022 mint" autocomplete="off" spellcheck="false"></label>
-          <label class="bot-field"><small>STRATEGY</small><select id="multiBotStrategy"><option value="DCA">DCA</option><option value="TARGET">TARGET PRICE</option></select></label>
-          <label class="bot-field"><small>SIDE</small><select id="multiBotSide"><option value="BUY">BUY</option><option value="SELL">SELL</option></select></label>
-          <label class="bot-field"><small>TRADE AMOUNT</small><input id="multiBotAmount" type="number" min="0" step="0.001" placeholder="0.01 SOL for BUY"></label>
-          <label class="bot-field"><small>INTERVAL (SECONDS)</small><input id="multiBotInterval" type="number" min="60" step="60" value="300"></label>
-          <label class="bot-field"><small>MAX TRADES</small><input id="multiBotMaxTrades" type="number" min="1" step="1" value="5"></label>
-          <label class="bot-field"><small>MAX TOTAL SPEND (SOL)</small><input id="multiBotMaxSpend" type="number" min="0" step="0.01" value="0.1"></label>
-          <label class="bot-field bot-target-field"><small>TARGET PRICE (USD)</small><input id="multiBotTarget" type="number" min="0" step="0.00000001" placeholder="Required for TARGET"></label>
-        </div>
-        <div class="bot-safety-box"><div><i>!</i><strong>SCHEDULED BOT: DRY RUN ONLY · MANUAL SWAP: MAINNET</strong></div><p>Strategy configurations are saved disabled and run in simulation only. The separate Raydium swap button can request a mainnet transaction and open Phantom for your explicit approval. Check the token mint, spend amount, receive amount, fees, and slippage before signing. Never approve a transaction you do not understand.</p></div>
-        <div class="bot-actions" style="justify-content:flex-start;flex-wrap:wrap">
-          <button id="multiBotRaydiumQuote" class="bot-secondary" type="button">GET RAYDIUM MAINNET QUOTE</button>
-          <button id="multiBotRaydiumSwap" class="bot-primary" type="button">REVIEW & SWAP WITH PHANTOM</button>
-          <button id="multiBotCreateConfig" class="bot-primary" type="button">SAVE DRY-RUN STRATEGY</button>
-          <div id="multiBotRaydiumQuoteResult" role="status" aria-live="polite" style="width:100%;padding:12px 0;overflow-wrap:anywhere">Raydium quote has not been requested.</div>
-          <button id="multiBotLoadConfigs" class="bot-secondary" type="button">REFRESH STRATEGIES</button>
-        </div>
-        <div id="multiBotConfigResult" style="padding:12px 0;overflow-wrap:anywhere" aria-live="polite">No strategies loaded.</div>
-        <div class="bot-history"><div class="bot-history-head"><strong>WALLET TRADE HISTORY</strong><span>PREVIEW RECORDS</span></div><div id="multiBotHistory" class="bot-history-empty">Connect a wallet and refresh strategies to load history.</div></div>
-        <div class="trading-bot-foot"><span>MULTI-WALLET</span><span>PER-TOKEN CONFIG</span><span>DRY RUN ONLY</span></div>
-      </div>
-    </section>
-
-    <section id="trading-bot" class="trading-bot-section" aria-label="Automated trading bot">
+<section id="trading-bot" class="trading-bot-section" aria-label="Automated trading bot">
       <div class="trading-bot-intro">
         <div class="platform-section-kicker">11 / TRADING BOT</div>
         <h2>Automate your <span class="section-title-accent">strategy.</span></h2>
@@ -413,7 +367,6 @@
   <script src="token-authority.js?v=6"></script>
   <script src="token-mint.js?v=25"></script>
   <script src="trading-bot.js?v=22"></script>
-  <script src="multi-token-bot.js?v=8"></script>
   <!-- Multi-wallet staging panel intentionally not loaded on the public swap site. -->
   <script>
     // Independent TOKEN INFO bridge.
