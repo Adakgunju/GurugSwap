@@ -915,19 +915,19 @@ async function renderTokenList(query = "") {
           toToken = fromToken;
         }
         fromToken = token;
-        // TOKEN INFO follows the token the user most recently selected,
-        // whether it was the PAY or RECEIVE side.
-        activeTokenInfoMint = token.mint;
-        updateTokenInfo(token);
+        // TOKEN INFO is tied to the RECEIVE (TO) token, not FROM.
+
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
-        activeTokenInfoMint = token.mint;
-        updateTokenInfo(token);
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
+      // Update TOKEN INFO only after the selected TO state and button label
+      // have both been committed. Pass the current toToken, never the stale
+      // token object from the previous picker state.
+      updateTokenInfo(toToken);
       resetQuoteForTokenChange();
 
       // Hydrate the icon after selection without changing which token
