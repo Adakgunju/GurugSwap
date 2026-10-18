@@ -928,6 +928,10 @@ async function renderTokenList(query = "") {
 
       if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
+      // Re-apply TOKEN INFO after the visible TO button has been committed.
+      // Use the current toToken state, not the clicked token object, so this
+      // remains correct even if selecting a token swaps the opposite side.
+      updateTokenInfo(toToken);
       resetQuoteForTokenChange();
 
       // Hydrate the icon after selection without changing which token
