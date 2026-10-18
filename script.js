@@ -745,6 +745,9 @@ function updateTokenButtons() {
 
   if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
 
+  // TOKEN INFO must follow the committed TO token whenever the visible token buttons refresh.
+  updateTokenInfo(toToken);
+
   refreshBalancesSoon();
   updateSwapButtonState();
 }
