@@ -10168,3 +10168,18 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+
+/* Mobile: inset Token Mint intro text from the viewport edge. */
+@media (max-width: 850px) {
+  body .workspace-main > #token-mint .platform-placeholder-head {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #token-mint .platform-placeholder-head h1,
+  body .workspace-main > #token-mint .platform-placeholder-head h2,
+  body .workspace-main > #token-mint .platform-placeholder-head p {
+    box-sizing: border-box !important;
+  }
+}
