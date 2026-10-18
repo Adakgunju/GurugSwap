@@ -10002,3 +10002,48 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+
+
+/* MOBILE FEATURE HEADING SPACING RESTORE
+   Keep a clear gap between the sticky site header and each feature's intro.
+   Do not change card widths, field layout, or desktop styling. */
+@media (max-width: 850px) {
+  body .workspace-main > #distributeTokens,
+  body .workspace-main > #multi-airdrop,
+  body .workspace-main > #token-burn,
+  body .workspace-main > #authority-manager,
+  body .workspace-main > #trading-bot,
+  body .workspace-main > #multi-token-bot,
+  body .workspace-main > #create-token,
+  body .workspace-main > #token-mint,
+  body .workspace-main > #liquidity-token,
+  body .workspace-main > #token-info {
+    padding-top: 28px !important;
+  }
+
+  body .workspace-main > #distributeTokens .platform-placeholder-head,
+  body .workspace-main > #multi-airdrop .platform-placeholder-head,
+  body .workspace-main > #token-burn .platform-placeholder-head,
+  body .workspace-main > #authority-manager .platform-placeholder-head,
+  body .workspace-main > #trading-bot .trading-bot-intro,
+  body .workspace-main > #multi-token-bot .trading-bot-intro,
+  body .workspace-main > #create-token .create-token-head,
+  body .workspace-main > #token-mint .platform-placeholder-head,
+  body .workspace-main > #liquidity-token .platform-placeholder-head,
+  body .workspace-main > #token-info .platform-placeholder-head {
+    margin-top: 0 !important;
+    margin-bottom: 22px !important;
+    padding-top: 0 !important;
+  }
+
+  body .workspace-main > #distributeTokens .platform-placeholder-head h1,
+  body .workspace-main > #multi-airdrop .platform-placeholder-head h1,
+  body .workspace-main > #token-burn .platform-placeholder-head h1,
+  body .workspace-main > #authority-manager .platform-placeholder-head h1,
+  body .workspace-main > #token-mint .platform-placeholder-head h1,
+  body .workspace-main > #liquidity-token .platform-placeholder-head h1,
+  body .workspace-main > #token-info .platform-placeholder-head h1 {
+    margin-top: 10px !important;
+  }
+}
