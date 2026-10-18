@@ -358,7 +358,7 @@
     </div>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=50"></script>
+  <script src="script.js?v=49"></script>
   <script src="create-token-v15.js?v=27"></script>
   <script src="distribute-token.js?v=7"></script>
   <script src="multi-airdrop.js?v=9"></script>
@@ -368,6 +368,235 @@
   <script src="token-mint.js?v=25"></script>
   <script src="trading-bot.js?v=22"></script>
   <!-- Multi-wallet staging panel intentionally not loaded on the public swap site. -->
+  <script>
+    // Independent TOKEN INFO bridge.
+    // It follows the visible TO token and updates the card directly,
+    // so it does not depend on script.js function scope or async timing.
+    (() => {
+      const toSymbolEl = document.getElementById("toTokenSymbol");
+      const tokenListEl = document.getElementById("tokenList");
+      if (!toSymbolEl) return;
+
+      let lastSymbol = "";
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      }
+
+      function setTokenIcon(token) {
+        const identity = document.getElementById("tokenInfoIdentity");
+        if (!identity) return;
+
+        let iconHtml = "";
+        if (token.mint === "So11111111111111111111111111111111111111112") {
+          iconHtml = '<span class="token-info-icon sol-logo" aria-hidden="true"><i></i><i></i><i></i></span>';
+        } else if (token.icon) {
+          iconHtml = '<img class="token-info-icon" src="' + token.icon + '" alt="">';
+        } else {
+          iconHtml = '<span class="token-info-icon token-info-placeholder">' +
+            String(token.symbol || "?").slice(0, 1).toUpperCase() + '</span>';
+        }
+
+        identity.innerHTML =
+          iconHtml +
+          '<div><strong>' + (token.name || "Solana Token") +
+          '</strong><small>$' + (token.symbol || "TOKEN") + '</small></div>';
+      }
+
+      async function loadVisibleTokenInfo(force = false) {
+        const symbol = (toSymbolEl?.textContent || "GURUG").trim().toUpperCase();
+        if (!symbol || (!force && symbol === lastSymbol)) return;
+        lastSymbol = symbol;
+
+        try {
+          const GURUG_MINT = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+          const GURUG_PAIR = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
+
+          let token;
+          let market;
+
+          if (symbol === "GURUG") {
+            token = {
+              symbol: "GURUG",
+              name: "Gurug",
+              mint: GURUG_MINT,
+              icon: "https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"
+            };
+
+            setText("tokenInfoName", token.name);
+            setText("tokenInfoSymbol", "$" + token.symbol);
+            setText("tokenInfoMint", token.mint);
+            setText("tokenInfoNetwork", "SOLANA");
+            setText("tokenInfoStatus", "LOADING MARKET");
+            setText("tokenInfoPrice", "—");
+            setText("tokenInfoChange", "—");
+            setText("tokenInfoLiquidity", "—");
+            setText("tokenInfoVolume", "—");
+            setTokenIcon(token);
+
+            const swapEl = document.getElementById("tokenInfoSwap");
+            if (swapEl) swapEl.hidden = false;
+
+            const chartEl = document.getElementById("tokenInfoChart");
+            if (chartEl) {
+              chartEl.href = "https://dexscreener.com/solana/" + GURUG_PAIR;
+            }
+
+            let pairData = null;
+            try {
+              const pairRes = await fetch(
+                "https://api.dexscreener.com/latest/dex/pairs/solana/" + GURUG_PAIR,
+                {cache:"no-store"}
+              );
+              if (pairRes.ok) pairData = await pairRes.json();
+            } catch (pairError) {
+              console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
+            }
+            let gurugPairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
+            const hasGurugPair = pairs => pairs.some(p =>
+              p?.chainId === "solana" &&
+              (String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase() ||
+               String(p?.quoteToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase())
+            );
+            if (!hasGurugPair(gurugPairs)) {
+              const tokenRes = await fetch(
+                "https://api.dexscreener.com/latest/dex/tokens/" + GURUG_MINT,
+                {cache:"no-store"}
+              );
+              if (tokenRes.ok) {
+                const tokenData = await tokenRes.json();
+                gurugPairs = (Array.isArray(tokenData?.pairs) ? tokenData.pairs : [])
+                  .filter(p => p?.chainId === "solana" &&
+                    (String(p?.baseToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase() ||
+                     String(p?.quoteToken?.address || "").toLowerCase() === GURUG_MINT.toLowerCase()));
+              }
+            }
+            market = {pairs: gurugPairs};
+          } else {
+            const res = await fetch(
+              "https://lite-api.jup.ag/tokens/v2/search?query=" +
+              encodeURIComponent(symbol),
+              {cache:"no-store"}
+            );
+            if (!res.ok) return;
+
+            const data = await res.json();
+            const wanted = symbol.toLowerCase();
+            const found = Array.isArray(data)
+              ? data.find(t => String(t?.symbol || "").toLowerCase() === wanted) ||
+                data.find(t => String(t?.name || "").toLowerCase() === wanted)
+              : null;
+
+            if (!found?.id) return;
+
+            token = {
+              symbol: found.symbol || symbol,
+              name: found.name || symbol,
+              mint: found.id,
+              icon: found.icon || found.logoURI || ""
+            };
+
+            setText("tokenInfoName", token.name);
+            setText("tokenInfoSymbol", "$" + token.symbol);
+            setText("tokenInfoMint", token.mint);
+            setText("tokenInfoNetwork", "SOLANA");
+            setText("tokenInfoStatus", "LOADING MARKET");
+            setText("tokenInfoPrice", "—");
+            setText("tokenInfoChange", "—");
+            setText("tokenInfoLiquidity", "—");
+            setText("tokenInfoVolume", "—");
+            setTokenIcon(token);
+
+            const swapEl = document.getElementById("tokenInfoSwap");
+            if (swapEl) swapEl.hidden = false;
+
+            const chartEl = document.getElementById("tokenInfoChart");
+            if (chartEl) {
+              chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
+            }
+
+            const marketRes = await fetch(
+              "https://api.dexscreener.com/latest/dex/tokens/" +
+              encodeURIComponent(token.mint),
+              {cache:"no-store"}
+            );
+            market = await marketRes.json();
+          }
+
+          // Keep the market card synchronized with the current TO-token selection.
+
+          const pairs = Array.isArray(market?.pairs) ? market.pairs : [];
+          const pair = pairs
+            .filter(p => p?.chainId === "solana")
+            .sort((a,b) =>
+              Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)
+            )[0];
+
+          if (!pair) {
+            setText("tokenInfoStatus", "NO MARKET DATA");
+            return;
+          }
+
+          const price = Number(pair.priceUsd);
+          const change = Number(pair.priceChange?.h24);
+          const liquidity = Number(pair.liquidity?.usd);
+          const volume = Number(pair.volume?.h24);
+
+          const formatPrice = value => {
+            if (!Number.isFinite(value)) return "—";
+            if (value >= 1) return "$" + value.toLocaleString("en-US", {maximumFractionDigits:2});
+            if (value >= 0.01) return "$" + value.toLocaleString("en-US", {maximumFractionDigits:4});
+            return "$" + value.toLocaleString("en-US", {maximumFractionDigits:8});
+          };
+
+          const formatCompact = value => {
+            if (!Number.isFinite(value)) return "—";
+            if (value >= 1000000000) return "$" + (value / 1000000000).toFixed(2) + "B";
+            if (value >= 1000000) return "$" + (value / 1000000).toFixed(2) + "M";
+            if (value >= 1000) return "$" + (value / 1000).toFixed(1) + "K";
+            return "$" + value.toFixed(0);
+          };
+
+          setText("tokenInfoPrice", formatPrice(price));
+          setText("tokenInfoChange",
+            Number.isFinite(change)
+              ? (change >= 0 ? "+" : "") + change.toFixed(2) + "%"
+              : "—"
+          );
+          setText("tokenInfoLiquidity", formatCompact(liquidity));
+          setText("tokenInfoVolume", formatCompact(volume));
+          setText("tokenInfoStatus", "LIVE MARKET");
+
+          const changeEl = document.getElementById("tokenInfoChange");
+          if (changeEl) {
+            changeEl.style.color =
+              Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
+          }
+
+          const chartEl = document.getElementById("tokenInfoChart");
+          if (chartEl) chartEl.href = pair.url || chartEl.href;
+        } catch (err) {
+          console.warn("Independent token-info bridge failed:", err);
+          setText("tokenInfoStatus", "MARKET DATA UNAVAILABLE");
+        }
+      }
+
+      loadVisibleTokenInfo(true);
+
+      new MutationObserver(() => loadVisibleTokenInfo(false)).observe(toSymbolEl, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+
+      if (tokenListEl) {
+        tokenListEl.addEventListener("click", () => {
+          setTimeout(() => loadVisibleTokenInfo(true), 0);
+        });
+      }
+    })();
+  </script>
 
     <style id="single-section-view-styles">
       /* Platform workspace: show one menu section at a time. Feature scripts and DOM IDs remain unchanged. */
