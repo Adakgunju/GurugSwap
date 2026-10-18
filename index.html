@@ -635,7 +635,16 @@
       @media(max-width:850px){
         .workspace-main.single-section-view{
           min-height:calc(100vh - 76px)!important;
-          padding-top:24px!important;
+          padding-top:36px!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active{
+          padding-top:28px!important;
+          box-sizing:border-box!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active > .platform-placeholder-head,
+        .workspace-main.single-section-view > section.single-section-active > .trading-bot-intro,
+        .workspace-main.single-section-view > section.single-section-active > .create-token-head{
+          margin-top:0!important;
         }
         .workspace-main.single-section-view > section.single-section-active{
           min-height:0!important;
@@ -646,7 +655,10 @@
       }
       @media(max-width:520px){
         .workspace-main.single-section-view{
-          padding-top:18px!important;
+          padding-top:32px!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active{
+          padding-top:24px!important;
         }
       }
     </style>
