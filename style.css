@@ -10047,3 +10047,67 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     margin-top: 10px !important;
   }
 }
+
+
+/* GURUG NETWORK: remove the enclosing section frame and tighten spacing. */
+.workspace-main.single-section-view > #links.single-section-active,
+.workspace-main > #links.links-section {
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+.workspace-main.single-section-view > #links.single-section-active {
+  padding-top: 0 !important;
+}
+.workspace-main #links .links-heading {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+.workspace-main #links .links-heading h2 {
+  margin: 14px 0 14px !important;
+}
+.workspace-main #links .links-heading p {
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+.workspace-main #links .link-grid {
+  margin-top: 24px !important;
+  gap: 12px !important;
+}
+.workspace-main #links .link-card {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+}
+@media (max-width: 850px) {
+  .workspace-main.single-section-view > #links.single-section-active {
+    padding: 0 !important;
+    margin-bottom: 12px !important;
+  }
+  .workspace-main #links .links-heading {
+    padding-top: 0 !important;
+  }
+  .workspace-main #links .links-heading h2 {
+    margin: 12px 0 !important;
+  }
+  .workspace-main #links .link-grid {
+    margin-top: 20px !important;
+    gap: 10px !important;
+  }
+}
+@media (max-width: 520px) {
+  .workspace-main #links .link-grid {
+    grid-template-columns: 1fr !important;
+    margin-top: 18px !important;
+    gap: 10px !important;
+  }
+  .workspace-main #links .link-card {
+    min-height: 118px !important;
+    padding: 18px !important;
+    border-radius: 14px !important;
+  }
+}
