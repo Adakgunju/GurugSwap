@@ -10111,3 +10111,13 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     border-radius: 14px !important;
   }
 }
+
+
+/* Mobile: give the Gurug Network heading a small inset from the screen edge. */
+@media (max-width: 850px) {
+  .workspace-main #links .links-heading {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    box-sizing: border-box !important;
+  }
+}
