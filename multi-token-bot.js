@@ -184,6 +184,47 @@
     }
   });
 
+  $("multiBotRaydiumQuote")?.addEventListener("click", async () => {
+    const button = $("multiBotRaydiumQuote");
+    const output = $("multiBotRaydiumQuoteResult");
+    const SOL_MINT = "So11111111111111111111111111111111111111112";
+    try {
+      const tokenMint = $("multiBotMint")?.value.trim() || "";
+      const side = $("multiBotSide")?.value || "BUY";
+      const amount = String($("multiBotAmount")?.value || "").trim();
+      if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(tokenMint)) {
+        throw new Error("Enter a valid-looking Solana token mint first.");
+      }
+      if (!amount || !Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+        throw new Error("Enter a positive trade amount first.");
+      }
+      if (button) button.disabled = true;
+      if (output) output.textContent = "Requesting a live Raydium mainnet quote…";
+      const quote = await post("raydium-quote", {
+        inputMint: side === "BUY" ? SOL_MINT : tokenMint,
+        outputMint: side === "BUY" ? tokenMint : SOL_MINT,
+        amount,
+        slippageBps: 50
+      });
+      if (output) {
+        const inputLabel = side === "BUY" ? "SOL" : "token";
+        const outputLabel = side === "BUY" ? "token" : "SOL";
+        output.textContent =
+          "RAYDIUM MAINNET QUOTE · " + quote.amount + " " + inputLabel +
+          " → " + quote.expectedOutput + " " + outputLabel +
+          " · minimum out: " + quote.minimumOutputRaw + " raw units" +
+          " · price impact: " + (quote.priceImpactPct ?? "not reported") + "%" +
+          " · slippage: " + quote.slippageBps + " bps. Quote only — no wallet signature or swap submitted.";
+      }
+      setStatus("Raydium mainnet quote received. No transaction was signed or sent.");
+    } catch (error) {
+      if (output) output.textContent = error.message || "Could not fetch a Raydium quote.";
+      setStatus(error.message || "Could not fetch a Raydium quote.", true);
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
+
   $("multiBotCreateConfig")?.addEventListener("click", async () => {
     try {
       const walletId = Number(walletSelect?.value);
