@@ -309,12 +309,7 @@
         if (output) output.textContent =
           "Transaction submitted (" + (i + 1) + "/" + built.transactions.length +
           "): " + signature + " · waiting for confirmation…";
-        const latest = await connection.getLatestBlockhash("confirmed");
-        const confirmation = await connection.confirmTransaction({
-          signature,
-          blockhash: latest.blockhash,
-          lastValidBlockHeight: latest.lastValidBlockHeight
-        }, "confirmed");
+        const confirmation = await connection.confirmTransaction(signature, "confirmed");
         if (confirmation?.value?.err) {
           throw new Error("On-chain transaction failed: " + JSON.stringify(confirmation.value.err));
         }
