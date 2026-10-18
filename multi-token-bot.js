@@ -6,6 +6,19 @@
   const status = $("multiBotStatus");
   const walletSelect = $("multiBotWallet");
   const walletList = $("multiBotWalletList");
+  const sideSelect = $("multiBotSide");
+  const amountInput = $("multiBotAmount");
+
+  function updateAmountHint() {
+    const isSell = sideSelect?.value === "SELL";
+    const label = amountInput?.closest("label")?.querySelector("small");
+    if (label) label.textContent = isSell ? "TRADE AMOUNT (TOKENS)" : "TRADE AMOUNT (SOL)";
+    if (amountInput) amountInput.placeholder = isSell ? "Token quantity to sell" : "SOL to spend per buy";
+    if (amountInput) amountInput.step = isSell ? "any" : "0.001";
+  }
+
+  sideSelect?.addEventListener("change", updateAmountHint);
+  updateAmountHint();
 
   function provider() {
     return window.phantom?.solana?.isPhantom ? window.phantom.solana :
