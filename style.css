@@ -9672,3 +9672,227 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .landing-feature { padding: 14px; }
   .platform-header .platform-note span { padding: 6px 7px; }
 }
+
+
+/* FIX: multi-token bot had legacy light-theme selectors overriding the new UI. */
+body .workspace-main > #multi-token-bot.trading-bot-section {
+  display: block !important;
+  width: 100% !important;
+  max-width: 1320px !important;
+  margin: 0 auto 44px !important;
+  padding: 34px 0 44px !important;
+  box-sizing: border-box !important;
+  border-top: 1px solid #252b35 !important;
+  background: transparent !important;
+  color: #f4f6fb !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-intro {
+  display: block !important;
+  max-width: 100% !important;
+  margin: 0 0 24px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #f4f6fb !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-intro h2 {
+  margin: 12px 0 14px !important;
+  color: #f4f6fb !important;
+  font-size: clamp(34px, 4vw, 54px) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.055em !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-intro p {
+  max-width: 760px !important;
+  margin: 0 !important;
+  color: #aeb8cb !important;
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: clamp(18px, 2.5vw, 30px) !important;
+  border: 1px solid #29344b !important;
+  border-radius: 18px !important;
+  background: linear-gradient(145deg, #111a2d 0%, #0c1222 70%, #141027 100%) !important;
+  box-shadow: 0 18px 44px rgba(0,0,0,.24) !important;
+  color: #f4f6fb !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-head {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 18px !important;
+  margin: 0 0 20px !important;
+  padding: 0 0 18px !important;
+  border-bottom: 1px solid #273148 !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-kicker,
+body .workspace-main > #multi-token-bot .platform-section-kicker {
+  color: #9297ff !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .15em !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-head h3 {
+  margin: 8px 0 !important;
+  color: #f4f6fb !important;
+  font-size: clamp(22px, 2.3vw, 30px) !important;
+  line-height: 1.2 !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-head h3 span {
+  color: #f4df35 !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-head p {
+  max-width: 680px !important;
+  margin: 0 !important;
+  color: #aeb8cb !important;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-status-pill {
+  flex: 0 0 auto !important;
+  padding: 9px 12px !important;
+  border: 1px solid #51472a !important;
+  border-radius: 999px !important;
+  background: rgba(244,223,53,.07) !important;
+  color: #e9d96f !important;
+  font-size: 9px !important;
+}
+body .workspace-main > #multi-token-bot #multiBotStatus {
+  margin: 0 0 16px !important;
+  padding: 13px 15px !important;
+  border: 1px solid #30394d !important;
+  border-radius: 10px !important;
+  background: #0a1020 !important;
+  color: #d8dfef !important;
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+}
+body .workspace-main > #multi-token-bot .bot-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 14px 0 18px !important;
+}
+body .workspace-main > #multi-token-bot .bot-primary,
+body .workspace-main > #multi-token-bot .bot-secondary {
+  min-height: 42px !important;
+  padding: 11px 15px !important;
+  border-radius: 9px !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+}
+body .workspace-main > #multi-token-bot .bot-primary {
+  border: 1px solid #f4df35 !important;
+  background: #f4df35 !important;
+  color: #17170b !important;
+}
+body .workspace-main > #multi-token-bot .bot-secondary {
+  border: 1px solid #39445b !important;
+  background: #171f31 !important;
+  color: #e3e8f4 !important;
+}
+body .workspace-main > #multi-token-bot .bot-form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+}
+body .workspace-main > #multi-token-bot .bot-field {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  gap: 7px !important;
+  padding: 12px !important;
+  border: 1px solid #2b354a !important;
+  border-radius: 10px !important;
+  background: #131b2b !important;
+}
+body .workspace-main > #multi-token-bot .bot-field-wide {
+  grid-column: 1 / -1 !important;
+}
+body .workspace-main > #multi-token-bot .bot-field small {
+  color: #9ca9c2 !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  line-height: 1.4 !important;
+  letter-spacing: .1em !important;
+}
+body .workspace-main > #multi-token-bot .bot-field input,
+body .workspace-main > #multi-token-bot .bot-field select {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 11px 12px !important;
+  border: 1px solid #34415b !important;
+  border-radius: 8px !important;
+  background: #090f1d !important;
+  color: #f4f6fb !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+}
+body .workspace-main > #multi-token-bot .bot-field input::placeholder {
+  color: #7f8ba2 !important;
+  opacity: 1 !important;
+}
+body .workspace-main > #multi-token-bot .bot-safety-box {
+  margin-top: 18px !important;
+  padding: 15px !important;
+  border: 1px solid #4a4023 !important;
+  border-radius: 11px !important;
+  background: rgba(244,223,53,.045) !important;
+  color: #f0e8bf !important;
+}
+body .workspace-main > #multi-token-bot .bot-safety-box p {
+  color: #c5c7ce !important;
+  font-size: 11px !important;
+  line-height: 1.7 !important;
+}
+body .workspace-main > #multi-token-bot .bot-history {
+  margin-top: 22px !important;
+  border-top: 1px solid #273148 !important;
+}
+body .workspace-main > #multi-token-bot .trading-bot-foot {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-top: 20px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid #273148 !important;
+  color: #8793ab !important;
+  font-size: 9px !important;
+}
+@media (max-width: 760px) {
+  body .workspace-main > #multi-token-bot.trading-bot-section {
+    padding: 28px 0 32px !important;
+    margin-bottom: 20px !important;
+  }
+  body .workspace-main > #multi-token-bot .trading-bot-head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  body .workspace-main > #multi-token-bot .bot-form-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  body .workspace-main > #multi-token-bot .bot-field-wide {
+    grid-column: auto !important;
+  }
+  body .workspace-main > #multi-token-bot .bot-actions {
+    align-items: stretch !important;
+  }
+  body .workspace-main > #multi-token-bot .bot-actions button {
+    max-width: 100% !important;
+    white-space: normal !important;
+  }
+  body .workspace-main > #multi-token-bot .trading-bot-intro h2 {
+    font-size: clamp(32px, 8vw, 44px) !important;
+  }
+}
