@@ -371,5 +371,189 @@
   <!-- TOKEN INFO is managed only by script.js to avoid duplicate async updates. -->
 
 
+
+    <style id="single-section-view-styles">
+      /* Platform workspace: show one menu section at a time. Feature scripts and DOM IDs remain unchanged. */
+      .workspace-main.single-section-view{
+        min-height:calc(100vh - 82px)!important;
+        padding-top:40px!important;
+      }
+      .workspace-main.single-section-view > section{
+        display:none!important;
+        margin-top:0!important;
+        margin-bottom:0!important;
+        width:100%!important;
+      }
+      .workspace-main.single-section-view > section.single-section-active{
+        display:block!important;
+      }
+      .workspace-main.single-section-view > #token-info.single-section-companion{
+        display:block!important;
+      }
+      /* Token Info is a Swap-only companion; never leak it into other tool pages. */
+      .workspace-main.single-section-view > #token-info:not(.single-section-companion){
+        display:none!important;
+      }
+      .workspace-main.single-section-view > #swap.single-section-active{
+        margin-bottom:28px!important;
+      }
+      .workspace-main.single-section-view > #token-info.single-section-companion{
+        margin-top:28px!important;
+      }
+      .workspace-main.single-section-view .swap-intro-inner,
+      .workspace-main.single-section-view .platform-placeholder-head,
+      .workspace-main.single-section-view .links-heading,
+      .workspace-main.single-section-view .partner-ads-heading{
+        margin-bottom:28px!important;
+      }
+      @media(max-width:850px){
+        .workspace-main.single-section-view{
+          min-height:calc(100vh - 76px)!important;
+          padding-top:36px!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active{
+          padding-top:28px!important;
+          box-sizing:border-box!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active > .platform-placeholder-head,
+        .workspace-main.single-section-view > section.single-section-active > .trading-bot-intro,
+        .workspace-main.single-section-view > section.single-section-active > .create-token-head{
+          margin-top:0!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active{
+          min-height:0!important;
+        }
+        .workspace-main.single-section-view > #token-info.single-section-companion{
+          margin-top:20px!important;
+        }
+      }
+      @media(max-width:520px){
+        .workspace-main.single-section-view{
+          padding-top:32px!important;
+        }
+        .workspace-main.single-section-view > section.single-section-active{
+          padding-top:24px!important;
+        }
+      }
+    </style>
+
+    <script>
+      // Close the BUILD dropdown as soon as a destination is selected.
+      (() => {
+        const buildMenu = document.querySelector(".topbar .build-menu");
+        if (!buildMenu) return;
+
+        buildMenu.querySelectorAll(".build-menu-panel a").forEach(link => {
+          link.addEventListener("click", () => {
+            buildMenu.open = false;
+          });
+        });
+
+        // Also dismiss the dropdown when clicking anywhere outside it or pressing Escape.
+        document.addEventListener("click", event => {
+          if (buildMenu.open && !buildMenu.contains(event.target)) {
+            buildMenu.open = false;
+          }
+        });
+        document.addEventListener("keydown", event => {
+          if (event.key === "Escape" && buildMenu.open) {
+            buildMenu.open = false;
+            buildMenu.querySelector("summary")?.focus();
+          }
+        });
+      })();
+
+      // Single-section platform navigation.
+      (() => {
+        const menuTargets = [
+          "create-token","distributeTokens","liquidity","swap",
+          "multi-airdrop","token-burn","token-mint","authority-manager",
+          "trading-bot","multi-token-bot","links"
+        ];
+
+        function showSection(targetId, updateHash = true) {
+          const main = document.querySelector(".workspace-main");
+          const target = document.getElementById(targetId);
+          if (!main || !target) return false;
+
+          main.classList.add("single-section-view");
+
+          main.querySelectorAll(":scope > section").forEach(section => {
+            const active = section.id === targetId;
+            const companion = targetId === "swap" && section.id === "token-info";
+            section.classList.toggle("single-section-active", active);
+            section.classList.toggle("single-section-companion", companion);
+            section.setAttribute("aria-hidden", active || companion ? "false" : "true");
+            // Enforce the one-page view inline as well, so older/conflicting CSS
+            // cannot leave Token Info visible when another tool is selected.
+            section.style.setProperty("display", active || companion ? "block" : "none", "important");
+          });
+
+          document.querySelectorAll(".workspace-nav, #mobileMenu a").forEach(link => {
+            const active = link.getAttribute("href") === "#" + targetId;
+            link.classList.toggle("active", active);
+            if (active) link.setAttribute("aria-current", "page");
+            else link.removeAttribute("aria-current");
+          });
+
+          if (updateHash) history.replaceState(null, "", "#" + targetId);
+
+          const menu = document.getElementById("mobileMenu");
+          const menuBtn = document.getElementById("mobileMenuBtn");
+          if (menu && !menu.hidden) {
+            menu.hidden = true;
+            menuBtn?.setAttribute("aria-expanded", "false");
+            if (menuBtn) menuBtn.textContent = "MENU";
+          }
+
+          const topbar = document.querySelector(".topbar");
+          const offset = (topbar?.offsetHeight || 76) + 10;
+          const y = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({top: Math.max(0, y), behavior:"smooth"});
+          return true;
+        }
+
+        window.gurugNavigate = function(targetId) {
+          if (!menuTargets.includes(targetId)) return;
+          if (showSection(targetId, true)) return;
+          setTimeout(() => showSection(targetId, true), 100);
+          setTimeout(() => showSection(targetId, true), 500);
+        };
+
+        function bindNavigation() {
+          document.querySelectorAll(".workspace-nav, #mobileMenu a").forEach(link => {
+            if (link.dataset.gurugNavBound) return;
+            link.dataset.gurugNavBound = "1";
+            link.addEventListener("click", event => {
+              const href = link.getAttribute("href") || "";
+              if (!href.startsWith("#")) return;
+              const targetId = href.slice(1);
+              if (!menuTargets.includes(targetId)) return;
+              event.preventDefault();
+              event.stopPropagation();
+              window.gurugNavigate(targetId);
+            });
+          });
+        }
+
+        function initNavigation() {
+          bindNavigation();
+          const hash = window.location.hash.replace(/^#/, "");
+          const targetId = menuTargets.includes(hash) ? hash : "swap";
+          window.gurugNavigate(targetId);
+        }
+
+        window.addEventListener("hashchange", () => {
+          const hash = window.location.hash.replace(/^#/, "");
+          if (menuTargets.includes(hash)) window.gurugNavigate(hash);
+        });
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initNavigation, {once:true});
+        } else {
+          initNavigation();
+        }
+      })();
+    </script>
 </body>
 </html>
