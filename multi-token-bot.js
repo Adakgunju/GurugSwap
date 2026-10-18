@@ -84,7 +84,7 @@
     const challenge = await post("wallet-challenge", { publicKey });
     const signed = await walletProvider.signMessage(new TextEncoder().encode(challenge.message), "utf8");
     const signature = encodeBase58(signed.signature || signed);
-    return { nonce: challenge.nonce, signature };
+    return { publicKey, nonce: challenge.nonce, signature };
   }
 
   async function authenticated(action, body = {}) {
