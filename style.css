@@ -10153,3 +10153,18 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+
+/* Mobile: add the same subtle left/right inset to the Swap page intro text. */
+@media (max-width: 850px) {
+  body .workspace-main > #swap .swap-intro-inner {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #swap .swap-intro-kicker,
+  body .workspace-main > #swap .swap-intro-inner h2,
+  body .workspace-main > #swap .swap-intro-inner p {
+    box-sizing: border-box !important;
+  }
+}
