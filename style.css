@@ -10183,3 +10183,13 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+
+/* Mobile landing-page hero: add the missing inset to the text block (not the swap form). */
+@media (max-width: 600px) {
+  body .workspace-main #swap .landing-copy {
+    padding-left: 11px !important;
+    padding-right: 6px !important;
+    box-sizing: border-box !important;
+  }
+}
