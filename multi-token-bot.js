@@ -25,6 +25,20 @@
       (window.solana?.isPhantom ? window.solana : null);
   }
 
+  function formatRawAmount(raw, decimals) {
+    if (raw === undefined || raw === null || !Number.isInteger(Number(decimals)) || Number(decimals) < 0 || Number(decimals) > 18) {
+      return String(raw ?? "—");
+    }
+    const digits = String(raw);
+    if (!/^\\d+$/.test(digits)) return String(raw);
+    const scale = 10n ** BigInt(Number(decimals));
+    const value = BigInt(digits);
+    const whole = value / scale;
+    if (Number(decimals) === 0) return whole.toString();
+    const fraction = (value % scale).toString().padStart(Number(decimals), "0").replace(/0+$/, "");
+    return fraction ? whole.toString() + "." + fraction : whole.toString();
+  }
+
   function setStatus(message, error = false) {
     if (!status) return;
     status.textContent = message;
@@ -212,7 +226,7 @@
         output.textContent =
           "RAYDIUM MAINNET QUOTE · " + quote.amount + " " + inputLabel +
           " → " + quote.expectedOutput + " " + outputLabel +
-          " · minimum out: " + quote.minimumOutputRaw + " raw units" +
+          " · minimum out: " + formatRawAmount(quote.minimumOutputRaw, quote.outputDecimals) + " " + outputLabel + " (minimum)" +
           " · price impact: " + (quote.priceImpactPct ?? "not reported") + "%" +
           " · slippage: " + quote.slippageBps + " bps. Quote only — no wallet signature or swap submitted.";
       }
@@ -281,7 +295,7 @@
         throw new Error("Raydium did not return any transactions.");
       }
       const executionExpectedOutput = built.expectedOutput ?? quote.expectedOutput;
-      const executionMinimumOutputRaw = built.minimumOutputRaw ?? quote.minimumOutputRaw;
+      const executionMinimumOutput = formatRawAmount(built.minimumOutputRaw ?? quote.minimumOutputRaw, built.outputDecimals ?? quote.outputDecimals);
       const connection = new window.solanaWeb3.Connection(
         "https://api.mainnet-beta.solana.com", "confirmed"
       );
@@ -298,7 +312,7 @@
         }
         if (output) output.textContent =
           "Phantom approval " + (i + 1) + " of " + built.transactions.length +
-          " · fresh build quote: " + executionExpectedOutput + " " + outputLabel + " · minimum out: " + executionMinimumOutputRaw + " raw units.";
+          " · fresh build quote: " + executionExpectedOutput + " " + outputLabel + " · minimum out: " + executionMinimumOutput + " " + outputLabel + ".";
         const sent = await walletProvider.signAndSendTransaction(transaction, {
           preflightCommitment: "confirmed",
           skipPreflight: false,
@@ -321,7 +335,7 @@
       if (output) output.textContent =
         "SWAP CONFIRMED · " + signatures.join(" · ") +
         " · " + quote.amount + " " + inputLabel + " → estimated " +
-        executionExpectedOutput + " " + outputLabel + " · minimum out: " + executionMinimumOutputRaw + " raw units. Verify final balances in Phantom.";
+        executionExpectedOutput + " " + outputLabel + " · minimum out: " + executionMinimumOutput + " " + outputLabel + ". Verify final balances in Phantom.";
       setStatus("Raydium mainnet swap confirmed. Signature(s): " + signatures.join(", "));
     } catch (error) {
       const reason = error.message || "Swap could not be completed.";
