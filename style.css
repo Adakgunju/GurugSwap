@@ -10138,3 +10138,16 @@ body .workspace-main > #multi-token-bot .trading-bot-foot {
     font-size: clamp(32px, 8vw, 44px) !important;
   }
 }
+
+
+/* MULTI-TOKEN BOT — match the horizontal gutters of Multi Airdrop */
+body .workspace-main > #multi-token-bot.trading-bot-section {
+  padding-left: clamp(20px, 4.7vw, 64px) !important;
+  padding-right: clamp(20px, 4.7vw, 64px) !important;
+}
+@media (max-width: 760px) {
+  body .workspace-main > #multi-token-bot.trading-bot-section {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
