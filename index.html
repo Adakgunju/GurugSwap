@@ -187,7 +187,7 @@
       <div class="trading-bot-intro">
         <div class="platform-section-kicker">12 / MULTI-WALLET TOKEN BOT</div>
         <h2>Any Solana token. <span class="section-title-accent">Your wallet.</span></h2>
-        <p>Connect your wallet, register your workspace, and create per-token strategies. This connected preview currently saves and simulates strategies only; live automated signing is not enabled.</p>
+        <p>Connect your wallet, request a live Raydium mainnet quote, and approve a one-off swap in Phantom. Scheduled multi-token strategies remain dry-run only.</p>
       </div>
       <div class="trading-bot-card">
         <div class="trading-bot-head">
@@ -211,7 +211,7 @@
           <label class="bot-field"><small>MAX TOTAL SPEND (SOL)</small><input id="multiBotMaxSpend" type="number" min="0" step="0.01" value="0.1"></label>
           <label class="bot-field bot-target-field"><small>TARGET PRICE (USD)</small><input id="multiBotTarget" type="number" min="0" step="0.00000001" placeholder="Required for TARGET"></label>
         </div>
-        <div class="bot-safety-box"><div><i>!</i><strong>PREVIEW ONLY — NO LIVE SWAPS</strong></div><p>Saving creates a disabled dry-run configuration. Enabling it below only allows simulation. Mainnet transaction building, independent instruction-policy validation, and managed signing must pass separate checks before live trading can be enabled.</p></div>
+        <div class="bot-safety-box"><div><i>!</i><strong>SCHEDULED BOT: DRY RUN ONLY · MANUAL SWAP: MAINNET</strong></div><p>Strategy configurations are saved disabled and run in simulation only. The separate Raydium swap button can request a mainnet transaction and open Phantom for your explicit approval. Check the token mint, spend amount, receive amount, fees, and slippage before signing. Never approve a transaction you do not understand.</p></div>
         <div class="bot-actions" style="justify-content:flex-start;flex-wrap:wrap">
           <button id="multiBotRaydiumQuote" class="bot-secondary" type="button">GET RAYDIUM MAINNET QUOTE</button>
           <button id="multiBotRaydiumSwap" class="bot-primary" type="button">REVIEW & SWAP WITH PHANTOM</button>
