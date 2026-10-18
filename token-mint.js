@@ -60,12 +60,12 @@
 
 /* TOKEN MINT — refreshed palette and clear hierarchy */
 #token-mint{padding:34px clamp(20px,4vw,64px) 52px!important;background:radial-gradient(ellipse at 4% 12%,rgba(64,230,176,.08),transparent 35%),radial-gradient(ellipse at 95% 0%,rgba(92,118,255,.09),transparent 36%)!important}
-#token-mint .platform-placeholder-head{max-width:1320px!important;margin:0 auto 26px!important}
+#token-mint .platform-placeholder-head{width:100%!important;max-width:1180px!important;margin:0 auto 26px!important;box-sizing:border-box!important}
 #token-mint .platform-section-kicker{margin:0 0 12px!important;color:#63e9c0!important;font-size:11px!important;font-weight:900!important;letter-spacing:.16em!important}
 #token-mint .platform-placeholder-head h2{margin:0 0 13px!important;color:#f7f8ff!important;font-size:clamp(32px,3.4vw,46px)!important;line-height:1.1!important;letter-spacing:-.045em!important}
 #token-mint .platform-placeholder-head h2 .section-title-accent{background:linear-gradient(100deg,#69efb9,#44d8e7 55%,#8d83ff)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
 #token-mint .platform-placeholder-head p{max-width:780px!important;margin:0!important;color:#c0cbea!important;font-size:14px!important;line-height:1.7!important}
-#token-mint .token-mint-shell{max-width:1320px!important;margin:0 auto!important}
+#token-mint .token-mint-shell{width:100%!important;max-width:1180px!important;margin:0 auto!important;box-sizing:border-box!important}
 #token-mint .token-mint-card{position:relative!important;max-width:none!important;margin:0!important;padding:clamp(20px,2vw,30px)!important;border:1px solid rgba(90,224,187,.28)!important;border-radius:20px!important;background:radial-gradient(ellipse at 100% 0%,rgba(62,220,177,.09),transparent 42%),linear-gradient(145deg,#121b30 0%,#0b1223 70%,#111a2c 100%)!important;box-shadow:0 18px 48px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.04)!important;color:#f5f7ff!important}
 #token-mint .token-mint-card:before{content:""!important;display:block!important;height:3px!important;margin:-1px 0 22px!important;border-radius:99px!important;background:linear-gradient(90deg,#42e6b2,#45cfe7 52%,#7f7aff)!important}
 #token-mint .token-mint-grid{grid-template-columns:minmax(0,1fr) minmax(210px,.42fr)!important;gap:16px!important;align-items:end!important}
