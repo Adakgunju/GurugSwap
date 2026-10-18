@@ -9976,3 +9976,29 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     padding-right: 18px !important;
   }
 }
+
+
+/* TOKEN MINT DESKTOP WIDTH — align the content column with Token Creation.
+   Keep the mint form's single-card layout; constrain only its outer width. */
+@media (min-width: 851px) {
+  body .workspace-main > #token-mint {
+    width: 100% !important;
+    max-width: 1180px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #token-mint .platform-placeholder-head,
+  body .workspace-main > #token-mint .token-mint-shell {
+    width: 100% !important;
+    max-width: 1180px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+  body .workspace-main > #token-mint .token-mint-card {
+    width: 100% !important;
+    max-width: 1180px !important;
+    box-sizing: border-box !important;
+  }
+}
