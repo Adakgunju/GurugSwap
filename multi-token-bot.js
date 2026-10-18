@@ -230,6 +230,7 @@
     const output = $("multiBotRaydiumQuoteResult");
     const SOL_MINT = "So11111111111111111111111111111111111111112";
     const walletProvider = provider();
+    const submittedSignatures = [];
     try {
       if (!walletProvider) throw new Error("Phantom was not found. Connect Phantom first.");
       if (!walletProvider.publicKey) await walletProvider.connect();
@@ -306,6 +307,7 @@
           throw new Error("Wallet did not return a transaction signature.");
         }
         signatures.push(signature);
+        submittedSignatures.push(signature);
         if (output) output.textContent =
           "Transaction submitted (" + (i + 1) + "/" + built.transactions.length +
           "): " + signature + " · waiting for confirmation…";
@@ -320,8 +322,15 @@
         quote.expectedOutput + " " + outputLabel + ". Verify final balances in Phantom.";
       setStatus("Raydium mainnet swap confirmed. Signature(s): " + signatures.join(", "));
     } catch (error) {
-      if (output) output.textContent = error.message || "Swap could not be completed.";
-      setStatus(error.message || "Swap could not be completed.", true);
+      const reason = error.message || "Swap could not be completed.";
+      const partial = submittedSignatures.length
+        ? " Transaction signature(s) already submitted: " + submittedSignatures.join(" · ") +
+          ". Check each signature on Solscan and verify Phantom balances before retrying."
+        : "";
+      if (output) output.textContent = reason + partial;
+      setStatus(reason + (submittedSignatures.length
+        ? " Submitted signature(s): " + submittedSignatures.join(", ") + ". Check chain status before retrying."
+        : ""), true);
     } finally {
       if (button) button.disabled = false;
     }
