@@ -188,7 +188,9 @@
         operation: "register",
         wallet: { publicKey, walletType: "user_connected", label: "GurugSwap user wallet" }
       });
-      renderWallets([data.wallet]);
+      // The API returns a "wallets" array (not a singular "wallet" field).
+      // Render the response shape correctly, then refresh from the signed workspace.
+      renderWallets(data.wallets || []);
       setStatus("Your wallet is registered. Select it below to configure tokens. No private key was shared.");
       await loadWallets();
     } catch (error) {
