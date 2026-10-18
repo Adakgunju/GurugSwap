@@ -30,7 +30,7 @@
       return String(raw ?? "—");
     }
     const digits = String(raw);
-    if (!/^\\d+$/.test(digits)) return String(raw);
+    if (!/^\d+$/.test(digits)) return String(raw);
     const scale = 10n ** BigInt(Number(decimals));
     const value = BigInt(digits);
     const whole = value / scale;
