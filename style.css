@@ -10133,3 +10133,11 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+
+/* TOKEN DISTRIBUTION: reduce excessive mobile gap above the section heading. */
+@media (max-width: 850px) {
+  body .workspace-main > #distributeTokens {
+    padding-top: 12px !important;
+  }
+}
