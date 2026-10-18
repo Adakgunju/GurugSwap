@@ -760,8 +760,17 @@ function updateTokenButtons() {
     infoIdentityEl.innerHTML =
       tokenInfoIconMarkup(toToken) +
       '<div><strong>' + (toToken.name || "Solana Token") +
-      '</strong><small>
+      '</strong><small>$' + (toToken.symbol || "TOKEN") + '</small></div>';
+  }
+  if (infoStatusEl) infoStatusEl.textContent = "LOADING MARKET";
+  if (infoChartEl && toToken.mint) {
+    infoChartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(toToken.mint);
+  }
+
+  refreshBalancesSoon();
+  updateSwapButtonState();
 }
+
 const TOKEN_RECENTS_KEY = "gurugSwap.recentTokens";
 
 function getRecentTokenMints() {
