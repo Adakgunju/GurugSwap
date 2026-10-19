@@ -9,7 +9,8 @@
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
-  const MAX_RECIPIENTS_PER_TX = 5;
+  const MAX_RECIPIENTS_PER_TX = 5; // Keep transactions within Solana packet/compute limits.
+  const MAX_RECIPIENTS_TOTAL = 2000;
   const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
   const GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS = 1000000; // 0.001 SOL
 
@@ -79,7 +80,8 @@
     const button = document.getElementById("multiAirdropSend");
     if (!button) return;
     const hasMint = getMintText().length > 0;
-    const hasRecipients = recipientAddresses.some(address => String(address || "").trim().length > 0);
+    const validRecipientCount = recipientAddresses.filter(address => String(address || "").trim().length > 0).length;
+    const hasRecipients = validRecipientCount > 0 && validRecipientCount <= MAX_RECIPIENTS_TOTAL;
     const amountText = getAirdropAmount().replace(/,/g, "");
     const amount = Number(amountText);
     const hasAmount = amountText.length > 0 && Number.isFinite(amount) && amount > 0;
@@ -182,6 +184,9 @@
   function validateRows(web3, amount) {
     const addresses = recipientAddresses.map(address => String(address || "").trim()).filter(Boolean);
     if (!addresses.length) throw new Error("Paste at least one recipient wallet address.");
+    if (addresses.length > MAX_RECIPIENTS_TOTAL) {
+      throw new Error(`Maximum ${MAX_RECIPIENTS_TOTAL.toLocaleString("en-US")} recipient wallets per run. You pasted ${addresses.length.toLocaleString("en-US")}.`);
+    }
 
     const seen = new Set();
     return addresses.map((address, index) => {
@@ -426,7 +431,7 @@
 
     recipientAddresses = addresses;
     renderRecipients();
-    setStatus(`Loaded ${addresses.length} wallet address(es). Enter the common token amount, then send.`, "active");
+    setStatus(`Loaded ${addresses.length.toLocaleString("en-US")} wallet address(es). Up to ${MAX_RECIPIENTS_TOTAL.toLocaleString("en-US")} are supported per run; transactions are split into groups of ${MAX_RECIPIENTS_PER_TX}.`, "active");
   }
 
   function addStyles() {
@@ -578,7 +583,7 @@
           <label class="multi-airdrop-label" for="multiAirdropAddresses" style="margin-top:24px">RECIPIENT WALLET ADDRESSES</label>
           <div class="multi-airdrop-address-editor">
             <div id="multiAirdropLineNumbers" class="multi-airdrop-line-numbers" aria-hidden="true">1</div>
-            <textarea id="multiAirdropAddresses" class="multi-airdrop-addresses" placeholder="Paste wallet addresses here — one address per line.\n\nYou can paste hundreds or thousands of addresses at once." spellcheck="false"></textarea>
+            <textarea id="multiAirdropAddresses" class="multi-airdrop-addresses" placeholder="Paste wallet addresses here — one address per line.\n\nYou can paste up to 2,000 addresses at once." spellcheck="false"></textarea>
           </div>
           <div class="multi-airdrop-hint">One wallet address per line. Commas and spaces are also accepted. The same amount will be sent to every wallet.</div>
 
@@ -606,9 +611,9 @@
         <aside class="multi-airdrop-help">
           <h3>HOW IT WORKS</h3>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">1</div><div><strong>Select your token</strong><span>Paste the SPL Token or Token-2022 mint address you want to distribute.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">2</div><div><strong>Paste wallet addresses</strong><span>Paste hundreds or thousands of Solana wallet addresses at once. One address per line is easiest.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">2</div><div><strong>Paste wallet addresses</strong><span>Paste up to 2,000 Solana wallet addresses at once. One address per line is easiest.</span></div></div>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">3</div><div><strong>Set one amount</strong><span>Enter the token amount once. Every wallet receives the same amount.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">4</div><div><strong>Approve batches in Phantom</strong><span>GurugSwap automatically splits the list into practical Solana transactions and asks Phantom to approve each batch.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">4</div><div><strong>Approve batches in Phantom</strong><span>Up to 2,000 recipients per run. Solana limits mean the list is split into transactions of up to 5 wallets, and Phantom must approve each transaction.</span></div></div>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">5</div><div><strong>Track every batch</strong><span>Each confirmed batch gets a direct Solscan transaction link.</span></div></div>
         </aside>
       </div>
