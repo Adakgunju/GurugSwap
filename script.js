@@ -916,15 +916,15 @@ async function renderTokenList(query = "") {
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
+
+        // Update TOKEN INFO immediately, before any balance/quote/UI work can
+        // interrupt the selection handler. The selected TO token mint is source of truth.
+        updateTokenInfo(toToken);
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
       resetQuoteForTokenChange();
-
-      // Always sync TOKEN INFO after the selected TO token state and button UI
-      // have been committed. The mint on this token object is the source of truth.
-      if (target === "to") updateTokenInfo(toToken);
 
       // Hydrate the icon after selection without changing which token
       // TOKEN INFO is showing.
