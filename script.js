@@ -916,21 +916,15 @@ async function renderTokenList(query = "") {
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
-
-        // Update TOKEN INFO immediately, before any balance/quote/UI work can
-        // interrupt the selection handler. The selected TO token mint is source of truth.
-        updateTokenInfo(toToken);
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
       resetQuoteForTokenChange();
 
-      // Re-sync after the visible TO button has been rebuilt. Keep this
-      // synchronous and before awaiting icon hydration or any network request.
-      if (target === "to") {
-        updateTokenInfo(toToken);
-      }
+      // Always sync TOKEN INFO after the selected TO token state and button UI
+      // have been committed. The mint on this token object is the source of truth.
+      if (target === "to") updateTokenInfo(toToken);
 
       // Hydrate the icon after selection without changing which token
       // TOKEN INFO is showing.
@@ -1365,8 +1359,8 @@ async function updateTokenInfo(token) {
   if (swapEl) swapEl.hidden = false;
   identityEl.innerHTML =
     tokenInfoIconMarkup(token) +
-    '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") +
-    '</strong><small id="tokenInfoSymbol">$' + (token.symbol || "TOKEN") + '</small></div>';
+    '<div><strong>' + (token.name || "Solana Token") +
+    '</strong><small>$' + (token.symbol || "TOKEN") + '</small></div>';
 
   statusEl.textContent = "LOADING MARKET";
   priceEl.textContent = "—";
@@ -1445,189 +1439,8 @@ if (tokenInfoSwapButton) {
   });
 }
 
-// TOKEN INFO is synchronized from the live TO-token state in two ways:
-// 1) the picker updates it directly;
-// 2) this observer catches any other code path that changes the visible TO token.
-const observedToTokenSymbol = document.getElementById("toTokenSymbol");
-if (observedToTokenSymbol && typeof MutationObserver !== "undefined") {
-  let lastObservedToMint = toToken.mint;
-  const toTokenObserver = new MutationObserver(() => {
-    if (toToken?.mint && toToken.mint !== lastObservedToMint) {
-      lastObservedToMint = toToken.mint;
-      updateTokenInfo(toToken);
-    }
-  });
-  toTokenObserver.observe(observedToTokenSymbol, {
-    childList: true,
-    characterData: true,
-    subtree: true
-  });
-}
-
 // Initial TOKEN INFO follows the default TO token (GSWAP).
-updateTokenInfo(toToken);
-
-/* --- LIVE GSWAP MARKET TICKER --- */
-async function updateGswapMarketTicker() {
-  const priceEl = document.getElementById("gurugPrice");
-  const changeEl = document.getElementById("gurugChange");
-  if (!priceEl || !changeEl) return;
-
-  try {
-    const tokenMint = mint;
-    const response = await fetch(TOKEN_INFO_DEX + encodeURIComponent(tokenMint), {cache:"no-store"});
-    if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
-    const data = await response.json();
-    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
-    const pair = pairs.filter(p => p?.chainId === "solana")
-      .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
-    if (!pair) throw new Error("No Solana market pair found for the GSWAP mint");
-
-    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
-    const basePrice = Number(pair?.priceUsd);
-    const nativePrice = Number(pair?.priceNative);
-    const price = isBaseToken ? basePrice :
-      (Number.isFinite(basePrice) && Number.isFinite(nativePrice) && nativePrice > 0 ? basePrice / nativePrice : NaN);
-    const change = isBaseToken ? Number(pair?.priceChange?.h24) : NaN;
-
-    if (Number.isFinite(price)) {
-      priceEl.textContent = price < 0.000001
-        ? "$" + price.toFixed(10)
-        : price < 0.001
-          ? "$" + price.toFixed(7)
-          : "$" + price.toFixed(6);
-    }
-    if (Number.isFinite(change)) {
-      changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
-      changeEl.classList.toggle("down", change < 0);
-    } else {
-      changeEl.textContent = "—";
-    }
-  } catch (err) {
-    console.warn("GSWAP ticker update failed.", err);
-  }
-}
-
-updateGswapMarketTicker();
-setInterval(updateGswapMarketTicker, 30000);
-
-const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
-if (heroConnectWalletBtn) {
-  heroConnectWalletBtn.addEventListener("click", async () => {
-    const provider = getPhantomProvider();
-    if (provider?.publicKey) {
-      try {
-        await provider.disconnect();
-        updateWalletButton(null);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      await connectPhantom();
-    }
-  });
-}
-
-
- + (token.symbol || "TOKEN") + '</small></div>';
-
-  statusEl.textContent = "LOADING MARKET";
-  priceEl.textContent = "—";
-  changeEl.textContent = "—";
-  changeEl.style.color = "";
-  liquidityEl.textContent = "—";
-  volumeEl.textContent = "—";
-  chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
-
-  try {
-    let json;
-    const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
-    json = await res.json();
-    if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint) return;
-    const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
-    const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
-    const pair = solanaPairs.sort((a,b) =>
-      Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)
-    )[0];
-
-    if (!pair) {
-      statusEl.textContent = "NO MARKET DATA";
-      return;
-    }
-
-    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === String(token.mint || "").toLowerCase();
-    const basePriceUsd = Number(pair.priceUsd);
-    const nativePrice = Number(pair.priceNative);
-    const price = isBaseToken ? basePriceUsd :
-      (Number.isFinite(basePriceUsd) && Number.isFinite(nativePrice) && nativePrice > 0
-        ? basePriceUsd / nativePrice
-        : NaN);
-    // DexScreener's 24h change belongs to the base token. Do not mislabel it
-    // as the quote token's change when the selected mint is the quote asset.
-    const change = isBaseToken ? Number(pair.priceChange?.h24) : NaN;
-    const liquidity = Number(pair.liquidity?.usd);
-    const volume = Number(pair.volume?.h24);
-
-    priceEl.textContent = formatUsd(price);
-    changeEl.textContent = Number.isFinite(change)
-      ? (change >= 0 ? "+" : "") + change.toFixed(2) + "%"
-      : "—";
-    changeEl.style.color = Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
-    liquidityEl.textContent = formatCompactUsd(liquidity);
-    volumeEl.textContent = formatCompactUsd(volume);
-    statusEl.textContent = "LIVE MARKET";
-    chartEl.href = pair.url || chartEl.href;
-  } catch (err) {
-    console.warn("Token info market lookup failed:", err);
-    statusEl.textContent = "MARKET DATA UNAVAILABLE";
-  }
-}
-
-const tokenInfoCopyButton = document.getElementById("tokenInfoCopy");
-if (tokenInfoCopyButton) {
-  tokenInfoCopyButton.addEventListener("click", async () => {
-    const value = document.getElementById("tokenInfoMint")?.textContent || "";
-    if (!value || value === "—") return;
-    try {
-      await navigator.clipboard.writeText(value);
-      const label = document.getElementById("tokenInfoCopyText");
-      if (label) {
-        label.textContent = "COPIED!";
-        setTimeout(() => label.textContent = "COPY", 1400);
-      }
-    } catch {
-      alert(value);
-    }
-  });
-}
-
-const tokenInfoSwapButton = document.getElementById("tokenInfoSwap");
-if (tokenInfoSwapButton) {
-  tokenInfoSwapButton.addEventListener("click", () => {
-    document.getElementById("swap")?.scrollIntoView({behavior:"smooth", block:"start"});
-  });
-}
-
-// TOKEN INFO is synchronized from the live TO-token state in two ways:
-// 1) the picker updates it directly;
-// 2) this observer catches any other code path that changes the visible TO token.
-const observedToTokenSymbol = document.getElementById("toTokenSymbol");
-if (observedToTokenSymbol && typeof MutationObserver !== "undefined") {
-  let lastObservedToMint = toToken.mint;
-  const toTokenObserver = new MutationObserver(() => {
-    if (toToken?.mint && toToken.mint !== lastObservedToMint) {
-      lastObservedToMint = toToken.mint;
-      updateTokenInfo(toToken);
-    }
-  });
-  toTokenObserver.observe(observedToTokenSymbol, {
-    childList: true,
-    characterData: true,
-    subtree: true
-  });
-}
-
-// Initial TOKEN INFO follows the default TO token (GSWAP).
+// Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
 /* --- LIVE GSWAP MARKET TICKER --- */
