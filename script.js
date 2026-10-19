@@ -926,6 +926,12 @@ async function renderTokenList(query = "") {
       updateTokenButtons();
       resetQuoteForTokenChange();
 
+      // Re-sync after the visible TO button has been rebuilt. Keep this
+      // synchronous and before awaiting icon hydration or any network request.
+      if (target === "to") {
+        updateTokenInfo(toToken);
+      }
+
       // Hydrate the icon after selection without changing which token
       // TOKEN INFO is showing.
       await hydrateTokenIcon(token);
