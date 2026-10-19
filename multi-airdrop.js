@@ -214,7 +214,6 @@
 
     // Make simulation inputs explicit for Phantom transaction risk analysis.
     tx.add(web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1000000 }));
-    tx.add(web3.ComputeBudgetProgram.setLoadedAccountsDataSizeLimit({ bytes: 128000 }));
 
     if (feeLamports > 0) {
       tx.add(web3.SystemProgram.transfer({
