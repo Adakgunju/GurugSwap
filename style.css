@@ -10193,3 +10193,19 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+/* DESKTOP ONLY: add the enclosing workspace frame to Token Creation.
+   Mobile layout is intentionally untouched. */
+@media (min-width: 851px) {
+  body .workspace-main.single-section-view > #create-token.single-section-active,
+  body .workspace-main > #create-token {
+    box-sizing: border-box !important;
+    border: 1px solid rgba(111, 133, 205, .24) !important;
+    border-radius: 22px !important;
+    background:
+      radial-gradient(ellipse at 4% 12%, rgba(0, 221, 243, .075), transparent 35%),
+      radial-gradient(ellipse at 95% 0%, rgba(222, 54, 185, .075), transparent 36%),
+      linear-gradient(145deg, rgba(12, 19, 37, .76), rgba(7, 12, 25, .70)) !important;
+    box-shadow: 0 20px 54px rgba(0, 0, 0, .18), inset 0 1px rgba(255, 255, 255, .025) !important;
+  }
+}
