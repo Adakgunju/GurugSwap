@@ -9,7 +9,7 @@
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
-  const MAX_RECIPIENTS_PER_TX = 5; // Keep transactions within Solana packet/compute limits.
+  const MAX_RECIPIENTS_PER_TX = 10; // Conservative larger batches; pre-sign simulation checks each transaction.
   const MAX_RECIPIENTS_TOTAL = 2000;
   const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
   const GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS = 1000000; // 0.001 SOL
@@ -470,7 +470,7 @@
 
     recipientAddresses = addresses;
     renderRecipients();
-    setStatus(`Loaded ${addresses.length.toLocaleString("en-US")} wallet address(es). Up to ${MAX_RECIPIENTS_TOTAL.toLocaleString("en-US")} are supported per run; transactions are split into groups of ${MAX_RECIPIENTS_PER_TX}.`, "active");
+    setStatus(`Loaded ${addresses.length.toLocaleString("en-US")} wallet address(es). Up to ${MAX_RECIPIENTS_TOTAL.toLocaleString("en-US")} are supported per run; transactions are split into groups of up to ${MAX_RECIPIENTS_PER_TX}.`, "active");
   }
 
   function addStyles() {
