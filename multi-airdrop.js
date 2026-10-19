@@ -410,8 +410,9 @@
         });
         await showResults(results);
 
+        const failureDetail = error?.message || String(error) || "Unknown error";
         setStatus(
-          `Batch ${i + 1} failed. Later batches were not sent. Fix the issue and run the airdrop again.`,
+          `Batch ${i + 1} failed: ${failureDetail}. Later batches were not sent.`,
           "error"
         );
         return results;
