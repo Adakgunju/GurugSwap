@@ -212,6 +212,10 @@
     tx.recentBlockhash = latest.blockhash;
     tx.feePayer = owner;
 
+    // Make simulation inputs explicit for Phantom transaction risk analysis.
+    tx.add(web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1000000 }));
+    tx.add(web3.ComputeBudgetProgram.setLoadedAccountsDataSizeLimit({ bytes: 128000 }));
+
     if (feeLamports > 0) {
       tx.add(web3.SystemProgram.transfer({
         fromPubkey: owner,
@@ -370,6 +374,18 @@
           spl,
           i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
         );
+
+        // Simulate locally through the selected RPC before asking Phantom to sign.
+        // If this fails, stop here and show the RPC logs instead of prompting the wallet.
+        const simulation = await connection.simulateTransaction(built.tx, {
+          sigVerify: false,
+          replaceRecentBlockhash: true,
+          commitment: "confirmed"
+        });
+        if (simulation.value.err) {
+          const logs = (simulation.value.logs || []).slice(-6).join(" | ");
+          throw new Error("Pre-sign simulation failed: " + JSON.stringify(simulation.value.err) + (logs ? " — " + logs : ""));
+        }
 
         setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom: ${batch.length} wallet(s) × ${uiAmount} GSWAP.`, "active");
         const signed = await provider.signTransaction(built.tx);
