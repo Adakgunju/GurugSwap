@@ -1,4 +1,4 @@
-const mint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
+const mint = "4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3";
 
 const copyMintBtn = document.getElementById("copyMint");
 if (copyMintBtn) {
@@ -130,7 +130,7 @@ const swapDirectionButton = document.getElementById("swapDirection");
 
 const TOKEN_CATALOG = [
   {symbol:"SOL", name:"Solana", mint:SOL_MINT, decimals:9, icon:"sol"},
-  {symbol:"GURUG", name:"Gurug", mint, decimals:null, icon:"https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"},
+  {symbol:"GSWAP", name:"GurugSwap", mint, decimals:null, icon:"https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"},
   {symbol:"USDC", name:"USD Coin", mint:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", decimals:6},
   {symbol:"RAY", name:"Raydium", mint:"4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", decimals:6},
   {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6}
@@ -146,7 +146,7 @@ function applyCanonicalTokenIcon(token) {
   const canonicalIcon = CANONICAL_TOKEN_ICONS.get(token.mint);
   if (canonicalIcon) {
     token.icon = canonicalIcon;
-    // GURUG SWAP's own token gets a local verified badge in this UI.
+    // GSWAP gets a local site-level badge in this UI.
     // This is a site-level display badge, not a Jupiter verification claim.
     if (token.mint === mint) token.verified = true;
   }
@@ -743,7 +743,7 @@ function updateTokenButtons() {
     }
   }
 
-  if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GURUG");
+  if (toButton) toButton.classList.toggle("is-gurug", toToken.symbol === "GSWAP");
 
   refreshBalancesSoon();
   updateSwapButtonState();
@@ -1330,7 +1330,7 @@ let tokenInfoRequestId = 0;
 let activeTokenInfoMint = null;
 
 async function updateTokenInfo(token) {
-  // Reflect the currently selected TO token; the default selection is GURUG.
+  // Reflect the currently selected TO token; the default selection is GSWAP.
   activeTokenInfoMint = token.mint;
   const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
@@ -1369,44 +1369,8 @@ async function updateTokenInfo(token) {
 
   try {
     let json;
-    if (String(token.symbol || "").toUpperCase() === "GURUG") {
-      // For Gurug, use the explicitly selected current pair rather than an older/high-liquidity pair.
-      const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
-      const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
-      let pairData = null;
-      try {
-        const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
-        if (pairRes.ok) pairData = await pairRes.json();
-      } catch (pairError) {
-        console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
-      }
-      let pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
-      const hasGurugPair = list => list.some(p =>
-        p?.chainId === "solana" &&
-        (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
-         String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase())
-      );
-      if (!hasGurugPair(pairs)) {
-        const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
-        if (tokenRes.ok) {
-          const tokenData = await tokenRes.json();
-          const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
-          pairs = tokenPairs.filter(p => p?.chainId === "solana" &&
-            (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
-             String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase()));
-        }
-      }
-      // Keep the configured GURUG pool when it is returned; do not silently
-      // switch the display to a different pool just because it has more liquidity.
-      const configuredPair = pairs.find(p =>
-        String(p?.pairAddress || "").toLowerCase() === pairAddress.toLowerCase()
-      );
-      if (configuredPair) pairs = [configuredPair];
-      json = {pairs};
-    } else {
-      const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
-      json = await res.json();
-    }
+    const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
+    json = await res.json();
     if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint) return;
     const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
     const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
@@ -1472,47 +1436,32 @@ if (tokenInfoSwapButton) {
   });
 }
 
-// Initial TOKEN INFO follows the default TO token (GURUG).
+// Initial TOKEN INFO follows the default TO token (GSWAP).
 // Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
-/* --- LIVE GURUG MARKET TICKER --- */
-async function updateGurugMarketTicker() {
+/* --- LIVE GSWAP MARKET TICKER --- */
+async function updateGswapMarketTicker() {
   const priceEl = document.getElementById("gurugPrice");
   const changeEl = document.getElementById("gurugChange");
   if (!priceEl || !changeEl) return;
 
   try {
-    const tokenMint = "G8zUWL2mz8DJ16BrfDJPCo7657kJU3Y5NcrGZ6jtpBm5";
-    const pairAddress = "8RL8yZ5LJ3PYyJVmSaxsEs6ok1uGu14LdjZM7chdqFhZ";
-    let pairs = [];
-    try {
-      const pairRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/" + pairAddress, {cache:"no-store"});
-      if (pairRes.ok) {
-        const pairData = await pairRes.json();
-        pairs = Array.isArray(pairData?.pairs) ? pairData.pairs : (pairData?.pair ? [pairData.pair] : []);
-      }
-    } catch (pairError) {
-      console.warn("GURUG pair lookup failed; trying token lookup.", pairError);
-    }
-    const matchesGurug = p => p?.chainId === "solana" &&
-      (String(p?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase() ||
-       String(p?.quoteToken?.address || "").toLowerCase() === tokenMint.toLowerCase());
-    let pair = pairs.filter(matchesGurug).sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
-    if (!pair) {
-      const tokenRes = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + tokenMint, {cache:"no-store"});
-      if (tokenRes.ok) {
-        const tokenData = await tokenRes.json();
-        const tokenPairs = Array.isArray(tokenData?.pairs) ? tokenData.pairs : [];
-        pair = tokenPairs.filter(matchesGurug)
-          .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
-      }
-    }
-    if (!pair) throw new Error("No Solana market pair found for the GURUG mint");
-    const isBaseGurug = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
-    const price = isBaseGurug ? Number(pair?.priceUsd) :
-      (Number(pair?.priceNative) > 0 ? Number(pair?.priceUsd) / Number(pair?.priceNative) : NaN);
-    const change = Number(pair?.priceChange?.h24);
+    const tokenMint = mint;
+    const response = await fetch(TOKEN_INFO_DEX + encodeURIComponent(tokenMint), {cache:"no-store"});
+    if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
+    const data = await response.json();
+    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+    const pair = pairs.filter(p => p?.chainId === "solana")
+      .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
+    if (!pair) throw new Error("No Solana market pair found for the GSWAP mint");
+
+    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
+    const basePrice = Number(pair?.priceUsd);
+    const nativePrice = Number(pair?.priceNative);
+    const price = isBaseToken ? basePrice :
+      (Number.isFinite(basePrice) && Number.isFinite(nativePrice) && nativePrice > 0 ? basePrice / nativePrice : NaN);
+    const change = isBaseToken ? Number(pair?.priceChange?.h24) : NaN;
 
     if (Number.isFinite(price)) {
       priceEl.textContent = price < 0.000001
@@ -1521,19 +1470,19 @@ async function updateGurugMarketTicker() {
           ? "$" + price.toFixed(7)
           : "$" + price.toFixed(6);
     }
-
     if (Number.isFinite(change)) {
       changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
       changeEl.classList.toggle("down", change < 0);
+    } else {
+      changeEl.textContent = "—";
     }
   } catch (err) {
-    console.log("GURUG ticker update failed.", err);
+    console.warn("GSWAP ticker update failed.", err);
   }
 }
 
-updateGurugMarketTicker();
-setInterval(updateGurugMarketTicker, 30000);
-
+updateGswapMarketTicker();
+setInterval(updateGswapMarketTicker, 30000);
 
 const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
 if (heroConnectWalletBtn) {
