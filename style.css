@@ -10225,3 +10225,18 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-shadow: 0 20px 54px rgba(0, 0, 0, .20), inset 0 1px rgba(255, 255, 255, .025) !important;
   }
 }
+
+/* DESKTOP ONLY: create real inset spacing inside the Token Mint outer frame. */
+@media (min-width: 851px) {
+  body .workspace-main.single-section-view > #token-mint.single-section-active {
+    padding: 34px clamp(24px, 3vw, 48px) 42px !important;
+  }
+  body .workspace-main.single-section-view > #token-mint.single-section-active > .platform-placeholder-head {
+    margin: 0 0 28px !important;
+  }
+  body .workspace-main.single-section-view > #token-mint.single-section-active > .token-mint-card {
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
