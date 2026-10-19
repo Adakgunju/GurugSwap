@@ -10257,3 +10257,30 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     margin-top: 0 !important;
   }
 }
+
+
+/* HEADER MASCOT LOGO: keep the character silhouette, with a clean flat bottom crop. */
+.topbar .brand img.brand-logo {
+  width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px !important;
+  object-fit: contain !important;
+  object-position: center top !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  clip-path: inset(0 0 12% 0) !important;
+  margin-bottom: -5px !important;
+}
+.topbar .brand:hover img.brand-logo {
+  transform: translateY(-1px) scale(1.025) !important;
+}
+@media (max-width: 520px) {
+  .topbar .brand img.brand-logo {
+    width: 32px !important;
+    height: 32px !important;
+    flex-basis: 32px !important;
+    clip-path: inset(0 0 10% 0) !important;
+    margin-bottom: -3px !important;
+  }
+}
