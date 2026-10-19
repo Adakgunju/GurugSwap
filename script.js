@@ -916,14 +916,15 @@ async function renderTokenList(query = "") {
       } else {
         if (token.mint === fromToken.mint) fromToken = toToken;
         toToken = token;
-        // Commit the selected TO token to TOKEN INFO immediately.
-        activeTokenInfoMint = token.mint;
-        updateTokenInfo(token);
       }
 
       if (tokenPicker) tokenPicker.hidden = true;
       updateTokenButtons();
       resetQuoteForTokenChange();
+
+      // Always sync TOKEN INFO after the selected TO token state and button UI
+      // have been committed. The mint on this token object is the source of truth.
+      if (target === "to") updateTokenInfo(toToken);
 
       // Hydrate the icon after selection without changing which token
       // TOKEN INFO is showing.
@@ -975,6 +976,8 @@ if (swapDirectionButton) {
     toToken = oldFrom;
     updateTokenButtons();
     resetQuoteForTokenChange();
+    // TOKEN INFO always describes the current TO token, including after direction swaps.
+    updateTokenInfo(toToken);
     refreshBalancesSoon();
   });
 }
