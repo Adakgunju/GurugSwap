@@ -376,11 +376,34 @@
 
         // Simulate locally through the selected RPC before asking Phantom to sign.
         // If this fails, stop here and show the RPC logs instead of prompting the wallet.
-        const simulation = await connection.simulateTransaction(built.tx, {
-          sigVerify: false,
-          replaceRecentBlockhash: true,
-          commitment: "confirmed"
+        const simulationPayload = built.tx.serialize({
+          requireAllSignatures: false,
+          verifySignatures: false
+        }).toString("base64");
+        const simulationResponse = await fetch(rpc, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 1,
+            method: "simulateTransaction",
+            params: [simulationPayload, {
+              encoding: "base64",
+              sigVerify: false,
+              replaceRecentBlockhash: true,
+              commitment: "confirmed"
+            }]
+          }),
+          cache: "no-store"
         });
+        if (!simulationResponse.ok) {
+          throw new Error("RPC simulation request failed with HTTP " + simulationResponse.status);
+        }
+        const simulationJson = await simulationResponse.json();
+        if (simulationJson.error) {
+          throw new Error("RPC simulation error: " + (simulationJson.error.message || JSON.stringify(simulationJson.error)));
+        }
+        const simulation = simulationJson.result;
         if (simulation.value.err) {
           const logs = (simulation.value.logs || []).slice(-6).join(" | ");
           throw new Error("Pre-sign simulation failed: " + JSON.stringify(simulation.value.err) + (logs ? " — " + logs : ""));
