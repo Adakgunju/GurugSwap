@@ -1439,8 +1439,26 @@ if (tokenInfoSwapButton) {
   });
 }
 
+// TOKEN INFO is synchronized from the live TO-token state in two ways:
+// 1) the picker updates it directly;
+// 2) this observer catches any other code path that changes the visible TO token.
+const observedToTokenSymbol = document.getElementById("toTokenSymbol");
+if (observedToTokenSymbol && typeof MutationObserver !== "undefined") {
+  let lastObservedToMint = toToken.mint;
+  const toTokenObserver = new MutationObserver(() => {
+    if (toToken?.mint && toToken.mint !== lastObservedToMint) {
+      lastObservedToMint = toToken.mint;
+      updateTokenInfo(toToken);
+    }
+  });
+  toTokenObserver.observe(observedToTokenSymbol, {
+    childList: true,
+    characterData: true,
+    subtree: true
+  });
+}
+
 // Initial TOKEN INFO follows the default TO token (GSWAP).
-// Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
 /* --- LIVE GSWAP MARKET TICKER --- */
