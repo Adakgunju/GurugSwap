@@ -1366,7 +1366,7 @@ async function updateTokenInfo(token) {
   identityEl.innerHTML =
     tokenInfoIconMarkup(token) +
     '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") +
-    '</strong><small id="tokenInfoSymbol">
+    '</strong><small id="tokenInfoSymbol">$' + (token.symbol || "TOKEN") + '</small></div>';
 
   statusEl.textContent = "LOADING MARKET";
   priceEl.textContent = "—";
