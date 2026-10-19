@@ -10240,3 +10240,20 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     box-sizing: border-box !important;
   }
 }
+
+/* DESKTOP ONLY: restore top breathing room inside the Gurug Network frame. */
+@media (min-width: 851px) {
+  body .workspace-main.single-section-view > #links.single-section-active,
+  body .workspace-main > #links.links-section {
+    padding-top: 34px !important;
+  }
+  body .workspace-main.single-section-view > #links.single-section-active .links-heading,
+  body .workspace-main > #links.links-section .links-heading {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 28px !important;
+  }
+  body .workspace-main > #links .links-heading .platform-section-kicker {
+    margin-top: 0 !important;
+  }
+}
