@@ -5,8 +5,7 @@
   // such as getParsedAccountInfo/getTokenAccountBalance.
   const RPCS = [
     "https://api.mainnet-beta.solana.com",
-    "https://rpc.solanatracker.io/public",
-    "https://solana-rpc.publicnode.com"
+    "https://rpc.solanatracker.io/public"
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
@@ -61,7 +60,7 @@
       } catch (error) {
         lastError = error;
         const message = String(error?.message || error || "");
-        const retryable = /failed to fetch|network|fetch|\b403\b|access forbidden|forbidden|429|rate.?limit|\b5\d\d\b|timeout|temporar/i.test(message);
+        const retryable = /failed to fetch|network|fetch|429|rate.?limit|\b5\d\d\b|timeout|temporar/i.test(message);
         if (!retryable) throw error;
       }
     }
@@ -340,6 +339,7 @@
 
     const mintText = getMintText();
     if (!mintText) throw new Error("Enter the token mint address.");
+
     const amountText = getAirdropAmount();
     if (!amountText) throw new Error("Enter the token amount to send to each wallet.");
 
@@ -357,12 +357,14 @@
     setStatus("Checking token, balance and recipient wallets...", "active");
     const mintInfo = await readMint(connection, mint, provider.publicKey, spl);
     const amountRaw = uiAmountToRaw(amountText, mintInfo.decimals);
+
     if (amountRaw <= 0n) throw new Error("Token amount must be greater than zero.");
 
     const validated = validateRows(web3, amountRaw);
     const totalRaw = amountRaw * BigInt(validated.length);
     const uiAmount = formatUiAmount(amountRaw, mintInfo.decimals);
     const totalUiAmount = formatUiAmount(totalRaw, mintInfo.decimals);
+
     if (totalRaw > mintInfo.rawBalance) {
       throw new Error("Your token balance is lower than the total airdrop amount.");
     }
@@ -372,19 +374,21 @@
       batches.push(validated.slice(i, i + MAX_RECIPIENTS_PER_TX));
     }
 
+    updateSummary(batches.length, mintInfo.decimals);
+    const totalEl = document.getElementById("multiAirdropTotal");
+    if (totalEl) totalEl.textContent = totalUiAmount;
+    setStatus(`Ready: ${validated.length} recipient(s) × ${uiAmount} tokens = ${totalUiAmount} total in ${batches.length} transaction(s).`, "active");
+
+    // GurugSwap service fee is shown separately. Solana network fees are handled by Phantom.
     const feeLamports = validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS;
     const costEl = document.getElementById("multiAirdropCost");
     if (costEl) costEl.textContent = (feeLamports / 1e9).toFixed(3) + " SOL";
-    const totalEl = document.getElementById("multiAirdropTotal");
-    if (totalEl) totalEl.textContent = totalUiAmount;
 
-    // Prepare and simulate every transaction before opening Phantom. This lets
-    // packet-size splitting happen before signatures are requested.
-    const preparedBatches = [];
-    let batchIndex = 0;
-    while (batchIndex < batches.length) {
-      const batch = batches[batchIndex];
-      setStatus(`Preparing batch ${batchIndex + 1} of ${batches.length} — ${batch.length} wallet(s) × ${uiAmount} GSWAP...`, "active");
+    const results = [];
+    for (let i = 0; i < batches.length;) {
+      const batch = batches[i];
+      setStatus(`Preparing batch ${i + 1} of ${batches.length} — ${batch.length} wallet(s) × ${uiAmount} GSWAP...`, "active");
+
       try {
         const built = await buildBatch(
           connection,
@@ -395,12 +399,11 @@
           mintInfo.tokenProgram,
           mintInfo.sourceAta,
           spl,
-          batchIndex === 0 ? feeLamports : 0
+          i === 0 ? validated.length * GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS : 0
         );
 
-        // Detect oversized transactions before asking the wallet to sign.
-        built.tx.serialize({ requireAllSignatures: false, verifySignatures: false });
-
+        // Simulate locally through the selected RPC before asking Phantom to sign.
+        // If this fails, stop here and show the RPC logs instead of prompting the wallet.
         const simulationPayload = built.tx.serialize({
           requireAllSignatures: false,
           verifySignatures: false
@@ -434,75 +437,43 @@
           throw new Error("Pre-sign simulation failed: " + JSON.stringify(simulation.value.err) + (logs ? " — " + logs : ""));
         }
 
-        preparedBatches.push({ tx: built.tx, items: batch, newAtaCount: built.newAtaCount });
-        batchIndex++;
-        updateSummary(batches.length, mintInfo.decimals);
+        setStatus(`Approve batch ${i + 1} of ${batches.length} in Phantom: ${batch.length} wallet(s) × ${uiAmount} GSWAP.`, "active");
+        const signed = await provider.signTransaction(built.tx);
+        const signature = await connection.sendRawTransaction(signed.serialize(), {
+          skipPreflight: false,
+          maxRetries: 3
+        });
+
+        setStatus(`Confirming batch ${i + 1} of ${batches.length}...`, "active");
+        await connection.confirmTransaction(signature, "confirmed");
+
+        results.push({ ok: true, signature, items: batch, decimals: mintInfo.decimals });
+        await showResults(results);
+        i++;
       } catch (error) {
-        const detail = error?.message || String(error) || "Unknown error";
-        const packetTooLarge = /transaction too large|packet.{0,20}(?:size|1232)|1232.{0,20}(?:byte|size)/i.test(detail);
+        console.error("MULTI AIRDROP batch failed:", error);
+        const failureDetail = error?.message || String(error) || "Unknown error";
+        const packetTooLarge = /transaction too large|packet.{0,20}(?:size|1232)|1232.{0,20}(?:byte|size)/i.test(failureDetail);
         if (packetTooLarge && batch.length > 1) {
           const midpoint = Math.ceil(batch.length / 2);
           const firstHalf = batch.slice(0, midpoint);
           const secondHalf = batch.slice(midpoint);
-          batches.splice(batchIndex, 1, firstHalf, secondHalf);
+          batches.splice(i, 1, firstHalf, secondHalf);
           updateSummary(batches.length, mintInfo.decimals);
-          setStatus(`Transaction exceeds Solana's 1,232-byte limit. Splitting ${batch.length} wallets into ${firstHalf.length} + ${secondHalf.length} before signing...`, "active");
+          setStatus(`Transaction exceeds Solana's 1,232-byte limit. Automatically splitting ${batch.length} wallets into ${firstHalf.length} + ${secondHalf.length} and retrying...`, "active");
           continue;
         }
-        throw new Error(`Batch ${batchIndex + 1} could not be prepared: ${detail}`);
-      }
-    }
 
-    if (!preparedBatches.length) throw new Error("No transactions were prepared.");
-    const signedTransactions = [];
-    const canSignAll = typeof provider.signAllTransactions === "function";
-    const SIGN_GROUP_SIZE = 10;
-
-    if (canSignAll) {
-      for (let offset = 0; offset < preparedBatches.length; offset += SIGN_GROUP_SIZE) {
-        const group = preparedBatches.slice(offset, offset + SIGN_GROUP_SIZE);
-        setStatus(
-          `Approve transaction group ${Math.floor(offset / SIGN_GROUP_SIZE) + 1} in Phantom — ${group.length} transaction(s), ${group.reduce((sum, item) => sum + item.items.length, 0)} wallet(s)...`,
-          "active"
-        );
-        const signedGroup = await provider.signAllTransactions(group.map(item => item.tx));
-        signedTransactions.push(...signedGroup);
-      }
-    } else {
-      // Compatibility fallback for wallets that do not implement signAllTransactions.
-      for (let i = 0; i < preparedBatches.length; i++) {
-        setStatus(`Approve batch ${i + 1} of ${preparedBatches.length} in Phantom...`, "active");
-        signedTransactions.push(await provider.signTransaction(preparedBatches[i].tx));
-      }
-    }
-
-    // Transactions are signed in groups first, then submitted in order so the
-    // service fee remains attached only to the first transaction.
-    const results = [];
-    for (let i = 0; i < preparedBatches.length; i++) {
-      const batch = preparedBatches[i];
-      try {
-        setStatus(`Sending batch ${i + 1} of ${preparedBatches.length}...`, "active");
-        const signature = await connection.sendRawTransaction(signedTransactions[i].serialize(), {
-          skipPreflight: false,
-          maxRetries: 3
-        });
-        setStatus(`Confirming batch ${i + 1} of ${preparedBatches.length}...`, "active");
-        await connection.confirmTransaction(signature, "confirmed");
-        results.push({ ok: true, signature, items: batch.items, decimals: mintInfo.decimals });
-        await showResults(results);
-      } catch (error) {
-        const failureDetail = error?.message || String(error) || "Unknown error";
         results.push({
           ok: false,
           signature: "",
-          items: batch.items,
+          items: batch,
           decimals: mintInfo.decimals,
           error: failureDetail
         });
         await showResults(results);
         setStatus(
-          `Batch ${i + 1} failed: ${failureDetail}. Later transactions were not sent.`,
+          `Batch ${i + 1} failed: ${failureDetail}. Later batches were not sent.`,
           "error"
         );
         return results;
