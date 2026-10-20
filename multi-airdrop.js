@@ -9,7 +9,7 @@
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
-  const MAX_RECIPIENTS_PER_TX = 4; // Keep legacy transactions comfortably below Solana's 1232-byte packet limit.
+  const MAX_RECIPIENTS_PER_TX = 100; // Desired batch size; oversized transactions are automatically split before signing.
   const MAX_RECIPIENTS_TOTAL = 2000;
   const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
   const GURUG_AIRDROP_FEE_PER_WALLET_LAMPORTS = 1000000; // 0.001 SOL
@@ -357,7 +357,7 @@
     if (costEl) costEl.textContent = (feeLamports / 1e9).toFixed(3) + " SOL";
 
     const results = [];
-    for (let i = 0; i < batches.length; i++) {
+    for (let i = 0; i < batches.length;) {
       const batch = batches[i];
       setStatus(`Preparing batch ${i + 1} of ${batches.length} — ${batch.length} wallet(s) × ${uiAmount} GSWAP...`, "active");
 
@@ -421,6 +421,7 @@
 
         results.push({ ok: true, signature, items: batch, decimals: mintInfo.decimals });
         await showResults(results);
+        i++;
       } catch (error) {
         console.error("MULTI AIRDROP batch failed:", error);
         results.push({
@@ -433,6 +434,16 @@
         await showResults(results);
 
         const failureDetail = error?.message || String(error) || "Unknown error";
+        const packetTooLarge = /transaction too large|packet.{0,20}(?:size|1232)|1232.{0,20}(?:byte|size)/i.test(failureDetail);
+        if (packetTooLarge && batch.length > 1) {
+          const midpoint = Math.ceil(batch.length / 2);
+          const firstHalf = batch.slice(0, midpoint);
+          const secondHalf = batch.slice(midpoint);
+          batches.splice(i, 1, firstHalf, secondHalf);
+          updateSummary(batches.length, mintInfo.decimals);
+          setStatus(`Transaction exceeds Solana's 1,232-byte limit. Automatically splitting ${batch.length} wallets into ${firstHalf.length} + ${secondHalf.length} and retrying...`, "active");
+          continue;
+        }
         setStatus(
           `Batch ${i + 1} failed: ${failureDetail}. Later batches were not sent.`,
           "error"
@@ -470,7 +481,7 @@
 
     recipientAddresses = addresses;
     renderRecipients();
-    setStatus(`Loaded ${addresses.length.toLocaleString("en-US")} wallet address(es). Up to ${MAX_RECIPIENTS_TOTAL.toLocaleString("en-US")} are supported per run; transactions are split into groups of up to ${MAX_RECIPIENTS_PER_TX}.`, "active");
+    setStatus(`Loaded ${addresses.length.toLocaleString("en-US")} wallet address(es). Up to ${MAX_RECIPIENTS_TOTAL.toLocaleString("en-US")} are supported per run; batches target up to ${MAX_RECIPIENTS_PER_TX} wallets and automatically split to fit Solana's 1,232-byte transaction limit.`, "active");
   }
 
   function addStyles() {
@@ -652,7 +663,7 @@
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">1</div><div><strong>Select your token</strong><span>Paste the SPL Token or Token-2022 mint address you want to distribute.</span></div></div>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">2</div><div><strong>Paste wallet addresses</strong><span>Paste up to 2,000 Solana wallet addresses at once. One address per line is easiest.</span></div></div>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">3</div><div><strong>Set one amount</strong><span>Enter the token amount once. Every wallet receives the same amount.</span></div></div>
-          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">4</div><div><strong>Approve batches in Phantom</strong><span>Up to 2,000 recipients per run. Solana transaction-size limits mean the list is split into transactions of up to 4 wallets, and Phantom must approve each transaction.</span></div></div>
+          <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">4</div><div><strong>Approve batches in Phantom</strong><span>Up to 2,000 recipients per run. Batches target up to 100 wallets, then automatically split further when needed to fit Solana's 1,232-byte transaction limit. Phantom must approve each resulting transaction.</span></div></div>
           <div class="multi-airdrop-help-step"><div class="multi-airdrop-help-num">5</div><div><strong>Track every batch</strong><span>Each confirmed batch gets a direct Solscan transaction link.</span></div></div>
         </aside>
       </div>
