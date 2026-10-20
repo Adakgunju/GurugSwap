@@ -10334,3 +10334,14 @@ body .topbar > .brand::before { content: none !important; }
     flex-basis: 32px !important;
   }
 }
+
+
+/* HEADER LOGO CLEANUP: remove the leftover square frame around the mascot. */
+body .topbar > .brand > img.brand-logo {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  filter: none !important;
+}
