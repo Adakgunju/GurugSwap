@@ -5,7 +5,8 @@
   // such as getParsedAccountInfo/getTokenAccountBalance.
   const RPCS = [
     "https://api.mainnet-beta.solana.com",
-    "https://rpc.solanatracker.io/public"
+    "https://rpc.solanatracker.io/public",
+    "https://solana-rpc.publicnode.com"
   ];
   const SPL_CDN = "https://esm.sh/@solana/spl-token@0.4.14?bundle";
   const BUFFER_CDN = "https://esm.sh/buffer@6.0.3?bundle";
