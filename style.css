@@ -10310,3 +10310,27 @@ body .workspace-main > #multi-token-bot.trading-bot-section {
     margin-right: -4px !important;
   }
 }
+
+
+/* FINAL FIX: keep the header mascot image visible; override legacy hidden-logo rule. */
+body .topbar > .brand > img.brand-logo {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  clip-path: none !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+body .topbar > .brand::before { content: none !important; }
+@media (max-width: 520px) {
+  body .topbar > .brand > img.brand-logo {
+    width: 32px !important;
+    height: 32px !important;
+    flex-basis: 32px !important;
+  }
+}
