@@ -424,15 +424,6 @@
         i++;
       } catch (error) {
         console.error("MULTI AIRDROP batch failed:", error);
-        results.push({
-          ok: false,
-          signature: "",
-          items: batch,
-          decimals: mintInfo.decimals,
-          error: error?.message || "Transaction failed or was cancelled."
-        });
-        await showResults(results);
-
         const failureDetail = error?.message || String(error) || "Unknown error";
         const packetTooLarge = /transaction too large|packet.{0,20}(?:size|1232)|1232.{0,20}(?:byte|size)/i.test(failureDetail);
         if (packetTooLarge && batch.length > 1) {
@@ -444,6 +435,15 @@
           setStatus(`Transaction exceeds Solana's 1,232-byte limit. Automatically splitting ${batch.length} wallets into ${firstHalf.length} + ${secondHalf.length} and retrying...`, "active");
           continue;
         }
+
+        results.push({
+          ok: false,
+          signature: "",
+          items: batch,
+          decimals: mintInfo.decimals,
+          error: failureDetail
+        });
+        await showResults(results);
         setStatus(
           `Batch ${i + 1} failed: ${failureDetail}. Later batches were not sent.`,
           "error"
