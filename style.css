@@ -10367,3 +10367,12 @@ body .workspace-main > section#create-token {
 body .workspace-main > section#distributeTokens {
   border-radius: 18px !important;
 }
+
+
+/* CORNER PATCH: explicitly round the top-right outer frame on Multi Airdrop, Token Burn, and Token Authority. */
+body .workspace-main > section#multi-airdrop,
+body .workspace-main > section#token-burn,
+body .workspace-main > section#authority-manager {
+  border-top-right-radius: 18px !important;
+  border-top-left-radius: 18px !important;
+}
