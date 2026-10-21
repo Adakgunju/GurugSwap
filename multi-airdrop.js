@@ -60,7 +60,7 @@
       } catch (error) {
         lastError = error;
         const message = String(error?.message || error || "");
-        const retryable = /failed to fetch|network|fetch|429|rate.?limit|\b5\d\d\b|timeout|temporar/i.test(message);
+        const retryable = /failed to fetch|network|fetch|\\b403\\b|forbidden|access denied|unauthorized|429|rate.?limit|\\b5\\d\\d\\b|timeout|temporar/i.test(message);
         if (!retryable) throw error;
       }
     }
