@@ -10345,3 +10345,10 @@ body .topbar > .brand > img.brand-logo {
   border-radius: 0 !important;
   filter: none !important;
 }
+
+/* FINAL: square outer frames for Token Burn and Token Authority only.
+   Keep all functionality and inner controls unchanged. */
+body .workspace-main > #token-burn.token-burn-section #tokenBurnApp .token-burn-card,
+body .workspace-main > #authority-manager .token-authority-card {
+  border-radius: 0 !important;
+}
