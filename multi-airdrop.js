@@ -237,7 +237,7 @@
   async function buildBatch(connection, owner, mint, batch, decimals, tokenProgram, sourceAta, spl, feeLamports = 0) {
     const web3 = window.solanaWeb3;
     const tx = new web3.Transaction();
-    const latest = await connection.getLatestBlockhash("confirmed");
+    const latest = await rpcRead(connection, "getLatestBlockhash", ["confirmed"]);
     tx.recentBlockhash = latest.blockhash;
     tx.feePayer = owner;
 
