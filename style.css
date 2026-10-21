@@ -10361,3 +10361,9 @@ body .workspace-main > section#liquidity.gurug-liquidity,
 body .workspace-main > section#create-token {
   border-radius: 18px !important;
 }
+
+
+/* TOKEN DISTRIBUTION OUTER FRAME — match the rounded corners used on the other tool pages. */
+body .workspace-main > section#distributeTokens {
+  border-radius: 18px !important;
+}
