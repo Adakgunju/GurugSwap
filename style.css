@@ -10351,3 +10351,13 @@ body .topbar > .brand > img.brand-logo {
 body .workspace-main > section {
   border-radius: 18px !important;
 }
+
+/* TARGETED OUTER SECTION CORNERS — override page-specific square-corner rules.
+   These selectors affect only the outer section frames, never the inner function cards. */
+body .workspace-main > section#trading-bot.trading-bot-section,
+body .workspace-main > section#token-burn.token-burn-section,
+body .workspace-main > section#multi-airdrop.platform-placeholder-section,
+body .workspace-main > section#liquidity.gurug-liquidity,
+body .workspace-main > section#create-token {
+  border-radius: 18px !important;
+}
