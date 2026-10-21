@@ -42,6 +42,33 @@
     throw new Error("No Solana RPC endpoint is currently available. Please try again.");
   }
 
+  // Retry read-only account queries across RPC endpoints when one provider denies access.
+  async function rpcRead(connection, method, args) {
+    const web3 = window.solanaWeb3;
+    const preferred = connection?.rpcEndpoint;
+    const endpoints = [...new Set([preferred, ...RPCS].filter(Boolean))];
+    let lastError = null;
+
+    for (const endpoint of endpoints) {
+      try {
+        const rpcConnection = endpoint === preferred
+          ? connection
+          : new web3.Connection(endpoint, "confirmed");
+        return await rpcConnection[method](...args);
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || error || "");
+        const retryable = /failed to fetch|network|fetch|\\b403\\b|forbidden|access denied|unauthorized|429|rate.?limit|\\b5\\d\\d\\b|timeout|temporar/i.test(message);
+        if (!retryable) throw error;
+      }
+    }
+
+    throw new Error(
+      "Account lookup failed on all available Solana RPC endpoints. " +
+      (lastError?.message || String(lastError || "Unknown RPC error"))
+    );
+  }
+
   async function loadSpl() {
     if (!bufferPromise) {
       bufferPromise = import(BUFFER_CDN).then(mod => {
@@ -132,7 +159,7 @@
   }
 
   async function readMint(connection, mint, owner, spl) {
-    const account = await connection.getParsedAccountInfo(mint, "confirmed");
+    const account = await rpcRead(connection, "getParsedAccountInfo", [mint, "confirmed"]);
     if (!account?.value?.data?.parsed?.info) throw new Error("토큰 민트를 읽을 수 없습니다.");
 
     const program = String(account.value.data.program || "");
@@ -158,7 +185,7 @@
       tokenProgram,
       spl.ASSOCIATED_TOKEN_PROGRAM_ID
     );
-    const sourceInfo = await connection.getAccountInfo(sourceAta, "confirmed");
+    const sourceInfo = await rpcRead(connection, "getAccountInfo", [sourceAta, "confirmed"]);
     if (!sourceInfo) throw new Error("Your wallet does not have a token account for this token.");
 
     const balance = await connection.getTokenAccountBalance(sourceAta, "confirmed");
@@ -214,7 +241,7 @@
         tokenProgram,
         spl.ASSOCIATED_TOKEN_PROGRAM_ID
       );
-      const destinationInfo = await connection.getAccountInfo(destinationAta, "confirmed");
+      const destinationInfo = await rpcRead(connection, "getAccountInfo", [destinationAta, "confirmed"]);
 
       if (!destinationInfo) {
         newAtaCount++;
