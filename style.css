@@ -10376,3 +10376,12 @@ body .workspace-main > section#authority-manager {
   border-top-right-radius: 18px !important;
   border-top-left-radius: 18px !important;
 }
+
+
+/* UNIFIED OUTER CORNERS: use one shorthand for all four corners on these three sections. */
+body .workspace-main > section#multi-airdrop,
+body .workspace-main > section#token-burn,
+body .workspace-main > section#authority-manager {
+  border-radius: 18px !important;
+  background-clip: padding-box !important;
+}
