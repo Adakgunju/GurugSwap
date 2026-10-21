@@ -10345,3 +10345,22 @@ body .topbar > .brand > img.brand-logo {
   border-radius: 0 !important;
   filter: none !important;
 }
+
+/* FINAL OUTER-PANEL CORNER CONSISTENCY.
+   Round only the outer page sections; inner functional cards and controls retain their existing styles. */
+body .workspace-main > section,
+body .workspace-main > #create-token,
+body .workspace-main > #distributeTokens,
+body .workspace-main > #liquidity,
+body .workspace-main > #swap,
+body .workspace-main > #token-info,
+body .workspace-main > #multi-airdrop,
+body .workspace-main > #token-burn,
+body .workspace-main > #token-mint,
+body .workspace-main > #authority-manager,
+body .workspace-main > #trading-bot,
+body .workspace-main > #links,
+body .workspace-main > #about {
+  border-radius: 18px !important;
+  overflow: hidden;
+}
