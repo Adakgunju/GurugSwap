@@ -1,14 +1,14 @@
-/* Minimal swap-card-only embed mode used by DexFuckers. Keep the normal GurugSwap page unchanged. */
-.swap-embed-mode body{margin:0!important;min-width:0!important;overflow-x:hidden!important;background:#080908!important}
+/* Swap-card-only embed mode for DexFuckers: no landing content, token info, or nested scrolling. */
+.swap-embed-mode,.swap-embed-mode body{margin:0!important;padding:0!important;width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;overflow:hidden!important;background:#080908!important}
 .swap-embed-mode .site-glow,.swap-embed-mode .gurug-rain,.swap-embed-mode .topbar,.swap-embed-mode #mobileMenu,.swap-embed-mode .platform-header,.swap-embed-mode .workspace-sidebar,.swap-embed-mode footer{display:none!important}
-.swap-embed-mode main{padding:0!important;margin:0!important;width:100%!important;max-width:none!important}
-.swap-embed-mode .workspace-shell{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
-.swap-embed-mode .workspace-main{display:block!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important}
+.swap-embed-mode main{display:block!important;padding:0!important;margin:0!important;width:100%!important;max-width:none!important;overflow:visible!important}
+.swap-embed-mode .workspace-shell{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;overflow:visible!important}
+.swap-embed-mode .workspace-main{display:block!important;width:100%!important;min-width:0!important;margin:0!important;padding:0!important;overflow:visible!important}
 .swap-embed-mode .workspace-main>.swap-section{display:block!important;width:100%!important;max-width:none!important;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
-.swap-embed-mode .landing-stage{display:block!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important}
-.swap-embed-mode .landing-copy,.swap-embed-mode .landing-mascot,.swap-embed-mode .landing-feature-grid,.swap-embed-mode .workspace-main>.swap-section>.section-label{display:none!important}
-.swap-embed-mode .workspace-main .swap-layout{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
-.swap-embed-mode .workspace-main .swap-card{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:14px!important;box-sizing:border-box!important;border-radius:12px!important;box-shadow:none!important}
+.swap-embed-mode .landing-stage{display:block!important;width:100%!important;min-height:0!important;height:auto!important;margin:0!important;padding:0!important;overflow:visible!important}
+.swap-embed-mode .landing-copy,.swap-embed-mode .landing-mascot,.swap-embed-mode .landing-feature-grid,.swap-embed-mode .workspace-main>.swap-section>.section-label,.swap-embed-mode .token-info-section,.swap-embed-mode #token-info,.swap-embed-mode .workspace-main>section:not(.swap-section){display:none!important}
+.swap-embed-mode .workspace-main .swap-layout{display:block!important;width:100%!important;max-width:none!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important}
+.swap-embed-mode .workspace-main .swap-card{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;height:auto!important;min-height:0!important;margin:0!important;padding:14px!important;box-sizing:border-box!important;border-radius:12px!important;box-shadow:none!important;overflow:visible!important}
 .swap-embed-mode .workspace-main .swap-card:before{border-radius:9px!important;inset:4px!important}
 .swap-embed-mode .workspace-main .card-head{margin-bottom:12px!important}
 .swap-embed-mode .workspace-main .token-box{padding:13px 10px!important;gap:8px!important}
@@ -18,7 +18,6 @@
 .swap-embed-mode .workspace-main .token b{font-size:10px!important}
 .swap-embed-mode .workspace-main .token-select{min-width:0!important;max-width:46%!important}
 .swap-embed-mode .workspace-main .card-foot{gap:5px!important;font-size:7px!important;letter-spacing:.04em!important}
-.swap-embed-mode .workspace-main>section:not(.swap-section){display:none!important}
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
 :root{--bg:#080808;--panel:#151515;--panel2:#1d1d1d;--yellow:#ffe500;--white:#f7f7f2;--muted:#a4a4a0;--line:#2b2b2b;--line2:#414141}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--white);font-family:'Space Grotesk',system-ui,sans-serif;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.035;background-image:radial-gradient(#fff .55px,transparent .55px);background-size:5px 5px}.site-glow{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 76% 18%,rgba(255,229,0,.07),transparent 28%),radial-gradient(circle at 12% 75%,rgba(255,229,0,.025),transparent 25%);z-index:-1}a{color:inherit;text-decoration:none}button,input,select{font:inherit}
