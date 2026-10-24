@@ -981,6 +981,20 @@ if (swapDirectionButton) {
   });
 }
 
+// Accept an optional token mint from DexFuckers via ?outputMint=<mint>.
+(async () => {
+  const requestedMint = new URLSearchParams(window.location.search).get("outputMint");
+  if (!requestedMint || requestedMint === toToken.mint || !isLikelyMint(requestedMint)) return;
+  const requestedToken = await fetchTokenByMint(requestedMint);
+  if (!requestedToken || requestedToken.mint !== requestedMint) return;
+  toToken = applyCanonicalTokenIcon(requestedToken);
+  if (fromToken.mint === toToken.mint) fromToken = TOKEN_CATALOG[0];
+  updateTokenButtons();
+  resetQuoteForTokenChange();
+  updateTokenInfo(toToken);
+  rememberToken(toToken);
+})();
+
 updateTokenButtons();
 refreshBalancesSoon();
 hydrateCatalogIcons();
