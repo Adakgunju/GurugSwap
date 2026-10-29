@@ -430,25 +430,35 @@
     if (!programId || !poolFeeAccount) throw new Error("Raydium CPMM program configuration is unavailable.");
 
     const txVersion = sdk.TxVersion.V0;
-    const mintAInfo = {
-      address: mintA.address,
-      decimals: mintA.decimals,
-      programId: mintA.programId
-    };
-    const mintBInfo = {
-      address: mintB.address,
-      decimals: mintB.decimals,
-      programId: mintB.programId
-    };
+    // Raydium CPMM requires token_0_mint < token_1_mint by public-key bytes.
+    // Sort both mint metadata and deposit amounts together so the initial amounts
+    // cannot become attached to the wrong mint.
+    const mintPairs = [
+      { info: { address: mintA.address, decimals: mintA.decimals, programId: mintA.programId },
+        amount: tokenAmountBN, label: "token" },
+      { info: { address: mintB.address, decimals: mintB.decimals, programId: mintB.programId },
+        amount: solAmountBN, label: "SOL" }
+    ];
+    const mintBytes = mintPairs.map(pair => ({
+      ...pair,
+      bytes: new Web3.PublicKey(pair.info.address).toBytes()
+    }));
+    mintBytes.sort((left, right) => {
+      for (let i = 0; i < left.bytes.length; i++) {
+        if (left.bytes[i] !== right.bytes[i]) return left.bytes[i] - right.bytes[i];
+      }
+      return 0;
+    });
+    const [poolMint0, poolMint1] = mintBytes;
 
     setStatus("CPMM 풀 거래를 생성하는 중…");
     const { execute, extInfo, builder, transaction } = await raydium.cpmm.createPool({
       programId,
       poolFeeAccount,
-      mintA: mintAInfo,
-      mintB: mintBInfo,
-      mintAAmount: tokenAmountBN,
-      mintBAmount: solAmountBN,
+      mintA: poolMint0.info,
+      mintB: poolMint1.info,
+      mintAAmount: poolMint0.amount,
+      mintBAmount: poolMint1.amount,
       // Open the pool immediately. A client-side current timestamp can be stale by the time
       // the transaction lands, and may cause the on-chain CPMM initialization to fail.
       startTime: new BN(0),
