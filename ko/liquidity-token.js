@@ -3,6 +3,8 @@
 
   const 레이디움_API = "https://api-v3.raydium.io";
   const SOL_MINT = "So11111111111111111111111111111111111111112";
+  const GURUG_FEE_WALLET = "ARmME4KE6oe87TokQf7SmYZL6e5Gpz1UCobU3EEqSwEH";
+  const GURUG_POOL_FEE_LAMPORTS = 100000000;
 
   function injectStyles() {
     if (document.getElementById("gurug-liquidity-styles")) return;
