@@ -449,7 +449,9 @@
       mintB: mintBInfo,
       mintAAmount: tokenAmountBN,
       mintBAmount: solAmountBN,
-      startTime: new BN(Math.floor(Date.now() / 1000)),
+      // Open the pool immediately. A client-side current timestamp can be stale by the time
+      // the transaction lands, and may cause the on-chain CPMM initialization to fail.
+      startTime: new BN(0),
       feeConfig,
       associatedOnly: true,
       ownerInfo: {
