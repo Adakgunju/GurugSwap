@@ -247,6 +247,14 @@
 
   async function loadRaydiumSdk() {
     if (!raydiumSdkPromise) {
+      // Raydium SDK browser bundles may expect the Node.js Buffer global.
+      // Load the browser-compatible polyfill before importing the SDK.
+      if (typeof globalThis.Buffer === "undefined") {
+        const bufferModule = await import("https://esm.sh/buffer@6.0.3?bundle");
+        const BufferPolyfill = bufferModule.Buffer || bufferModule.default?.Buffer || bufferModule.default;
+        if (!BufferPolyfill) throw new Error("Could not initialize the Buffer polyfill required by Raydium.");
+        globalThis.Buffer = BufferPolyfill;
+      }
       setStatus("레이디움 CPMM 엔진을 불러오는 중…");
       raydiumSdkPromise = import("https://esm.sh/@raydium-io/raydium-sdk-v2@0.2.73-alpha?bundle");
     }
