@@ -837,7 +837,7 @@
   async function uploadToPermanentStorage(irys, provider, data, contentType, label) {
     const bytes = data instanceof Uint8Array ? data : utf8(data);
     const normalizedContentType = String(contentType || "").split(";")[0].trim().toLowerCase();
-    if (!/^(image\\/(png|jpeg|webp)|application\\/json)$/.test(normalizedContentType)) {
+    if (!["image/png", "image/jpeg", "image/webp", "application/json"].includes(normalizedContentType)) {
       throw new Error(label + " upload has an unsupported content type: " + normalizedContentType);
     }
 
