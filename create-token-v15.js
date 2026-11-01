@@ -836,12 +836,18 @@
 
   async function uploadToPermanentStorage(irys, provider, data, contentType, label) {
     const bytes = data instanceof Uint8Array ? data : utf8(data);
-    // Upload without custom Irys tags. This keeps the ANS-104 DataItem minimal and avoids
-    // browser-side tag encoding differences; Arweave/Irys still stores the payload permanently.
-    const tags = [];
+    const normalizedContentType = String(contentType || "").split(";")[0].trim().toLowerCase();
+    if (!/^(image\\/(png|jpeg|webp)|application\\/json)$/.test(normalizedContentType)) {
+      throw new Error(label + " upload has an unsupported content type: " + normalizedContentType);
+    }
 
-    // Exact ANS-104 DataItem size: header + signature + owner + target/anchor + tags + data.
-    const itemSize = 2 + 64 + 32 + 1 + 1 + 32 + 16 + bytes.length;
+    // ANS-104 tags are essential: gateways and token indexers use Content-Type
+    // to serve the image/JSON with the correct HTTP response headers.
+    const tags = [{ name: "Content-Type", value: normalizedContentType }];
+
+    // Include the serialized tag bytes in the exact ANS-104 DataItem size.
+    const rawTags = serializeIrysTags(tags);
+    const itemSize = 2 + 64 + 32 + 1 + 1 + 32 + 16 + rawTags.length + bytes.length;
     const price = await getIrysPrice(itemSize, tags, irys.address);
     if (price <= 0n) throw new Error(label + " storage price could not be calculated.");
 
