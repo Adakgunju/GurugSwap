@@ -1,4 +1,4 @@
-const mint = "4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3";
+const mint = "FxQcV3edL21VLkCAehv1BN8sfvo1zLfoU3mpPZPjvRZe";
 
 const copyMintBtn = document.getElementById("copyMint");
 if (copyMintBtn) {
