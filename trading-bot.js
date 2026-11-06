@@ -155,7 +155,22 @@
           ? Number(trade.amount_token || 0).toFixed(6) + " GURUG"
           : Number(trade.amount_sol || 0).toFixed(4) + " SOL";
         const price = trade.price_usd == null ? "—" : "$" + Number(trade.price_usd).toFixed(6);
-        row.innerHTML = "<span>" + side + "</span><span>" + amount + "</span><span>" + price + "</span><span>" + status + "</span>";
+        const rawCreatedAt = trade.created_at ? String(trade.created_at) : "";
+        const parsedCreatedAt = rawCreatedAt
+          ? new Date(/(?:Z|[+-]\\d{2}:?\\d{2})$/i.test(rawCreatedAt) ? rawCreatedAt : rawCreatedAt.replace(" ", "T") + "Z")
+          : null;
+        const tradeTime = parsedCreatedAt && Number.isFinite(parsedCreatedAt.getTime())
+          ? new Intl.DateTimeFormat("ko-KR", {
+              timeZone: "Asia/Seoul",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false
+            }).format(parsedCreatedAt)
+          : "time unavailable";
+        row.innerHTML = "<span>" + side + "</span><span>" + amount + "</span><span>" + price + "</span><span>" + status + " · " + tradeTime + "</span>";
         history.appendChild(row);
       });
     } catch {}
