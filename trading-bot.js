@@ -202,7 +202,12 @@
           "Price " + price + " · " + String(data.reason || "no decision") +
           " · Triggered " + (data.triggered ? "YES" : "NO") +
           " · TP " + tp + " · SL " + sl +
-          " · Token balance " + balance.toFixed(6) + exit + lastRun;
+          " · Token balance " + balance.toFixed(6) + exit +
+          " · Scheduler " + String(data.scheduler_block_reason || "unknown") +
+          " · Trades " + Number(data.trade_count || 0) + "/" + Number(data.max_trades || 0) +
+          " · Spend " + Number(data.total_spend_sol || 0).toFixed(4) + "/" + Number(data.max_total_spend_sol || 0).toFixed(4) + " SOL" +
+          (Number(data.seconds_remaining || 0) > 0 ? " · Wait " + Number(data.seconds_remaining) + "s" : "") +
+          lastRun;
       }
     } catch {}
   }
