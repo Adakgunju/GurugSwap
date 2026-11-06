@@ -192,6 +192,9 @@
       const balance = Number(data.token_balance || 0);
       const price = data.market_price_usd == null ? "unavailable" : "$" + Number(data.market_price_usd).toFixed(8);
       const exit = data.exit_triggered ? " · EXIT " + String(data.exit_reason || "").replace("_"," ").toUpperCase() : "";
+      const pendingInfo = data.pending_trade
+        ? " · UNRESOLVED TRADE #" + String(data.pending_trade.id) + " " + String(data.pending_trade.side || "").toUpperCase()
+        : "";
       const lastLog = Array.isArray(logData?.logs) ? logData.logs[0] : null;
       const lastRun = lastLog
         ? " · Last log: " + String(lastLog.event || "event") + " — " + String(lastLog.message || "")
@@ -207,7 +210,7 @@
           " · Trades " + Number(data.trade_count || 0) + "/" + Number(data.max_trades || 0) +
           " · Spend " + Number(data.total_spend_sol || 0).toFixed(4) + "/" + Number(data.max_total_spend_sol || 0).toFixed(4) + " SOL" +
           (Number(data.seconds_remaining || 0) > 0 ? " · Wait " + Number(data.seconds_remaining) + "s" : "") +
-          lastRun;
+          pendingInfo + lastRun;
       }
     } catch {}
   }
