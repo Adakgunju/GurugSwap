@@ -10,6 +10,7 @@
   const backendUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=status";
   const decisionUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=decision";
   const historyUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=history";
+  const logsUrl = "https://gurug-trading-bot.pcaticom.workers.dev/?action=logs";
   const settingsUrl = "https://gurug-trading-bot.pcaticom.workers.dev/trade?action=settings";
 
   function currentStrategy() {
@@ -162,15 +163,32 @@
 
   async function refreshDecision() {
     try {
-      const response = await fetch(decisionUrl, { cache: "no-store" });
-      const data = await response.json();
+      const [decisionResponse, logsResponse] = await Promise.all([
+        fetch(decisionUrl, { cache: "no-store" }),
+        fetch(logsUrl, { cache: "no-store" })
+      ]);
+      const [data, logData] = await Promise.all([
+        decisionResponse.json(),
+        logsResponse.json()
+      ]);
       if (!data?.ok) return;
       const tp = data.take_profit_usd == null ? "—" : "$" + Number(data.take_profit_usd).toFixed(6);
       const sl = data.stop_loss_usd == null ? "—" : "$" + Number(data.stop_loss_usd).toFixed(6);
       const balance = Number(data.token_balance || 0);
+      const price = data.market_price_usd == null ? "unavailable" : "$" + Number(data.market_price_usd).toFixed(8);
       const exit = data.exit_triggered ? " · EXIT " + String(data.exit_reason || "").replace("_"," ").toUpperCase() : "";
+      const lastLog = Array.isArray(logData?.logs) ? logData.logs[0] : null;
+      const lastRun = lastLog
+        ? " · Last log: " + String(lastLog.event || "event") + " — " + String(lastLog.message || "")
+        : " · No scheduler logs yet";
       const decisionLine = document.getElementById("botDecisionStatus");
-      if (decisionLine) decisionLine.textContent = "TP " + tp + " · SL " + sl + " · Token balance " + balance.toFixed(6) + exit;
+      if (decisionLine) {
+        decisionLine.textContent =
+          "Price " + price + " · " + String(data.reason || "no decision") +
+          " · Triggered " + (data.triggered ? "YES" : "NO") +
+          " · TP " + tp + " · SL " + sl +
+          " · Token balance " + balance.toFixed(6) + exit + lastRun;
+      }
     } catch {}
   }
 
