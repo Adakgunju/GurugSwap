@@ -157,7 +157,7 @@
         const price = trade.price_usd == null ? "—" : "$" + Number(trade.price_usd).toFixed(6);
         const rawCreatedAt = trade.created_at ? String(trade.created_at) : "";
         const parsedCreatedAt = rawCreatedAt
-          ? new Date(/(?:Z|[+-]\\d{2}:?\\d{2})$/i.test(rawCreatedAt) ? rawCreatedAt : rawCreatedAt.replace(" ", "T") + "Z")
+          ? new Date(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(rawCreatedAt) ? rawCreatedAt : rawCreatedAt.replace(" ", "T") + "Z")
           : null;
         const tradeTime = parsedCreatedAt && Number.isFinite(parsedCreatedAt.getTime())
           ? new Intl.DateTimeFormat("ko-KR", {
