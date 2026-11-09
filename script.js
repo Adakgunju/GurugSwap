@@ -130,15 +130,14 @@ const swapDirectionButton = document.getElementById("swapDirection");
 
 const TOKEN_CATALOG = [
   {symbol:"SOL", name:"Solana", mint:SOL_MINT, decimals:9, icon:"sol"},
-  {symbol:"GSWAP", name:"GurugSwap", mint, decimals:null, icon:"https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"},
+  {symbol:"MEDA", name:"MEDA", mint, decimals:null, icon:""},
   {symbol:"USDC", name:"USD Coin", mint:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", decimals:6},
   {symbol:"RAY", name:"Raydium", mint:"4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", decimals:6},
   {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6}
 ];
 
 const CANONICAL_TOKEN_ICONS = new Map([
-  [SOL_MINT, "sol"],
-  [mint, "https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png"]
+  [SOL_MINT, "sol"]
 ]);
 
 function applyCanonicalTokenIcon(token) {
@@ -146,9 +145,7 @@ function applyCanonicalTokenIcon(token) {
   const canonicalIcon = CANONICAL_TOKEN_ICONS.get(token.mint);
   if (canonicalIcon) {
     token.icon = canonicalIcon;
-    // GSWAP gets a local site-level badge in this UI.
-    // This is a site-level display badge, not a Jupiter verification claim.
-    if (token.mint === mint) token.verified = true;
+    if (token.mint === SOL_MINT) token.verified = false;
   }
   return token;
 }
