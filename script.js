@@ -1020,9 +1020,21 @@ function setSwapStatus(message, error = false, state = "") {
   }
   if (messageEl) messageEl.textContent = message;
   if (progress) progress.style.width = error ? "100%" : state === "success" ? "100%" : state === "active" ? "72%" : "0%";
-  if (txLink && state !== "success") {
-    txLink.hidden = true;
-    txLink.removeAttribute("href");
+  if (txLink) {
+    // A transaction can be broadcast even when the browser cannot confirm it.
+    // Keep the explorer link actionable in that case instead of hiding it.
+    const explorerMatch = String(message).match(/https:\/\/solscan\.io\/tx\/[A-Za-z0-9]+/);
+    if (explorerMatch) {
+      txLink.href = explorerMatch[0];
+      txLink.textContent = "VIEW TRANSACTION ↗";
+      txLink.hidden = false;
+      txLink.rel = "noopener noreferrer";
+      txLink.target = "_blank";
+      if (messageEl) messageEl.textContent = String(message).replace(explorerMatch[0], "").trim();
+    } else if (state !== "success") {
+      txLink.hidden = true;
+      txLink.removeAttribute("href");
+    }
   }
 }
 
