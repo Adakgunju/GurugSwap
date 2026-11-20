@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fffbe4">
-  <title>GURUG SWAP — SOL ↔ GSWAP</title>
-  <meta name="description" content="GURUG SWAP — swap SOL and GSWAP on Solana.">
+  <title>GURUG SWAP — SOL ↔ MEDA</title>
+  <meta name="description" content="GURUG SWAP — swap SOL and MEDA on Solana.">
   <script>if(new URLSearchParams(location.search).has("embed"))document.documentElement.classList.add("swap-embed-mode");</script>
   <link rel="stylesheet" href="style.css?v=169">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
@@ -109,7 +109,7 @@
           <button class="arrow" id="swapDirection" type="button" aria-label="Swap direction">↓</button>
           <div class="token-box">
             <div><small id="toLabel">YOU RECEIVE</small><strong id="gurugAmount">0.00</strong><div id="toBalance" class="token-balance" hidden></div></div>
-            <button class="token token-select gurug-token" id="toTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><img id="toTokenIcon" src="https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png" alt=""><span id="toTokenSymbol">GSWAP</span><b>⌄</b></button>
+            <button class="token token-select gurug-token" id="toTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><img id="toTokenIcon" src="https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png" alt=""><span id="toTokenSymbol">MEDA</span><b>⌄</b></button>
           </div>
 
           <div id="tokenPicker" class="token-picker" hidden role="dialog" aria-modal="true" aria-labelledby="tokenPickerTitle">
@@ -122,7 +122,7 @@
           <div id="swapStatus" class="swap-status">
             <div class="swap-status-top"><span class="swap-status-dot"></span><span id="swapStatusLabel">READY TO SWAP</span></div>
             <div class="swap-progress"><span id="swapProgressFill"></span></div>
-            <div id="swapStatusMessage" class="swap-status-message">Enter SOL to get a live GSWAP quote.</div>
+            <div id="swapStatusMessage" class="swap-status-message">Enter SOL to get a live MEDA quote.</div>
             <a id="swapTxLink" class="swap-tx-link" href="#" target="_blank" rel="noopener noreferrer" hidden>VIEW TRANSACTION ↗</a>
           </div>
           <div class="card-foot"><span>NON-CUSTODIAL</span><span>SOLANA MAINNET</span><span>RAYDIUM</span></div>
@@ -137,7 +137,7 @@
     </section>
 
     <section class="landing-feature-grid" aria-label="GurugSwap features">
-      <a class="landing-feature feature-swap" href="#swap"><span class="feature-icon">↔</span><span><strong>Swap</strong><small>Trade SOL, GSWAP and supported Solana tokens.</small></span><b>→</b></a>
+      <a class="landing-feature feature-swap" href="#swap"><span class="feature-icon">↔</span><span><strong>Swap</strong><small>Trade SOL, MEDA and supported Solana tokens.</small></span><b>→</b></a>
       <a class="landing-feature feature-liquidity" href="#liquidity"><span class="feature-icon">◉</span><span><strong>Liquidity Pool</strong><small>Explore liquidity tools and pool management.</small></span><b>→</b></a>
       <a class="landing-feature feature-create" href="#create-token"><span class="feature-icon">◇</span><span><strong>Token Creation</strong><small>Launch and manage your Solana token.</small></span><b>→</b></a>
       <a class="landing-feature feature-tools" href="#multi-airdrop"><span class="feature-icon">✦</span><span><strong>More on Gurug</strong><small>Airdrop, burn, mint and token authority tools.</small></span><b>→</b></a>
@@ -151,7 +151,7 @@
         <div class="token-info-main">
           <div id="tokenInfoIdentity" class="token-info-identity">
             <span class="token-info-icon token-info-placeholder">?</span>
-            <div><strong id="tokenInfoName">GurugSwap</strong><small id="tokenInfoSymbol">GSWAP</small></div>
+            <div><strong id="tokenInfoName">MEDA</strong><small id="tokenInfoSymbol">$MEDA</small></div>
           </div>
           <button id="tokenInfoSwap" class="token-info-swap" type="button">SWAP</button>
         </div>
@@ -359,7 +359,7 @@
     </div>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=63"></script>
+  <script src="script.js?v=64"></script>
   <script src="create-token-v15.js?v=27"></script>
   <script src="distribute-token.js?v=7"></script>
   <script src="multi-airdrop.js?v=25"></script>
