@@ -1547,8 +1547,8 @@ async function updateGswapMarketTicker() {
   if (!priceEl || !changeEl) return;
 
   try {
-    // GSWAP's own mint is separate from the default MEDA swap token.
-    const tokenMint = "4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3";
+    // The header ticker follows MEDA, the default token shown on the swap page.
+    const tokenMint = mint;
     const response = await fetch(TOKEN_INFO_DEX + encodeURIComponent(tokenMint), {cache:"no-store"});
     if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
     const data = await response.json();
