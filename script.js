@@ -1540,7 +1540,7 @@ if (tokenInfoSwapButton) {
 // Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
-/* --- LIVE GSWAP MARKET TICKER --- */
+/* --- LIVE MEDA MARKET TICKER --- */
 async function updateGswapMarketTicker() {
   const priceEl = document.getElementById("gurugPrice");
   const changeEl = document.getElementById("gurugChange");
@@ -1555,7 +1555,7 @@ async function updateGswapMarketTicker() {
     const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
     const pair = pairs.filter(p => p?.chainId === "solana")
       .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
-    if (!pair) throw new Error("No Solana market pair found for the GSWAP mint");
+    if (!pair) throw new Error("No Solana market pair found for the MEDA mint");
 
     const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
     const basePrice = Number(pair?.priceUsd);
@@ -1578,7 +1578,7 @@ async function updateGswapMarketTicker() {
       changeEl.textContent = "—";
     }
   } catch (err) {
-    console.warn("GSWAP ticker update failed.", err);
+    console.warn("MEDA ticker update failed.", err);
   }
 }
 
@@ -1691,11 +1691,11 @@ if (tokenInfoSwapButton) {
   });
 }
 
-// Initial TOKEN INFO follows the default TO token (GSWAP).
+// Initial TOKEN INFO follows the default TO token (MEDA).
 // Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
-/* --- LIVE GSWAP MARKET TICKER --- */
+/* --- LIVE MEDA MARKET TICKER --- */
 async function updateGswapMarketTicker() {
   const priceEl = document.getElementById("gurugPrice");
   const changeEl = document.getElementById("gurugChange");
@@ -1703,14 +1703,14 @@ async function updateGswapMarketTicker() {
 
   try {
     // GSWAP's own mint is separate from the default MEDA swap token.
-    const tokenMint = "4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3";
+    const tokenMint = mint;
     const response = await fetch(TOKEN_INFO_DEX + encodeURIComponent(tokenMint), {cache:"no-store"});
     if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
     const data = await response.json();
     const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
     const pair = pairs.filter(p => p?.chainId === "solana")
       .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
-    if (!pair) throw new Error("No Solana market pair found for the GSWAP mint");
+    if (!pair) throw new Error("No Solana market pair found for the MEDA mint");
 
     const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
     const basePrice = Number(pair?.priceUsd);
@@ -1733,7 +1733,7 @@ async function updateGswapMarketTicker() {
       changeEl.textContent = "—";
     }
   } catch (err) {
-    console.warn("GSWAP ticker update failed.", err);
+    console.warn("MEDA ticker update failed.", err);
   }
 }
 
