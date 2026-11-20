@@ -632,6 +632,68 @@ const TOKEN_ICON_CACHE = new Map(
     .map(token => [token.mint, token.icon])
 );
 
+async function fetchOnchainTokenMetadata(mintAddress) {
+  try {
+    if (!window.solanaWeb3?.PublicKey) return null;
+    const PublicKey = window.solanaWeb3.PublicKey;
+    const mintKey = new PublicKey(mintAddress);
+    const metadataProgram = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
+    const [metadataKey] = PublicKey.findProgramAddressSync(
+      [
+        new TextEncoder().encode("metadata"),
+        metadataProgram.toBytes(),
+        mintKey.toBytes()
+      ],
+      metadataProgram
+    );
+
+    let account = null;
+    for (const rpc of BALANCE_RPCS) {
+      try {
+        const result = await rpcRequest(rpc, "getAccountInfo", [
+          metadataKey.toBase58(),
+          {encoding:"base64", commitment:"confirmed"}
+        ]);
+        if (result?.value?.data?.[0]) {
+          account = result.value.data[0];
+          break;
+        }
+      } catch (err) {
+        console.warn("Token metadata RPC failed:", err);
+      }
+    }
+    if (!account) return null;
+
+    const bytes = Uint8Array.from(atob(account[0]), ch => ch.charCodeAt(0));
+    let offset = 1 + 32 + 32;
+    const readString = () => {
+      if (offset + 4 > bytes.length) throw new Error("Invalid metadata string");
+      const length = new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(0, true);
+      offset += 4;
+      if (length > bytes.length - offset) throw new Error("Invalid metadata length");
+      const value = new TextDecoder().decode(bytes.slice(offset, offset + length)).replace(/\\0+$/g, "").trim();
+      offset += length;
+      return value;
+    };
+
+    const name = readString();
+    const symbol = readString();
+    const uri = readString().replace(/\\0+$/g, "").trim();
+    if (!uri) return {name, symbol, uri:"", icon:""};
+
+    const metadataUrl = uri.replace(/^ipfs:\/\//i, "https://ipfs.io/ipfs/");
+    const response = await fetch(metadataUrl, {cache:"no-store"});
+    if (!response.ok) return {name, symbol, uri, icon:""};
+    const json = await response.json();
+    let icon = json?.image || json?.image_url || json?.logoURI || "";
+    if (icon.startsWith("ipfs://")) icon = icon.replace(/^ipfs:\/\//i, "https://ipfs.io/ipfs/");
+    return {name:json?.name || name, symbol:json?.symbol || symbol, uri, icon};
+  } catch (err) {
+    console.warn("On-chain token metadata lookup failed:", mintAddress, err);
+    return null;
+  }
+}
+
 async function hydrateTokenIcon(token) {
   if (!token) return token;
 
@@ -646,13 +708,26 @@ async function hydrateTokenIcon(token) {
 
   try {
     const found = await fetchTokenByMint(token.mint);
-    if (found?.icon) {
-      token.icon = found.icon;
+    if (found) {
       token.name = found.name || token.name;
+      token.symbol = found.symbol || token.symbol;
       token.decimals = found.decimals ?? token.decimals;
       token.verified = found.verified ?? token.verified;
-      TOKEN_ICON_CACHE.set(token.mint, found.icon);
+      if (found.icon) token.icon = found.icon;
+    }
 
+    if (!token.icon) {
+      const metadata = await fetchOnchainTokenMetadata(token.mint);
+      if (metadata) {
+        token.name = metadata.name || token.name;
+        token.symbol = metadata.symbol || token.symbol;
+        token.icon = metadata.icon || "";
+        token.metadataUri = metadata.uri || "";
+      }
+    }
+
+    if (token.icon) {
+      TOKEN_ICON_CACHE.set(token.mint, token.icon);
       const catalogToken = TOKEN_CATALOG.find(item => item.mint === token.mint);
       if (catalogToken) Object.assign(catalogToken, token);
     }
@@ -1373,6 +1448,8 @@ async function updateTokenInfo(token) {
 
   if (!nameEl || !token) return;
 
+  await hydrateTokenIcon(token);
+  if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint) return;
   applyCanonicalTokenIcon(token);
   nameEl.textContent = token.name || "Solana Token";
   symbolEl.textContent = "$" + (token.symbol || "TOKEN");
@@ -1472,7 +1549,8 @@ async function updateGswapMarketTicker() {
   if (!priceEl || !changeEl) return;
 
   try {
-    const tokenMint = mint;
+    // GSWAP's own mint is separate from the default MEDA swap token.
+    const tokenMint = "4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3";
     const response = await fetch(TOKEN_INFO_DEX + encodeURIComponent(tokenMint), {cache:"no-store"});
     if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
     const data = await response.json();
