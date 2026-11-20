@@ -671,14 +671,14 @@ async function fetchOnchainTokenMetadata(mintAddress) {
       const length = new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(0, true);
       offset += 4;
       if (length > bytes.length - offset) throw new Error("Invalid metadata length");
-      const value = new TextDecoder().decode(bytes.slice(offset, offset + length)).replace(/\\0+$/g, "").trim();
+      const value = new TextDecoder().decode(bytes.slice(offset, offset + length)).replace(/\0+$/g, "").trim();
       offset += length;
       return value;
     };
 
     const name = readString();
     const symbol = readString();
-    const uri = readString().replace(/\\0+$/g, "").trim();
+    const uri = readString().replace(/\0+$/g, "").trim();
     if (!uri) return {name, symbol, uri:"", icon:""};
 
     const metadataUrl = uri.replace(/^ipfs:\/\//i, "https://ipfs.io/ipfs/");
@@ -1459,7 +1459,160 @@ async function updateTokenInfo(token) {
   identityEl.innerHTML =
     tokenInfoIconMarkup(token) +
     '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") +
-    '</strong><small id="tokenInfoSymbol">$' + (token.symbol || "TOKEN") + '</small></div>';
+    '</strong><small id="tokenInfoSymbol">
+  priceEl.textContent = "—";
+  changeEl.textContent = "—";
+  changeEl.style.color = "";
+  liquidityEl.textContent = "—";
+  volumeEl.textContent = "—";
+  chartEl.href = "https://dexscreener.com/solana/" + encodeURIComponent(token.mint);
+
+  try {
+    let json;
+    const res = await fetch(TOKEN_INFO_DEX + encodeURIComponent(token.mint), {cache:"no-store"});
+    json = await res.json();
+    if (requestId !== tokenInfoRequestId || activeTokenInfoMint !== token.mint) return;
+    const pairs = Array.isArray(json?.pairs) ? json.pairs : [];
+    const solanaPairs = pairs.filter(pair => pair?.chainId === "solana");
+    const pair = solanaPairs.sort((a,b) =>
+      Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0)
+    )[0];
+
+    if (!pair) {
+      statusEl.textContent = "NO MARKET DATA";
+      return;
+    }
+
+    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === String(token.mint || "").toLowerCase();
+    const basePriceUsd = Number(pair.priceUsd);
+    const nativePrice = Number(pair.priceNative);
+    const price = isBaseToken ? basePriceUsd :
+      (Number.isFinite(basePriceUsd) && Number.isFinite(nativePrice) && nativePrice > 0
+        ? basePriceUsd / nativePrice
+        : NaN);
+    // DexScreener's 24h change belongs to the base token. Do not mislabel it
+    // as the quote token's change when the selected mint is the quote asset.
+    const change = isBaseToken ? Number(pair.priceChange?.h24) : NaN;
+    const liquidity = Number(pair.liquidity?.usd);
+    const volume = Number(pair.volume?.h24);
+
+    priceEl.textContent = formatUsd(price);
+    changeEl.textContent = Number.isFinite(change)
+      ? (change >= 0 ? "+" : "") + change.toFixed(2) + "%"
+      : "—";
+    changeEl.style.color = Number.isFinite(change) && change < 0 ? "#ff8f8f" : "#ffe500";
+    liquidityEl.textContent = formatCompactUsd(liquidity);
+    volumeEl.textContent = formatCompactUsd(volume);
+    statusEl.textContent = "LIVE MARKET";
+    chartEl.href = pair.url || chartEl.href;
+  } catch (err) {
+    console.warn("Token info market lookup failed:", err);
+    statusEl.textContent = "MARKET DATA UNAVAILABLE";
+  }
+}
+
+const tokenInfoCopyButton = document.getElementById("tokenInfoCopy");
+if (tokenInfoCopyButton) {
+  tokenInfoCopyButton.addEventListener("click", async () => {
+    const value = document.getElementById("tokenInfoMint")?.textContent || "";
+    if (!value || value === "—") return;
+    try {
+      await navigator.clipboard.writeText(value);
+      const label = document.getElementById("tokenInfoCopyText");
+      if (label) {
+        label.textContent = "COPIED!";
+        setTimeout(() => label.textContent = "COPY", 1400);
+      }
+    } catch {
+      alert(value);
+    }
+  });
+}
+
+const tokenInfoSwapButton = document.getElementById("tokenInfoSwap");
+if (tokenInfoSwapButton) {
+  tokenInfoSwapButton.addEventListener("click", () => {
+    document.getElementById("swap")?.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
+
+// Initial TOKEN INFO follows the default TO token (GSWAP).
+// Later TO selections call updateTokenInfo() directly with the selected token.
+updateTokenInfo(toToken);
+
+/* --- LIVE GSWAP MARKET TICKER --- */
+async function updateGswapMarketTicker() {
+  const priceEl = document.getElementById("gurugPrice");
+  const changeEl = document.getElementById("gurugChange");
+  if (!priceEl || !changeEl) return;
+
+  try {
+    // GSWAP's own mint is separate from the default MEDA swap token.
+    const tokenMint = "4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3";
+    const response = await fetch(TOKEN_INFO_DEX + encodeURIComponent(tokenMint), {cache:"no-store"});
+    if (!response.ok) throw new Error("DexScreener HTTP " + response.status);
+    const data = await response.json();
+    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+    const pair = pairs.filter(p => p?.chainId === "solana")
+      .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
+    if (!pair) throw new Error("No Solana market pair found for the GSWAP mint");
+
+    const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
+    const basePrice = Number(pair?.priceUsd);
+    const nativePrice = Number(pair?.priceNative);
+    const price = isBaseToken ? basePrice :
+      (Number.isFinite(basePrice) && Number.isFinite(nativePrice) && nativePrice > 0 ? basePrice / nativePrice : NaN);
+    const change = isBaseToken ? Number(pair?.priceChange?.h24) : NaN;
+
+    if (Number.isFinite(price)) {
+      priceEl.textContent = price < 0.000001
+        ? "$" + price.toFixed(10)
+        : price < 0.001
+          ? "$" + price.toFixed(7)
+          : "$" + price.toFixed(6);
+    }
+    if (Number.isFinite(change)) {
+      changeEl.textContent = (change >= 0 ? "▲ " : "▼ ") + Math.abs(change).toFixed(2) + "%";
+      changeEl.classList.toggle("down", change < 0);
+    } else {
+      changeEl.textContent = "—";
+    }
+  } catch (err) {
+    console.warn("GSWAP ticker update failed.", err);
+  }
+}
+
+updateGswapMarketTicker();
+setInterval(updateGswapMarketTicker, 30000);
+
+const heroConnectWalletBtn = document.getElementById("heroConnectWallet");
+if (heroConnectWalletBtn) {
+  heroConnectWalletBtn.addEventListener("click", async () => {
+    const provider = getPhantomProvider();
+    if (provider?.publicKey) {
+      try {
+        await provider.disconnect();
+        updateWalletButton(null);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      await connectPhantom();
+    }
+  });
+}
+
+
+ + (token.symbol || "TOKEN") + '</small></div>';
+  const infoIcon = identityEl.querySelector("img.token-info-icon");
+  if (infoIcon) {
+    infoIcon.addEventListener("error", () => {
+      const fallback = document.createElement("span");
+      fallback.className = "token-info-icon token-info-placeholder";
+      fallback.textContent = String(token.symbol || "?").slice(0, 1).toUpperCase();
+      infoIcon.replaceWith(fallback);
+    }, {once:true});
+  }
 
   statusEl.textContent = "LOADING MARKET";
   priceEl.textContent = "—";
