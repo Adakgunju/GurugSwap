@@ -1430,7 +1430,7 @@ let tokenInfoRequestId = 0;
 let activeTokenInfoMint = null;
 
 async function updateTokenInfo(token) {
-  // Reflect the currently selected TO token; the default selection is GSWAP.
+  // Reflect the currently selected TO token; the default selection is MEDA.
   activeTokenInfoMint = token.mint;
   const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
@@ -1536,7 +1536,7 @@ if (tokenInfoSwapButton) {
   });
 }
 
-// Initial TOKEN INFO follows the default TO token (GSWAP).
+// Initial TOKEN INFO follows the default TO token (MEDA).
 // Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
