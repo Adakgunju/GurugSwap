@@ -671,14 +671,14 @@ async function fetchOnchainTokenMetadata(mintAddress) {
       const length = new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(0, true);
       offset += 4;
       if (length > bytes.length - offset) throw new Error("Invalid metadata length");
-      const value = new TextDecoder().decode(bytes.slice(offset, offset + length)).replace(/\0+$/g, "").trim();
+      const value = new TextDecoder().decode(bytes.slice(offset, offset + length)).replace(/\\0+$/g, "").trim();
       offset += length;
       return value;
     };
 
     const name = readString();
     const symbol = readString();
-    const uri = readString().replace(/\0+$/g, "").trim();
+    const uri = readString().replace(/\\0+$/g, "").trim();
     if (!uri) return {name, symbol, uri:"", icon:""};
 
     const metadataUrl = uri.replace(/^ipfs:\/\//i, "https://ipfs.io/ipfs/");
@@ -1430,7 +1430,7 @@ let tokenInfoRequestId = 0;
 let activeTokenInfoMint = null;
 
 async function updateTokenInfo(token) {
-  // Reflect the currently selected TO token; the default selection is MEDA.
+  // Reflect the currently selected TO token; the default selection is GSWAP.
   activeTokenInfoMint = token.mint;
   const requestId = ++tokenInfoRequestId;
   const nameEl = document.getElementById("tokenInfoName");
@@ -1456,25 +1456,10 @@ async function updateTokenInfo(token) {
   mintEl.textContent = token.mint || "—";
   networkEl.textContent = "SOLANA";
   if (swapEl) swapEl.hidden = false;
-  identityEl.innerHTML = tokenInfoIconMarkup(token);
-  const identityText = document.createElement("div");
-  const identityName = document.createElement("strong");
-  identityName.id = "tokenInfoName";
-  identityName.textContent = token.name || "Solana Token";
-  const identitySymbol = document.createElement("small");
-  identitySymbol.id = "tokenInfoSymbol";
-  identitySymbol.textContent = "$" + (token.symbol || "TOKEN");
-  identityText.append(identityName, identitySymbol);
-  identityEl.append(identityText);
-  const infoIcon = identityEl.querySelector("img.token-info-icon");
-  if (infoIcon) {
-    infoIcon.addEventListener("error", () => {
-      const fallback = document.createElement("span");
-      fallback.className = "token-info-icon token-info-placeholder";
-      fallback.textContent = String(token.symbol || "?").slice(0, 1).toUpperCase();
-      infoIcon.replaceWith(fallback);
-    }, {once:true});
-  }
+  identityEl.innerHTML =
+    tokenInfoIconMarkup(token) +
+    '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") +
+    '</strong><small id="tokenInfoSymbol">$' + (token.symbol || "TOKEN") + '</small></div>';
 
   statusEl.textContent = "LOADING MARKET";
   priceEl.textContent = "—";
@@ -1557,7 +1542,7 @@ if (tokenInfoSwapButton) {
 // Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
-/* --- LIVE MEDA MARKET TICKER --- */
+/* --- LIVE GSWAP MARKET TICKER --- */
 async function updateGswapMarketTicker() {
   const priceEl = document.getElementById("gurugPrice");
   const changeEl = document.getElementById("gurugChange");
