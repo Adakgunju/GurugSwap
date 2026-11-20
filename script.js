@@ -1456,10 +1456,16 @@ async function updateTokenInfo(token) {
   mintEl.textContent = token.mint || "—";
   networkEl.textContent = "SOLANA";
   if (swapEl) swapEl.hidden = false;
-  identityEl.innerHTML =
-    tokenInfoIconMarkup(token) +
-    '<div><strong id="tokenInfoName">' + (token.name || "Solana Token") +
-    '</strong><small id="tokenInfoSymbol">
+  identityEl.innerHTML = tokenInfoIconMarkup(token);
+  const identityText = document.createElement("div");
+  const identityName = document.createElement("strong");
+  identityName.id = "tokenInfoName";
+  identityName.textContent = token.name || "Solana Token";
+  const identitySymbol = document.createElement("small");
+  identitySymbol.id = "tokenInfoSymbol";
+  identitySymbol.textContent = "$" + (token.symbol || "TOKEN");
+  identityText.append(identityName, identitySymbol);
+  identityEl.append(identityText);
   const infoIcon = identityEl.querySelector("img.token-info-icon");
   if (infoIcon) {
     infoIcon.addEventListener("error", () => {
