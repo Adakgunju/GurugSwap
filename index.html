@@ -109,7 +109,7 @@
           <button class="arrow" id="swapDirection" type="button" aria-label="Swap direction">↓</button>
           <div class="token-box">
             <div><small id="toLabel">YOU RECEIVE</small><strong id="gurugAmount">0.00</strong><div id="toBalance" class="token-balance" hidden></div></div>
-            <button class="token token-select gurug-token" id="toTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><img id="toTokenIcon" src="https://raw.githubusercontent.com/Adakgunju/Gurug/main/assets/logo/gurug-logo2.png" alt=""><span id="toTokenSymbol">MEDA</span><b>⌄</b></button>
+            <button class="token token-select gurug-token" id="toTokenButton" type="button" aria-haspopup="dialog" aria-controls="tokenPicker"><span class="token-fallback token-dynamic-icon" aria-hidden="true">M</span><span id="toTokenSymbol">MEDA</span><b>⌄</b></button>
           </div>
 
           <div id="tokenPicker" class="token-picker" hidden role="dialog" aria-modal="true" aria-labelledby="tokenPickerTitle">
@@ -359,7 +359,7 @@
     </div>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=64"></script>
+  <script src="script.js?v=65"></script>
   <script src="create-token-v15.js?v=27"></script>
   <script src="distribute-token.js?v=7"></script>
   <script src="multi-airdrop.js?v=25"></script>
