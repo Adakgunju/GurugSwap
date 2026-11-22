@@ -1,4 +1,4 @@
-const mint = "FxQcV3edL21VLkCAehv1BN8sfvo1zLfoU3mpPZPjvRZe";
+const mint = "5EqpVeCHmAj7WDU896tp7UWRAkA333qnkaMVEN7ozGp3";
 
 const copyMintBtn = document.getElementById("copyMint");
 if (copyMintBtn) {
@@ -130,7 +130,7 @@ const swapDirectionButton = document.getElementById("swapDirection");
 
 const TOKEN_CATALOG = [
   {symbol:"SOL", name:"Solana", mint:SOL_MINT, decimals:9, icon:"sol"},
-  {symbol:"MEDA", name:"MEDA", mint, decimals:null, icon:""},
+  {symbol:"DEXF", name:"DEXF", mint, decimals:9, icon:""},
   {symbol:"USDC", name:"USD Coin", mint:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", decimals:6},
   {symbol:"RAY", name:"Raydium", mint:"4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", decimals:6},
   {symbol:"JUP", name:"Jupiter", mint:"JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", decimals:6}
@@ -1538,7 +1538,7 @@ if (tokenInfoSwapButton) {
   });
 }
 
-// Initial TOKEN INFO follows the default TO token (MEDA).
+// Initial TOKEN INFO follows the default TO token (DEXF).
 // Later TO selections call updateTokenInfo() directly with the selected token.
 updateTokenInfo(toToken);
 
@@ -1557,7 +1557,7 @@ async function updateGswapMarketTicker() {
     const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
     const pair = pairs.filter(p => p?.chainId === "solana")
       .sort((a,b) => Number(b?.liquidity?.usd || 0) - Number(a?.liquidity?.usd || 0))[0];
-    if (!pair) throw new Error("No Solana market pair found for the MEDA mint");
+    if (!pair) throw new Error("No Solana market pair found for the DEXF mint");
 
     const isBaseToken = String(pair?.baseToken?.address || "").toLowerCase() === tokenMint.toLowerCase();
     const basePrice = Number(pair?.priceUsd);
@@ -1580,7 +1580,7 @@ async function updateGswapMarketTicker() {
       changeEl.textContent = "—";
     }
   } catch (err) {
-    console.warn("MEDA ticker update failed.", err);
+    console.warn("DEXF ticker update failed.", err);
   }
 }
 
