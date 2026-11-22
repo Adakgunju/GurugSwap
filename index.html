@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fffbe4">
-  <title>GURUG SWAP — SOL ↔ MEDA</title>
-  <meta name="description" content="GURUG SWAP — swap SOL and MEDA on Solana.">
+  <title>GURUG SWAP — SOL ↔ DEXF</title>
+  <meta name="description" content="GURUG SWAP — swap SOL and DEXF on Solana.">
   <script>if(new URLSearchParams(location.search).has("embed"))document.documentElement.classList.add("swap-embed-mode");</script>
   <link rel="stylesheet" href="style.css?v=169">
   <script src="https://unpkg.com/@solana/web3.js@1.95.8/lib/index.iife.min.js"></script>
@@ -32,7 +32,7 @@
       <a href="#links">NETWORK</a>
     </nav>
     <div class="top-actions">
-      <div class="market-ticker" aria-label="MEDA market price"><span class="ticker-label">MEDA</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
+      <div class="market-ticker" aria-label="DEXF market price"><span class="ticker-label">DEXF</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
       <button class="wallet-btn top-wallet" id="connectWallet" type="button">CONNECT WALLET</button>
       <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-expanded="false" aria-controls="mobileMenu">MENU</button>
     </div>
@@ -122,7 +122,7 @@
           <div id="swapStatus" class="swap-status">
             <div class="swap-status-top"><span class="swap-status-dot"></span><span id="swapStatusLabel">READY TO SWAP</span></div>
             <div class="swap-progress"><span id="swapProgressFill"></span></div>
-            <div id="swapStatusMessage" class="swap-status-message">Enter SOL to get a live MEDA quote.</div>
+            <div id="swapStatusMessage" class="swap-status-message">Enter SOL to get a live DEXF quote.</div>
             <a id="swapTxLink" class="swap-tx-link" href="#" target="_blank" rel="noopener noreferrer" hidden>VIEW TRANSACTION ↗</a>
           </div>
           <div class="card-foot"><span>NON-CUSTODIAL</span><span>SOLANA MAINNET</span><span>RAYDIUM</span></div>
@@ -137,7 +137,7 @@
     </section>
 
     <section class="landing-feature-grid" aria-label="GurugSwap features">
-      <a class="landing-feature feature-swap" href="#swap"><span class="feature-icon">↔</span><span><strong>Swap</strong><small>Trade SOL, MEDA and supported Solana tokens.</small></span><b>→</b></a>
+      <a class="landing-feature feature-swap" href="#swap"><span class="feature-icon">↔</span><span><strong>Swap</strong><small>Trade SOL, DEXF and supported Solana tokens.</small></span><b>→</b></a>
       <a class="landing-feature feature-liquidity" href="#liquidity"><span class="feature-icon">◉</span><span><strong>Liquidity Pool</strong><small>Explore liquidity tools and pool management.</small></span><b>→</b></a>
       <a class="landing-feature feature-create" href="#create-token"><span class="feature-icon">◇</span><span><strong>Token Creation</strong><small>Launch and manage your Solana token.</small></span><b>→</b></a>
       <a class="landing-feature feature-tools" href="#multi-airdrop"><span class="feature-icon">✦</span><span><strong>More on Gurug</strong><small>Airdrop, burn, mint and token authority tools.</small></span><b>→</b></a>
@@ -359,7 +359,7 @@
     </div>
   </main>
   <footer><span>© GURUG</span><span>BUILT ON SOLANA</span><span>GURUGSWAP — V1.0</span></footer>
-  <script src="script.js?v=70"></script>
+  <script src="script.js?v=71"></script>
   <script src="create-token-v15.js?v=27"></script>
   <script src="distribute-token.js?v=7"></script>
   <script src="multi-airdrop.js?v=25"></script>
