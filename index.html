@@ -29,7 +29,6 @@
           <a href="#authority-manager">Token Authority</a>
         </div>
       </details>
-      <a href="#links">NETWORK</a>
     </nav>
     <div class="top-actions">
       <div class="market-ticker" aria-label="DEXF market price"><span class="ticker-label">DEXF</span><strong id="gurugPrice">—</strong><span id="gurugChange" class="ticker-change">—</span></div>
@@ -47,7 +46,6 @@
     <a href="#token-mint" onclick="document.getElementById('token-mint')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN MINT</a>
     <a href="#trading-bot">TRADING BOT</a>
     <a href="#authority-manager" onclick="document.getElementById('authority-manager')?.scrollIntoView({behavior:'smooth',block:'start'}); return false;">TOKEN AUTHORITY</a>
-    <a href="#links">GURUG NETWORK</a>
   </div>
   <script>
     // EARLY NAVIGATION GUARD
@@ -288,30 +286,6 @@
       </div>
     </section>
 
-    <section id="links" class="links-section">
-      <div class="links-heading">
-  <div class="platform-section-kicker">06 / GURUG NETWORK</div>
-  <h2>Gurug <span>Network.</span></h2>
-  <p>Explore the Gurug ecosystem — SNS, Arcade, Mining and community.</p>
-</div>
-      <div class="link-grid">
-        <a class="link-card" href="https://gurugsol.xyz/" target="_blank" rel="noopener noreferrer"><span>01 / OFFICIAL</span><strong>WEBSITE</strong><em>↗</em></a>
-        <a class="link-card" href="https://dexscreener.com/solana/gfhc3jcwbmgrxuux2wpc2dflbl7dq1n6j1uhwwhcttgg" target="_blank" rel="noopener noreferrer"><span>02 / MARKET</span><strong>CHART</strong><em>↗</em></a>
-        <a class="link-card" href="https://x.com/gurugsol" target="_blank" rel="noopener noreferrer"><span>03 / FOLLOW</span><strong>𝕏 / X</strong><em>↗</em></a>
-        <a class="link-card" href="https://www.facebook.com/gurugsol/" target="_blank" rel="noopener noreferrer"><span>04 / FOLLOW</span><strong>FACEBOOK</strong><em>↗</em></a>
-        <a class="link-card" href="https://t.me/gurugsol" target="_blank" rel="noopener noreferrer"><span>05 / COMMUNITY</span><strong>TELEGRAM</strong><em>↗</em></a>
-        <a class="link-card" href="https://dexscreener.com/solana/4sDXjyUx2XGmuJbAUZLwZbGD58zsERtP3YyL4L5xNZh3" target="_blank" rel="noopener noreferrer"><span>06 / TRACK</span><strong>GSWAP MARKET</strong><em>↗</em></a>
-      </div>
-      <div class="universe-feature-grid">
-        <a class="universe-feature" href="https://adakgunju.github.io/Gurug/gellog/" target="_blank" rel="noopener noreferrer">
-          <span>07 / PLAY</span><strong>GURUG ARCADE</strong><p>PLAY THE SPACE SHOOTER.</p><em>↗</em>
-        </a>
-        <a class="universe-feature" href="https://adakgunju.github.io/Gurug/" target="_blank" rel="noopener noreferrer">
-          <span>08 / EXPLORE</span><strong>GURUG MINING</strong><p>ENTER THE GURUG WORLD.</p><em>↗</em>
-        </a>
-      </div>
-    </section>
-
     <section id="token-burn" class="platform-placeholder-section token-burn-section" aria-label="Token burn">
       <div class="platform-placeholder-head">
         <div class="platform-section-kicker">08 / TOKEN BURN</div>
@@ -467,7 +441,6 @@
         const menuTargets = [
           "create-token","distributeTokens","liquidity","swap",
           "multi-airdrop","token-burn","token-mint","authority-manager",
-          "trading-bot","multi-token-bot","links"
         ];
 
         function showSection(targetId, updateHash = true) {
